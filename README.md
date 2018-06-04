@@ -12,8 +12,6 @@ The SDK clients for web and React Native for [https://bullet-train.io/](https://
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See running in production for notes on how to deploy the project on a live system.
 
-## Installing
-
 ## Usage
 
 ```npm i bullet-train-client --save```
