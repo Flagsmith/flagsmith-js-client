@@ -8,7 +8,7 @@
 The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Bullet Train allows you to manage feature flags and remote config across multiple projects, environments and organisations.
 
 ## Getting Started
-**For full documentation visit [https://docs.bullet-train.io/](https://www.bullet-train.io/documentation)**
+**For full documentation visit [https://docs.bullet-train.io/clients/javascript/](https://docs.bullet-train.io/clients/javascript/)**
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See running in production for notes on how to deploy the project on a live system.
 
