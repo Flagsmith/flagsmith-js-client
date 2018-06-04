@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "deep-assign": "^2.0.0",
+    "react-native-bullet-train": "file:react-native-bullet-train",
     "whatwg-fetch": "^2.0.3"
   }
 }

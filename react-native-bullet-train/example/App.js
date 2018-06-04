@@ -14,6 +14,8 @@ import {
 } from 'react-native';
 import featureFlagger from "./bullet-train";
 
+const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
+
 export default class App extends Component<Props> {
     constructor(props, context) {
         super(props, context);
@@ -26,7 +28,7 @@ export default class App extends Component<Props> {
     componentWillMount() {
         const {handleFlags, handleFlagsError} = this;
         featureFlagger.init({
-            environmentID: 'hdhfMFceDY7rchkeGZrEsf',
+            environmentID,
             onChange: handleFlags,
             onError: handleFlagsError,
             defaultFlags: {
