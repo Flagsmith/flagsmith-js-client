@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.solidstategroup.com/solidstategroup/feature-flagger-client"
+    "url": "https://github.com/SolidStateGroup/bullet-train-js-client"
   },
   "keywords": [
     "react native",
@@ -21,9 +21,9 @@
   "author": "SSG",
   "license": "MIT",
   "bugs": {
-    "url": "https://git.solidstategroup.com/solidstategroup/feature-flagger-client/issues"
+    "url": "https://github.com/SolidStateGroup/bullet-train-js-client/issues"
   },
-  "homepage": "https://git.solidstategroup.com/solidstategroup/feature-flagger-client",
+  "homepage": "https://bullet-train.io",
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-core": "^6.26.3",

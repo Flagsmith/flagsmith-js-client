@@ -1,7 +1,7 @@
 {
-  "name": "react-hot-boilerplate",
+  "name": "bullet-train-client-example",
   "version": "1.0.0",
-  "description": "Boilerplate for ReactJS project with hot code reloading",
+  "description": "Bullet Train client example",
   "scripts": {
     "start": "node server.js",
     "lint": "eslint src"
@@ -17,9 +17,9 @@
   "author": "SSG",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gaearon/react-hot-boilerplate/issues"
+    "url": "https://github.com/SolidStateGroup/bullet-train-js-client/issues"
   },
-  "homepage": "https://github.com/gaearon/react-hot-boilerplate",
+  "homepage": "https://bullet-train.io",
   "devDependencies": {
     "babel-core": "^6.0.20",
     "babel-eslint": "^4.1.3",

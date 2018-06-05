@@ -1,6 +1,6 @@
 {
   "name": "bullet-train-client",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "Feature flagging to support continuous development",
   "main": "./lib/index.js",
   "repository": {
@@ -14,7 +14,7 @@
   "author": "SSG",
   "license": "MIT",
   "bugs": {
-    "url": "https://git.solidstategroup.com/solidstategroup/feature-flagger-client/issues"
+    "url": "https://github.com/SolidStateGroup/bullet-train-js-client/issues"
   },
-  "homepage": "https://git.solidstategroup.com/solidstategroup/feature-flagger-client"
+  "homepage": "https://bullet-train.io"
 }
