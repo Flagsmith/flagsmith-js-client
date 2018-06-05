@@ -12,7 +12,7 @@ import {
     Text,
     View
 } from 'react-native';
-import featureFlagger from "./bullet-train";
+import bulletTrain from "react-native-bullet-train";
 
 const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
 
@@ -27,7 +27,7 @@ export default class App extends Component<Props> {
 
     componentWillMount() {
         const {handleFlags, handleFlagsError} = this;
-        featureFlagger.init({
+        bulletTrain.init({
             environmentID,
             onChange: handleFlags,
             onError: handleFlagsError,
@@ -36,33 +36,33 @@ export default class App extends Component<Props> {
                 font_size: 12,
             }
         });
-        featureFlagger.startListening(2000)
+        bulletTrain.startListening(2000)
 
     }
 
     logout = () => {
-        featureFlagger.logout();
+        bulletTrain.logout();
         this.forceUpdate();
     };
 
     login = () => {
-        featureFlagger.identify("bullet_train_sample_user");
+        bulletTrain.identify("bullet_train_sample_user");
         this.forceUpdate();
     };
 
     render() {
 
-        const fontSize = parseInt(featureFlagger.getValue("font_size"));
+        const fontSize = parseInt(bulletTrain.getValue("font_size"));
         const {isLoading, logs} = this.state;
         return isLoading ? <Text>Loading</Text> : (
             <View>
                 <Text style={{fontSize}}>
-                    {JSON.stringify(featureFlagger.flags)}
+                    {JSON.stringify(bulletTrain.flags)}
                 </Text>
                 <Text style={styles.title}>
                     Events
                 </Text>
-                {featureFlagger.identity ? (
+                {bulletTrain.identity ? (
                     <Button title={"logout"} onPress={this.logout}/>
                 ) : <Button title={"login as sample user"} onPress={this.login}/>}
                 {logs.map(({timestamp, data, params, oldData},i) => (
@@ -82,7 +82,7 @@ export default class App extends Component<Props> {
                 timestamp: new Date().toDateString(),
                 params: JSON.stringify(params),
                 oldData: JSON.stringify(oldFlags),
-                data: JSON.stringify(featureFlagger.getAllFlags())
+                data: JSON.stringify(bulletTrain.getAllFlags())
             }].concat(this.state.logs)
         });
     };
