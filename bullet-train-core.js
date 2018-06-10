@@ -60,7 +60,7 @@ const BulletTrain = class {
 
     init({
              environmentID,
-             api = 'https://bullet-train-api.dokku1.solidstategroup.com/api/v1/',
+             api = 'https://bullet-train.io/api/v1/',
              onChange,
              disableCache,
              onError,
