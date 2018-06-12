@@ -124,7 +124,7 @@ const BulletTrain = class {
     }
 
     getValue(key) {
-        const flag = this.flags[key];
+        const flag = this.flags && this.flags[key];
         let res = null;
         if (flag && flag.enabled) {
             res = flag.value;
@@ -136,7 +136,7 @@ const BulletTrain = class {
 
 
     hasFeature(key) {
-        const flag = this.flags[key];
+        const flag = this.flags && this.flags[key];
         let res = false;
         if (flag && flag.enabled) {
             res = true;
