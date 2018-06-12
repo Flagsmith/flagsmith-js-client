@@ -86,7 +86,7 @@ const BulletTrain = class {
         //If the user specified default flags emit a changed event immediately
 
         if (!disableCache) {
-            AsyncStorage.getItem(BULLET_TRAIN_KEY, (err, res)=> {
+            AsyncStorage.getItem(BULLET_TRAIN_KEY, (err, res) => {
                 this.flags = res ? JSON.parse(res) : defaultFlags;
                 if (this.flags) {
                     onChange(null, {isFromServer: false});
@@ -123,7 +123,7 @@ const BulletTrain = class {
         clearInterval(this.interval);
     }
 
-    getValue(key) {
+    getValue = (key) => {
         const flag = this.flags && this.flags[key];
         let res = null;
         if (flag && flag.enabled) {
@@ -135,7 +135,7 @@ const BulletTrain = class {
     }
 
 
-    hasFeature(key) {
+    hasFeature = (key) => {
         const flag = this.flags && this.flags[key];
         let res = false;
         if (flag && flag.enabled) {
