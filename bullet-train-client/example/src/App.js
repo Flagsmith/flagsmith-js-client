@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import bulletTrain from 'bullet-train-client';
+import bulletTrain from './bullet-train';
 const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
 
 //Define default flags

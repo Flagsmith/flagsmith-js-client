@@ -12,7 +12,7 @@ import {
     Text,
     View
 } from 'react-native';
-import bulletTrain from "react-native-bullet-train";
+import bulletTrain from "./bullet-train";
 
 const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
 
