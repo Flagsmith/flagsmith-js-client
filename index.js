@@ -1,4 +1,4 @@
-import AsyncStorage from './async-storage';
+import AsyncStorage from "@callstack/async-storage";
 require('whatwg-fetch');
 const bt = require('./bullet-train-core');
 const bulletTrain = bt({AsyncStorage, fetch: window.fetch});
