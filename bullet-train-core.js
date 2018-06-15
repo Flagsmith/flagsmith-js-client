@@ -126,7 +126,7 @@ const BulletTrain = class {
     getValue = (key) => {
         const flag = this.flags && this.flags[key];
         let res = null;
-        if (flag && flag.enabled) {
+        if (flag) {
             res = flag.value;
         }
         //todo record check for value
