@@ -1,5 +1,4 @@
 const path = require('path');
-const _module = {};
 const defaultConfig = {
     mode: "production",
     devtool: 'source-map',
@@ -14,9 +13,6 @@ const defaultConfig = {
     },
     resolve: {
         extensions: ['*', '.js', '.jsx']
-    },
-    entry: {
-        main: './index.js'
     }
 };
 
@@ -28,6 +24,9 @@ module.exports = [
             library: "bullet-train",
             libraryTarget: "umd",
             path: path.join(__dirname, '/bullet-train-client/lib'),
+        },
+        entry: {
+            main: './index.js'
         }
     }),
     Object.assign({}, defaultConfig, { //compile the example
@@ -36,6 +35,9 @@ module.exports = [
             library: "bullet-train",
             libraryTarget: "umd",
             path: path.join(__dirname, '/bullet-train-client/example/src'),
+        },
+        entry: {
+            main: './index.js'
         }
     }),
     Object.assign({}, defaultConfig, { //compile the example
