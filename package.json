@@ -5,8 +5,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "deploy": "npm run build && cd ./bullet-train-client/ && npm publish && cd ../react-native-bullet-train && npm publish",
-    "start": "cd ./example && npm start & npm run dev",
-    "dev": "node_modules/.bin/webpack --watch",
+    "start": "node_modules/.bin/webpack --watch & cd ./bullet-train-client/example && npm start",
     "build": "node_modules/.bin/webpack"
   },
   "repository": {
