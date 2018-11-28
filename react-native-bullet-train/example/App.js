@@ -4,7 +4,7 @@
  * @flow
  */
 
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -26,7 +26,7 @@ export default class App extends Component<Props> {
     }
 
     componentWillMount() {
-        const {handleFlags, handleFlagsError} = this;
+        const { handleFlags, handleFlagsError } = this;
         bulletTrain.init({
             environmentID,
             onChange: handleFlags,
@@ -45,6 +45,10 @@ export default class App extends Component<Props> {
         this.forceUpdate();
     };
 
+    submitTrait = () => {
+        bulletTrain.setTrait('example_trait', !bulletTrain.getTrait('example_trait'));
+    }
+
     login = () => {
         bulletTrain.identify("bullet_train_sample_user");
         this.forceUpdate();
@@ -52,20 +56,30 @@ export default class App extends Component<Props> {
 
     render() {
 
+        const trait = bulletTrain.getTrait("example_trait") + "";
         const fontSize = parseInt(bulletTrain.getValue("font_size"));
-        const {isLoading, logs} = this.state;
+        const { isLoading, logs } = this.state;
+        const { submitTrait } = this;
         return isLoading ? <Text>Loading</Text> : (
-            <View>
-                <Text style={{fontSize}}>
+            <View style={{ padding: 50 }}>
+                <Text style={{ fontSize }}>
                     {JSON.stringify(bulletTrain.flags)}
                 </Text>
+                {bulletTrain.identity ? (
+                    <View>
+                        <Button title={"logout"} onPress={this.logout}/>
+                        <Button title={'Toggle user trait'} onPress={submitTrait}/>
+                        <View>
+                            <Text>
+                                example_trait: {trait}
+                            </Text>
+                        </View>
+                    </View>
+                ) : <Button title={"login as sample user"} onPress={this.login}/>}
                 <Text style={styles.title}>
                     Events
                 </Text>
-                {bulletTrain.identity ? (
-                    <Button title={"logout"} onPress={this.logout}/>
-                ) : <Button title={"login as sample user"} onPress={this.login}/>}
-                {logs.map(({timestamp, data, params, oldData},i) => (
+                {logs.map(({ timestamp, data, params, oldData }, i) => (
                     <Text key={i}>
                         {timestamp}: {data} {params} {oldData}
                     </Text>
@@ -99,7 +113,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
     },
-    welcome: {
+    title: {
         fontSize: 20,
         textAlign: 'center',
         margin: 10,

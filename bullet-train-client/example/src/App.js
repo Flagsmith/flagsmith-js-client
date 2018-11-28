@@ -39,9 +39,15 @@ export default class App extends Component {
         this.forceUpdate();
     };
 
+    submitTrait = ()=> {
+        bulletTrain.setTrait('example_trait', !bulletTrain.getTrait('example_trait'));
+    }
+
     render() {
 
         const fontSize = parseInt(bulletTrain.getValue("font_size"));
+        const trait = bulletTrain.getTrait("example_trait") + "";
+        const {submitTrait} = this;
         const {isLoading, logs} = this.state;
         return isLoading ? <div>Loading</div> : (
             <div>
@@ -49,17 +55,27 @@ export default class App extends Component {
                 <p style={{fontSize}}>
                     {JSON.stringify(bulletTrain.flags)}
                 </p>
-                <h3>
-                    Events
-                </h3>
                 {bulletTrain.identity ? (
-                    <button onClick={this.logout}>
-                        logout
-                    </button>
+                    <div>
+                        <div>
+                            <button onClick={submitTrait}>
+                                Toggle user trait
+                            </button>
+                            <div>
+                                example_trait: {trait}
+                            </div>
+                        </div>
+                        <button onClick={this.logout}>
+                            logout
+                        </button>
+                    </div>
                 ) : <button onClick={this.login}>
                     Login as sample user
                 </button>}
-                {logs.map(({timestamp, data, params, oldData},i) => (
+                <h3>
+                    Events
+                </h3>
+                {logs.map(({timestamp, data, params, oldData}, i) => (
                     <p key={i}>
                         {timestamp}: {data} {params} {oldData}
                     </p>
@@ -76,7 +92,7 @@ export default class App extends Component {
                 timestamp: new Date().toDateString(),
                 params: JSON.stringify(params),
                 oldData: JSON.stringify(oldFlags),
-                data: JSON.stringify(bulletTrain.getAllFlags())
+                data: JSON.stringify(bulletTrain.getAllFlags()),
             }].concat(this.state.logs)
         });
     };

@@ -9,51 +9,60 @@ const BulletTrain = class {
         AsyncStorage = props.AsyncStorage;
     }
 
-    getJSON = (url, method) => {
-        const {environmentID} = this;
-        console.log(url, environmentID)
-        return fetch(url + '?format=json', {
+    getJSON = (url, method, body) => {
+        const { environmentID } = this;
+        const options = {
             method: method || 'GET',
+            body,
             headers: {
                 'x-environment-key': environmentID
             }
-        })
+        };
+        if (method !== "GET")
+            options.headers['Content-Type'] = 'application/json; charset=utf-8'
+
+        return fetch(url + '?format=json', options)
             .then(res => res.json());
     };
 
     getFlags = () => {
-        const {onChange, onError, identity, api, disableCache} = this;
+        const { onChange, onError, identity, api, disableCache } = this;
 
-        const handleResponse = (res) => {
+        const handleResponse = ({ flags: features, traits }) => {
             // Handle server response
             let flags = {};
-            res.forEach(feature => {
+            let userTraits = {};
+            features.forEach(feature => {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     enabled: feature.enabled,
                     value: feature.feature_state_value
                 };
             });
+            traits.forEach(trait => {
+                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value
+            });
             this.oldFlags = flags;
             this.flags = flags;
+            this.traits = userTraits;
             if (!disableCache) {
                 AsyncStorage.setItem(BULLET_TRAIN_KEY, JSON.stringify(this.flags))
             }
-            onChange && onChange(this.oldFlags, {isFromServer: true});
+            onChange && onChange(this.oldFlags, { isFromServer: true });
         };
 
         if (identity) {
-            return this.getJSON(api + 'flags/' + identity)
+            return this.getJSON(api + 'identities/' + identity + '/')
                 .then(res => {
                     handleResponse(res)
-                }).catch(({message}) => {
-                    onError && onError({message})
+                }).catch(({ message }) => {
+                    onError && onError({ message })
                 });
         } else {
             return this.getJSON(api + "flags/")
                 .then(res => {
                     handleResponse(res)
-                }).catch(({message}) => {
-                    onError && onError({message})
+                }).catch(({ message }) => {
+                    onError && onError({ message })
                 });
         }
     };
@@ -89,7 +98,7 @@ const BulletTrain = class {
             AsyncStorage.getItem(BULLET_TRAIN_KEY, (err, res) => {
                 this.flags = res ? JSON.parse(res) : defaultFlags;
                 if (this.flags) {
-                    onChange(null, {isFromServer: false});
+                    onChange(null, { isFromServer: false });
                 }
                 this.getFlags();
             });
@@ -134,6 +143,17 @@ const BulletTrain = class {
         return res;
     }
 
+    getTrait = (key) => {
+        const trait = this.traits && this.traits[key];
+        return trait;
+    }
+
+    setTrait = (key, trait_value) => {
+        const { getJSON, identity, api } = this;
+
+        return getJSON(`${api}identities/${identity}/traits/${encodeURIComponent(key)}`, 'POST', JSON.stringify({ trait_value }))
+            .then(this.getFlags)
+    };
 
     hasFeature = (key) => {
         const flag = this.flags && this.flags[key];
@@ -148,8 +168,8 @@ const BulletTrain = class {
 
 };
 
-module.exports = function ({fetch, AsyncStorage}) {
-    return new BulletTrain({fetch, AsyncStorage});
+module.exports = function ({ fetch, AsyncStorage }) {
+    return new BulletTrain({ fetch, AsyncStorage });
 };
 
 
