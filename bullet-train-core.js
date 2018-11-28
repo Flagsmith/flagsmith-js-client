@@ -32,6 +32,8 @@ const BulletTrain = class {
             // Handle server response
             let flags = {};
             let userTraits = {};
+            features = features||[];
+            traits = traits||[];
             features.forEach(feature => {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     enabled: feature.enabled,
