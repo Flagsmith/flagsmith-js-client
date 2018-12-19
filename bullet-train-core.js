@@ -62,7 +62,7 @@ const BulletTrain = class {
         } else {
             return this.getJSON(api + "flags/")
                 .then(res => {
-                    handleResponse(res)
+                    handleResponse({flags: res})
                 }).catch(({ message }) => {
                     onError && onError({ message })
                 });
