@@ -1,2 +1,401 @@
-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t(require("react-native")):"function"==typeof define&&define.amd?define(["react-native"],t):"object"==typeof exports?exports["bullet-train"]=t(require("react-native")):e["bullet-train"]=t(e["react-native"])}(window,function(e){return function(e){var t={};function n(r){if(t[r])return t[r].exports;var i=t[r]={i:r,l:!1,exports:{}};return e[r].call(i.exports,i,i.exports,n),i.l=!0,i.exports}return n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var i in e)n.d(r,i,function(t){return e[t]}.bind(null,i));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=3)}([function(e,t,n){window,e.exports=function(e){var t={};function n(r){if(t[r])return t[r].exports;var i=t[r]={i:r,l:!1,exports:{}};return e[r].call(i.exports,i,i.exports,n),i.l=!0,i.exports}return n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var i in e)n.d(r,i,function(t){return e[t]}.bind(null,i));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=1)}([function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=function e(t,n,r){return n=Array.isArray(n)?n:n.split("."),(t=t[n[0]])&&n.length>1?e(t,n.slice(1)):void 0===t?r:t}},function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=function(e,t){return i(e,{all:{rules:t}},["all"]).then(function(e){return{result:e.all.result,rules:e.all.rules}})};var r=function(e){return e&&e.__esModule?e:{default:e}}(n(0)),i=function e(t,n,i){return new Promise(function(a,o){var u=i[i.length-1],s=(0,r.default)(n,i);if("all"===u||"any"===u||"none"===u)return Promise.all(s.rules.map(function(r,a){var o=["rules",a];return r.any?o=o.concat(["any"]):r.all?o=o.concat(["all"]):r.none&&(o=o.concat(["none"])),e(t,n,i.concat(o))})).then(function(e){var t=void 0;return"all"===u?t=!e.includes(!1):"any"===u?t=e.includes(!0):"none"===u&&(t=!e.includes(!0)),s.result=!!t,1===i.length&&a(n),a(t)});var l=!!function(e,t){var n=t.property,i=t.operator,a=t.value,o=(0,r.default)(e,n);switch(i){case"EQUAL":return o===a;case"NOT_EQUAL":return o!==a;case"GREATER_THAN":return o>a;case"GREATER_THAN_INCLUSIVE":return o>=a;case"LESS_THAN":return o<a;case"LESS_THAN_INCLUSIVE":return o<=a;case"CONTAINS":return o&&(o+"").includes(a);case"NOT_CONTAINS":return!o||!(o+"").includes(a);case"REGEX":return o&&new RegExp(a).test(o);default:return console.error("Invalid operator"),!1}}(t,s);return s.result=l,a(l)})}}])},function(e,t,n){"use strict";var r,i=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},a=function(){function e(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}return function(t,n,r){return n&&e(t.prototype,n),r&&e(t,r),t}}(),o=n(0),u=(r=o)&&r.__esModule?r:{default:r};var s=void 0,l=void 0,c="BULLET_TRAIN_DB",f=function(){function e(t){var n=this;!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.getJSON=function(e,t,r){var i=n.environmentID,a={method:t||"GET",body:r,headers:{"x-environment-key":i}};return"GET"!==t&&(a.headers["Content-Type"]="application/json; charset=utf-8"),s(e+"?format=json",a).then(function(e){return e.json()})},this.getFlags=function(){var e=n.onChange,t=n.onError,r=n.identity,a=n.api,o=n.disableCache,s=function(t,r){var a=t.flags,s=t.traits,f={},d={},g={};a=a||[],s=s||[],a.forEach(function(e){f[e.feature.name.toLowerCase().replace(/ /g,"_")]={enabled:e.enabled,value:e.feature_state_value}}),s.forEach(function(e){d[e.trait_key.toLowerCase().replace(/ /g,"_")]=e.trait_value}),n.oldFlags=f,n.flags=f,n.traits=d,r?(n.segments||(r=r.map(function(e){return i({},e,{rules:JSON.parse(e.rules)})}),n.segments=r),Promise.all(n.segments.map(function(e){return(0,u.default)(d,e.rules).then(function(t){g[e.name]=t.result})})).then(function(){n.userSegments=g,o||l.setItem(c,JSON.stringify(n.flags)),e&&e(n.oldFlags,{isFromServer:!0})})):(o||l.setItem(c,JSON.stringify(n.flags)),e&&e(n.oldFlags,{isFromServer:!0}))};return r?Promise.all([n.getJSON(a+"identities/"+r+"/"),n.segments?Promise.resolve(n.segments):n.getJSON(a+"segments/")]).then(function(e){s(e[0],e[1])}).catch(function(e){var n=e.message;t&&t({message:n})}):Promise.all([n.getJSON(a+"flags/")]).then(function(e){s({flags:e[0]},null)}).catch(function(e){var n=e.message;t&&t({message:n})})},this.getValue=function(e){var t=n.flags&&n.flags[e],r=null;return t&&(r=t.value),r},this.getTrait=function(e){return n.traits&&n.traits[e]},this.getSegments=function(){return n.userSegments},this.setTrait=function(e,t){var r=n.getJSON,i=n.identity;return r(n.api+"identities/"+i+"/traits/"+encodeURIComponent(e),"POST",JSON.stringify({trait_value:t})).then(n.getFlags)},this.hasFeature=function(e){var t=n.flags&&n.flags[e],r=!1;return t&&t.enabled&&(r=!0),r},s=t.fetch,l=t.AsyncStorage}return a(e,[{key:"init",value:function(e){var t=this,n=e.environmentID,r=e.api,i=void 0===r?"https://api.bullet-train.io/api/v1/":r,a=e.onChange,o=e.disableCache,u=e.onError,s=e.defaultFlags;if(this.environmentID=n,this.api=i,this.interval=null,this.disableCache=o,this.onChange=a,this.onError=u,this.flags=Object.assign({},s)||{},this.initialised=!0,!n)throw"Please specify a environment id";if(!a)throw"Please specify an onChange event";o||l.getItem(c,function(e,n){t.flags=n?JSON.parse(n):s,t.flags&&a(null,{isFromServer:!1}),t.getFlags()})}},{key:"getAllFlags",value:function(){return this.flags}},{key:"identify",value:function(e){this.identity=e,this.initialised&&!this.interval&&this.getFlags()}},{key:"logout",value:function(){this.identity=null,this.initialised&&!this.interval&&this.getFlags()}},{key:"startListening",value:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:1e3;this.interval||(this.interval=setInterval(this.getFlags,e))}},{key:"stopListening",value:function(){clearInterval(this.interval)}}]),e}();e.exports=function(e){var t=e.fetch,n=e.AsyncStorage;return new f({fetch:t,AsyncStorage:n})}},function(t,n){t.exports=e},function(e,t,n){"use strict";var r=n(2),i=n(1);e.exports=i({AsyncStorage:r.AsyncStorage,fetch:window.fetch})}])});
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("react-native"));
+	else if(typeof define === 'function' && define.amd)
+		define(["react-native"], factory);
+	else if(typeof exports === 'object')
+		exports["bullet-train"] = factory(require("react-native"));
+	else
+		root["bullet-train"] = factory(root["react-native"]);
+})(window, function(__WEBPACK_EXTERNAL_MODULE_react_native__) {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./index.react-native.js");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./bullet-train-core.js":
+/*!******************************!*\
+  !*** ./bullet-train-core.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _bulletTrainRulesEngine = __webpack_require__(/*! bullet-train-rules-engine */ "./node_modules/bullet-train-rules-engine/lib/index.js");
+
+var _bulletTrainRulesEngine2 = _interopRequireDefault(_bulletTrainRulesEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var fetch = void 0;
+var AsyncStorage = void 0;
+var BULLET_TRAIN_KEY = "BULLET_TRAIN_DB";
+
+var BulletTrain = function () {
+    function BulletTrain(props) {
+        var _this = this;
+
+        _classCallCheck(this, BulletTrain);
+
+        this.getJSON = function (url, method, body) {
+            var environmentID = _this.environmentID;
+
+            var options = {
+                method: method || 'GET',
+                body: body,
+                headers: {
+                    'x-environment-key': environmentID
+                }
+            };
+            if (method !== "GET") options.headers['Content-Type'] = 'application/json; charset=utf-8';
+
+            return fetch(url + '?format=json', options).then(function (res) {
+                return res.json();
+            });
+        };
+
+        this.getFlags = function () {
+            var onChange = _this.onChange,
+                onError = _this.onError,
+                identity = _this.identity,
+                api = _this.api,
+                disableCache = _this.disableCache;
+
+
+            var handleResponse = function handleResponse(_ref, segments) {
+                var features = _ref.flags,
+                    traits = _ref.traits;
+
+                // Handle server response
+                var flags = {};
+                var userTraits = {};
+                var userSegments = {};
+                features = features || [];
+                traits = traits || [];
+                features.forEach(function (feature) {
+                    flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
+                        enabled: feature.enabled,
+                        value: feature.feature_state_value
+                    };
+                });
+                traits.forEach(function (trait) {
+                    userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value;
+                });
+                _this.oldFlags = flags;
+                _this.flags = flags;
+                _this.traits = userTraits;
+                if (segments) {
+                    if (!_this.segments) {
+                        segments = segments.map(function (s) {
+                            return _extends({}, s, { rules: JSON.parse(s.rules) });
+                        });
+                        _this.segments = segments;
+                    }
+                    Promise.all(_this.segments.map(function (segment) {
+                        return (0, _bulletTrainRulesEngine2.default)(userTraits, segment.rules).then(function (res) {
+                            userSegments[segment.name] = res.result;
+                        });
+                    })).then(function () {
+                        _this.userSegments = userSegments;
+                        if (!disableCache) {
+                            AsyncStorage.setItem(BULLET_TRAIN_KEY, JSON.stringify(_this.flags));
+                        }
+                        onChange && onChange(_this.oldFlags, { isFromServer: true });
+                    });
+                } else {
+                    if (!disableCache) {
+                        AsyncStorage.setItem(BULLET_TRAIN_KEY, JSON.stringify(_this.flags));
+                    }
+                    onChange && onChange(_this.oldFlags, { isFromServer: true });
+                }
+            };
+
+            if (identity) {
+                return Promise.all([_this.getJSON(api + 'identities/' + identity + '/'), _this.segments ? Promise.resolve(_this.segments) : _this.getJSON(api + 'segments/')]).then(function (res) {
+                    handleResponse(res[0], res[1]);
+                }).catch(function (_ref2) {
+                    var message = _ref2.message;
+
+                    onError && onError({ message: message });
+                });
+            } else {
+                return Promise.all([_this.getJSON(api + "flags/")]).then(function (res) {
+                    handleResponse({ flags: res[0] }, null);
+                }).catch(function (_ref3) {
+                    var message = _ref3.message;
+
+                    onError && onError({ message: message });
+                });
+            }
+        };
+
+        this.getValue = function (key) {
+            var flag = _this.flags && _this.flags[key];
+            var res = null;
+            if (flag) {
+                res = flag.value;
+            }
+            //todo record check for value
+
+            return res;
+        };
+
+        this.getTrait = function (key) {
+            var trait = _this.traits && _this.traits[key];
+            return trait;
+        };
+
+        this.getSegments = function () {
+            return _this.userSegments;
+        };
+
+        this.segment = function (id) {
+            return _this.userSegments && _this.userSegments[id];
+        };
+
+        this.setTrait = function (key, trait_value) {
+            var getJSON = _this.getJSON,
+                identity = _this.identity,
+                api = _this.api;
+
+
+            return getJSON(api + 'identities/' + identity + '/traits/' + encodeURIComponent(key), 'POST', JSON.stringify({ trait_value: trait_value })).then(_this.getFlags);
+        };
+
+        this.hasFeature = function (key) {
+            var flag = _this.flags && _this.flags[key];
+            var res = false;
+            if (flag && flag.enabled) {
+                res = true;
+            }
+            //todo record check for feature
+
+            return res;
+        };
+
+        fetch = props.fetch;
+        AsyncStorage = props.AsyncStorage;
+    }
+
+    _createClass(BulletTrain, [{
+        key: 'init',
+        value: function init(_ref4) {
+            var _this2 = this;
+
+            var environmentID = _ref4.environmentID,
+                _ref4$api = _ref4.api,
+                api = _ref4$api === undefined ? 'https://api.bullet-train.io/api/v1/' : _ref4$api,
+                onChange = _ref4.onChange,
+                disableCache = _ref4.disableCache,
+                onError = _ref4.onError,
+                defaultFlags = _ref4.defaultFlags;
+
+
+            this.environmentID = environmentID;
+            this.api = api;
+            this.interval = null;
+            this.disableCache = disableCache;
+            this.onChange = onChange;
+            this.onError = onError;
+            this.flags = Object.assign({}, defaultFlags) || {};
+            this.initialised = true;
+
+            if (!environmentID) {
+                throw 'Please specify a environment id';
+            }
+            if (!onChange) {
+                throw 'Please specify an onChange event';
+            }
+
+            //If the user specified default flags emit a changed event immediately
+
+            if (!disableCache) {
+                AsyncStorage.getItem(BULLET_TRAIN_KEY, function (err, res) {
+                    _this2.flags = res ? JSON.parse(res) : defaultFlags;
+                    if (_this2.flags) {
+                        onChange(null, { isFromServer: false });
+                    }
+                    _this2.getFlags();
+                });
+            }
+        }
+    }, {
+        key: 'getAllFlags',
+        value: function getAllFlags() {
+            return this.flags;
+        }
+    }, {
+        key: 'identify',
+        value: function identify(userId) {
+            this.identity = userId;
+            if (this.initialised && !this.interval) this.getFlags();
+        }
+    }, {
+        key: 'logout',
+        value: function logout() {
+            this.identity = null;
+            if (this.initialised && !this.interval) this.getFlags();
+        }
+    }, {
+        key: 'startListening',
+        value: function startListening() {
+            var ticks = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1000;
+
+            if (this.interval) {
+                return;
+            }
+            this.interval = setInterval(this.getFlags, ticks);
+        }
+    }, {
+        key: 'stopListening',
+        value: function stopListening() {
+            clearInterval(this.interval);
+        }
+    }]);
+
+    return BulletTrain;
+}();
+
+module.exports = function (_ref5) {
+    var fetch = _ref5.fetch,
+        AsyncStorage = _ref5.AsyncStorage;
+
+    return new BulletTrain({ fetch: fetch, AsyncStorage: AsyncStorage });
+};
+
+/***/ }),
+
+/***/ "./index.react-native.js":
+/*!*******************************!*\
+  !*** ./index.react-native.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _reactNative = __webpack_require__(/*! react-native */ "react-native");
+
+var bt = __webpack_require__(/*! ./bullet-train-core */ "./bullet-train-core.js");
+module.exports = bt({ AsyncStorage: _reactNative.AsyncStorage, fetch: window.fetch });
+
+/***/ }),
+
+/***/ "./node_modules/bullet-train-rules-engine/lib/index.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/bullet-train-rules-engine/lib/index.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+!function(e,n){ true?module.exports=n():undefined}(window,function(){return function(e){var n={};function r(t){if(n[t])return n[t].exports;var u=n[t]={i:t,l:!1,exports:{}};return e[t].call(u.exports,u,u.exports,r),u.l=!0,u.exports}return r.m=e,r.c=n,r.d=function(e,n,t){r.o(e,n)||Object.defineProperty(e,n,{enumerable:!0,get:t})},r.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},r.t=function(e,n){if(1&n&&(e=r(e)),8&n)return e;if(4&n&&"object"==typeof e&&e&&e.__esModule)return e;var t=Object.create(null);if(r.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:e}),2&n&&"string"!=typeof e)for(var u in e)r.d(t,u,function(n){return e[n]}.bind(null,u));return t},r.n=function(e){var n=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(n,"a",n),n},r.o=function(e,n){return Object.prototype.hasOwnProperty.call(e,n)},r.p="",r(r.s=1)}([function(e,n,r){"use strict";Object.defineProperty(n,"__esModule",{value:!0}),n.default=function e(n,r,t){r=Array.isArray(r)?r:r.split(".");n=n[r[0]];if(n&&r.length>1)return e(n,r.slice(1));return void 0===n?t:n}},function(e,n,r){"use strict";Object.defineProperty(n,"__esModule",{value:!0}),n.default=function(e,n){return y(e,{all:{rules:n}},["all"]).then(function(e){return{result:e.all.result,rules:e.all.rules}})};var t=function(e){return e&&e.__esModule?e:{default:e}}(r(0));var u=function(e){0},o="EQUAL",l="NOT_EQUAL",a="GREATER_THAN",c="GREATER_THAN_INCLUSIVE",i="LESS_THAN",f="LESS_THAN_INCLUSIVE",s="CONTAINS",d="NOT_CONTAINS",p="REGEX",y=function e(n,r,y){return u(0),new Promise(function(v,b){var _=y[y.length-1],E=(0,t.default)(r,y);if("all"===_||"any"===_||"none"===_)return Promise.all(E.rules.map(function(t,u){var o=["rules",u];return t.any?o=o.concat(["any"]):t.all?o=o.concat(["all"]):t.none&&(o=o.concat(["none"])),e(n,r,y.concat(o))})).then(function(e){var n=void 0;return"all"===_?n=!e.includes(!1):"any"===_?n=e.includes(!0):"none"===_&&(n=!e.includes(!0)),E.result=!!n,1===y.length&&v(r),v(n)});var O=!!function(e,n){var r=n.property,y=n.operator,v=n.value;u();var b=(0,t.default)(e,r);switch(y){case o:return b===v;case l:return b!==v;case a:return b>v;case c:return b>=v;case i:return b<v;case f:return b<=v;case s:return b&&(b+"").includes(v);case d:return!b||!(b+"").includes(v);case p:return b&&new RegExp(v).test(b);default:return console.error("Invalid operator"),!1}}(n,E);return E.result=O,v(O)})}}])});
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "react-native":
+/*!*******************************!*\
+  !*** external "react-native" ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_react_native__;
+
+/***/ })
+
+/******/ });
+});
 //# sourceMappingURL=bullet-train.js.map

@@ -184,6 +184,10 @@ const BulletTrain = class {
         return this.userSegments;
     }
 
+    segment = (id) => {
+        return this.userSegments && this.userSegments[id];
+    }
+
     setTrait = (key, trait_value) => {
         const { getJSON, identity, api } = this;
 
