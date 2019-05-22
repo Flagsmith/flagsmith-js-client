@@ -75,9 +75,9 @@ export default class App extends Component {
                 <h3>
                     Events
                 </h3>
-                {logs.map(({timestamp, data, params, oldData}, i) => (
+                {logs.map(({timestamp, data, segments, params, oldData}, i) => (
                     <p key={i}>
-                        {timestamp}: {data} {params} {oldData}
+                        {timestamp}: {data} {params} {segments} {oldData}
                     </p>
                 ))}
             </div>
@@ -93,9 +93,11 @@ export default class App extends Component {
                 params: JSON.stringify(params),
                 oldData: JSON.stringify(oldFlags),
                 data: JSON.stringify(bulletTrain.getAllFlags()),
+                segments: JSON.stringify(bulletTrain.getSegments()),
             }].concat(this.state.logs)
         });
     };
+
     handleFlagsError = (data) => {
 
     };

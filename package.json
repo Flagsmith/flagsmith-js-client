@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@callstack/async-storage": "^1.1.0",
+    "bullet-train-rules-engine": "0.0.7",
     "deep-assign": "^2.0.0",
     "whatwg-fetch": "^2.0.3"
   }
