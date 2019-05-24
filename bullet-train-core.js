@@ -79,7 +79,7 @@ const BulletTrain = class {
 
         if (identity) {
             return Promise.all([
-                this.getJSON(api + 'identities/' + identity + '/'),
+                this.getJSON(api + 'identities/' + encodeURIComponent(identity) + '/'),
                 this.segments? Promise.resolve(this.segments):this.getJSON(api + 'segments/'),
             ])
                 .then((res) => {
@@ -191,7 +191,7 @@ const BulletTrain = class {
     setTrait = (key, trait_value) => {
         const { getJSON, identity, api } = this;
 
-        return getJSON(`${api}identities/${identity}/traits/${encodeURIComponent(key)}`, 'POST', JSON.stringify({ trait_value }))
+        return getJSON(`${api}identities/${encodeURIComponent(identity)}/traits/${encodeURIComponent(key)}`, 'POST', JSON.stringify({ trait_value }))
             .then(this.getFlags)
     };
 
