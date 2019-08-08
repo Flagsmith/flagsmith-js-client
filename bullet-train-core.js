@@ -23,7 +23,7 @@ const BulletTrain = class {
         if (method !== "GET")
             options.headers['Content-Type'] = 'application/json; charset=utf-8'
 
-        return fetch(url + '?format=json', options)
+        return fetch(url, options)
             .then(res => res.json());
     };
 
@@ -79,7 +79,7 @@ const BulletTrain = class {
 
         if (identity) {
             return Promise.all([
-                this.getJSON(api + 'identities/' + encodeURIComponent(identity) + '/'),
+                this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
                 this.segments? Promise.resolve(this.segments):this.getJSON(api + 'segments/'),
             ])
                 .then((res) => {
@@ -191,7 +191,15 @@ const BulletTrain = class {
     setTrait = (key, trait_value) => {
         const { getJSON, identity, api } = this;
 
-        return getJSON(`${api}identities/${encodeURIComponent(identity)}/traits/${encodeURIComponent(key)}`, 'POST', JSON.stringify({ trait_value }))
+        const body = {
+            "identity": {
+                "identifier": identity
+            },
+            "trait_key": key,
+            "trait_value": trait_value
+        }
+
+        return getJSON(`${api}traits/`, 'POST', JSON.stringify(body))
             .then(this.getFlags)
     };
 
