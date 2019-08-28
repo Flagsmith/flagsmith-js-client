@@ -14,7 +14,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Usage
 
+Web:
+
 ```npm i bullet-train-client --save```
+
+React Native:
+
+```npm i react-native-bullet-train --save```
 
 **Retrieving feature flags for your project**
 
