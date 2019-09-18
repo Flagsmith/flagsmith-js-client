@@ -68,6 +68,9 @@ bulletTrain.init({
 | ```stopListening()```     | Stop polling the api
 | ```getFlags()```     | Trigger a manual fetch of the environment features, if a user is identified it will fetch their features
 | ```identify(userId)```     | Identify as a user, this will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```
+| ```getTrait(key)```     | Get a user trait (e.g. favourite_colour), traits come back with ```getFlags()```. I.e. as soon as a identify, setTrait and incrementTrait are called.
+| ```setTrait(key, value)```     | Set a trait value for the currently identified user, it will also trigger a call to ```getFlags()```
+| ```incrementTrait(key, amount)```     | Increment a trait value for the currently identified user (accepts positive and negative values), it will also trigger a call to ```getFlags()```
 | ```logout()```     | Stop identifying as a user, this will trigger a call to ```getFlags()```
 
 ## Contributing
