@@ -59,18 +59,18 @@ bulletTrain.init({
 
 **Available Functions**
 
-| Property        | Description |         
+| Property        | Description |
 | ------------- |:-------------:|
 | ```init```     | Initialise the sdk against a particular environment
 | ```hasFeature(key)```     | Get the value of a particular feature e.g. ```bulletTrain.hasFeature("powerUserFeature") // true```
 | ```getValue(key)```     | Get the value of a particular feature e.g. ```bulletTrain.getValue("font_size") // 10```
+| ```getTrait(key)```     | Once used with an identified user you can get the value of any trait that is set for them e.g. ```bulletTrain.getTrait("accepted_cookie_policy")```
+| ```setTrait(key, value)```     | Once used with an identified user you can set the value of any trait relevant to them e.g. ```bulletTrain.setTrait("accepted_cookie_policy", true)```
+| ```incrementTrait(key, value)```     | You can also increment/decrement a particular trait them e.g. ```bulletTrain.incrementTrait("click_count", 1)```
 | ```startListening(ticks=1000)```     | Poll the api for changes every x milliseconds
 | ```stopListening()```     | Stop polling the api
 | ```getFlags()```     | Trigger a manual fetch of the environment features, if a user is identified it will fetch their features
 | ```identify(userId)```     | Identify as a user, this will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```
-| ```getTrait(key)```     | Get a user trait (e.g. favourite_colour), traits come back with ```getFlags()```. I.e. as soon as a identify, setTrait and incrementTrait are called.
-| ```setTrait(key, value)```     | Set a trait value for the currently identified user, it will also trigger a call to ```getFlags()```
-| ```incrementTrait(key, amount)```     | Increment a trait value for the currently identified user (accepts positive and negative values), it will also trigger a call to ```getFlags()```
 | ```logout()```     | Stop identifying as a user, this will trigger a call to ```getFlags()```
 
 ## Contributing
