@@ -1,3 +1,3 @@
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from "@callstack/async-storage";
 const bt = require('./bullet-train-core');
 module.exports = bt({AsyncStorage});
