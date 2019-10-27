@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import bulletTrain from './bullet-train';
-const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
+const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
 
 //Define default flags
 
@@ -40,13 +40,18 @@ export default class App extends Component {
     };
 
     submitTrait = ()=> {
-        bulletTrain.setTrait('example_trait', !bulletTrain.getTrait('example_trait'));
+        bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
     }
+
+    increment = (value)=> {
+        bulletTrain.incrementTrait("button_clicks", value)
+    };
 
     render() {
 
         const fontSize = parseInt(bulletTrain.getValue("font_size"));
         const trait = bulletTrain.getTrait("example_trait") + "";
+        const buttonClicks = bulletTrain.getTrait("button_clicks");
         const {submitTrait} = this;
         const {isLoading, logs} = this.state;
         return isLoading ? <div>Loading</div> : (
@@ -58,6 +63,17 @@ export default class App extends Component {
                 {bulletTrain.identity ? (
                     <div>
                         <div>
+                            <div>
+                                <div>
+                                    Button Clicks: {buttonClicks ? buttonClicks : "0"}
+                                </div>
+                                <button onClick={()=>this.increment(-1)}>
+                                    Decrement trait
+                                </button>
+                                <button onClick={()=>this.increment(1)}>
+                                    Increment trait
+                                </button>
+                            </div>
                             <button onClick={submitTrait}>
                                 Toggle user trait
                             </button>
@@ -93,7 +109,6 @@ export default class App extends Component {
                 params: JSON.stringify(params),
                 oldData: JSON.stringify(oldFlags),
                 data: JSON.stringify(bulletTrain.getAllFlags()),
-                segments: JSON.stringify(bulletTrain.getSegments()),
             }].concat(this.state.logs)
         });
     };

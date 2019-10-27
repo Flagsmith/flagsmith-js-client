@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import bulletTrain from "./bullet-train";
 
-const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
+const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
 
 export default class App extends Component<Props> {
   constructor(props, context) {
@@ -46,7 +46,7 @@ export default class App extends Component<Props> {
   };
 
   submitTrait = () => {
-    bulletTrain.setTrait('example_trait', !bulletTrain.getTrait('example_trait'));
+    bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
   }
 
   login = () => {
@@ -54,10 +54,15 @@ export default class App extends Component<Props> {
     this.forceUpdate();
   };
 
+  increment = (value)=> {
+    bulletTrain.incrementTrait("button_clicks", value)
+  };
+
   render() {
 
     const trait = bulletTrain.getTrait("example_trait") + "";
     const fontSize = parseInt(bulletTrain.getValue("font_size"));
+    const buttonClicks = bulletTrain.getTrait("button_clicks");
     const { isLoading, logs } = this.state;
     const { submitTrait } = this;
     return isLoading ? <Text>Loading</Text> : (
@@ -68,6 +73,14 @@ export default class App extends Component<Props> {
           {bulletTrain.identity ? (
               <View>
                 <Button title={"logout"} onPress={this.logout}/>
+                <View>
+                  <Text>
+                    Button Clicks: {buttonClicks ? buttonClicks : "0"}
+                  </Text>
+                  <Button title={'Decrement trait'} onPress={()=>this.increment(-1)}/>
+                  <Button title={'Increment trait'} onPress={()=>this.increment(1)}/>
+                </View>
+
                 <Button title={'Toggle user trait'} onPress={submitTrait}/>
                 <View>
                   <Text>
@@ -97,7 +110,6 @@ export default class App extends Component<Props> {
         params: JSON.stringify(params),
         oldData: JSON.stringify(oldFlags),
         data: JSON.stringify(bulletTrain.getAllFlags()),
-        segments: bulletTrain.getSegments()
       }].concat(this.state.logs)
     });
   };

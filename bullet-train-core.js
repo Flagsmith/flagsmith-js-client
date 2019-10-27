@@ -1,13 +1,14 @@
 import engine from 'bullet-train-rules-engine';
 
-let fetch;
+let fetch = global.fetch;
 let AsyncStorage;
 const BULLET_TRAIN_KEY = "BULLET_TRAIN_DB";
-
 const BulletTrain = class {
 
     constructor(props) {
-        fetch = props.fetch;
+        if (props.fetch) {
+            fetch = props.fetch;
+        }
         AsyncStorage = props.AsyncStorage;
     }
 
@@ -180,14 +181,6 @@ const BulletTrain = class {
         return trait;
     }
 
-    getSegments = () => {
-        return this.userSegments;
-    }
-
-    segment = (id) => {
-        return this.userSegments && this.userSegments[id];
-    }
-
     setTrait = (key, trait_value) => {
         const { getJSON, identity, api } = this;
 
@@ -200,6 +193,12 @@ const BulletTrain = class {
         }
 
         return getJSON(`${api}traits/`, 'POST', JSON.stringify(body))
+            .then(this.getFlags)
+    };
+
+    incrementTrait = (trait_key, increment_by) => {
+        const { getJSON, identity, api } = this;
+        return getJSON(`${api}traits/increment-value/`, 'POST', JSON.stringify({ trait_key, increment_by, identifier:identity }))
             .then(this.getFlags)
     };
 
