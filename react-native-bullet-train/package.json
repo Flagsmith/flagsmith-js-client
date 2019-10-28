@@ -1,6 +1,6 @@
 {
   "name": "react-native-bullet-train",
-  "version": "0.0.60",
+  "version": "0.0.62",
   "description": "Feature flagging to support continuous development",
   "main": "./lib/index.js",
   "repository": {
