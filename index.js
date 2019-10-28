@@ -1,6 +1,6 @@
 import AsyncStorage from "@callstack/async-storage";
-require('whatwg-fetch');
+import fetch from 'isomorphic-unfetch';
 const bt = require('./bullet-train-core');
-const bulletTrain = bt({AsyncStorage, fetch: global.fetch});
+const bulletTrain = bt({AsyncStorage, fetch});
 global.bulletTrain = bulletTrain;
 module.exports = bulletTrain;

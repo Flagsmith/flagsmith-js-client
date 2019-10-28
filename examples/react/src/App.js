@@ -1,6 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
-import bulletTrain from './bullet-train';
+import bulletTrain from 'bullet-train-client';
+
 const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
 
 //Define default flags
@@ -15,7 +16,7 @@ export default class App extends Component {
     }
 
     componentWillMount() {
-        const {handleFlags, handleFlagsError} = this;
+        const { handleFlags, handleFlagsError } = this;
         bulletTrain.init({
             environmentID,
             onChange: handleFlags,
@@ -25,7 +26,7 @@ export default class App extends Component {
                 font_size: 12,
             }
         });
-        bulletTrain.startListening(2000)
+        // bulletTrain.startListening(2000)
 
     }
 
@@ -39,11 +40,11 @@ export default class App extends Component {
         this.forceUpdate();
     };
 
-    submitTrait = ()=> {
-        bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
+    submitTrait = () => {
+        bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10) + "");
     }
 
-    increment = (value)=> {
+    increment = (value) => {
         bulletTrain.incrementTrait("button_clicks", value)
     };
 
@@ -52,12 +53,12 @@ export default class App extends Component {
         const fontSize = parseInt(bulletTrain.getValue("font_size"));
         const trait = bulletTrain.getTrait("example_trait") + "";
         const buttonClicks = bulletTrain.getTrait("button_clicks");
-        const {submitTrait} = this;
-        const {isLoading, logs} = this.state;
+        const { submitTrait } = this;
+        const { isLoading, logs } = this.state;
         return isLoading ? <div>Loading</div> : (
             <div>
                 <h2>{environmentID}</h2>
-                <p style={{fontSize}}>
+                <p style={{ fontSize }}>
                     {JSON.stringify(bulletTrain.flags)}
                 </p>
                 {bulletTrain.identity ? (
@@ -67,10 +68,10 @@ export default class App extends Component {
                                 <div>
                                     Button Clicks: {buttonClicks ? buttonClicks : "0"}
                                 </div>
-                                <button onClick={()=>this.increment(-1)}>
+                                <button onClick={() => this.increment(-1)}>
                                     Decrement trait
                                 </button>
-                                <button onClick={()=>this.increment(1)}>
+                                <button onClick={() => this.increment(1)}>
                                     Increment trait
                                 </button>
                             </div>
@@ -91,10 +92,36 @@ export default class App extends Component {
                 <h3>
                     Events
                 </h3>
-                {logs.map(({timestamp, data, segments, params, oldData}, i) => (
-                    <p key={i}>
-                        {timestamp}: {data} {params} {segments} {oldData}
-                    </p>
+                {logs.map(({ timestamp, data, segments, params, oldData }, i) => (
+                    <div style={{padding:10, backgroundColor:i%2?"#eaeaea": "white", position:'relative'}} key={i}>
+                        <div style={{position:'absolute', top:10, right:10}}>
+                            {timestamp}
+                        </div>
+                        <div>
+                            <div>
+                                <strong>
+                                    Segments
+                                </strong>
+                            </div>
+                            {segments}
+                        </div>
+                        <div>
+                            <div>
+                                <strong>
+                                    Traits
+                                </strong>
+                            </div>
+                            {data}
+                        </div>
+                        <div>
+                            <div>
+                                <strong>
+                                    Params
+                                </strong>
+                            </div>
+                            {params}
+                        </div>
+                    </div>
                 ))}
             </div>
         );
@@ -105,10 +132,10 @@ export default class App extends Component {
             ...params,
             isLoading: false,
             logs: [{
-                timestamp: new Date().toDateString(),
+                timestamp: new Date().toTimeString(),
                 params: JSON.stringify(params),
-                oldData: JSON.stringify(oldFlags),
-                data: JSON.stringify(bulletTrain.getAllFlags()),
+                segments: bulletTrain.getSegments() ? Object.keys(bulletTrain.getSegments()).join(", ") : null,
+                data: JSON.stringify(bulletTrain.getAllFlags(), null, 2),
             }].concat(this.state.logs)
         });
     };

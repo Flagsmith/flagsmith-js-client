@@ -1,6 +1,4 @@
-import engine from 'bullet-train-rules-engine';
-
-let fetch = global.fetch;
+let fetch;
 let AsyncStorage;
 const BULLET_TRAIN_KEY = "BULLET_TRAIN_DB";
 const BulletTrain = class {
@@ -8,6 +6,8 @@ const BulletTrain = class {
     constructor(props) {
         if (props.fetch) {
             fetch = props.fetch;
+        } else {
+            fetch = global.fetch;
         }
         AsyncStorage = props.AsyncStorage;
     }
@@ -23,7 +23,6 @@ const BulletTrain = class {
         };
         if (method !== "GET")
             options.headers['Content-Type'] = 'application/json; charset=utf-8'
-
         return fetch(url, options)
             .then(res => res.json());
     };
@@ -35,7 +34,6 @@ const BulletTrain = class {
             // Handle server response
             let flags = {};
             let userTraits = {};
-            let userSegments = {};
             features = features||[];
             traits = traits||[];
             features.forEach(feature => {
@@ -51,37 +49,19 @@ const BulletTrain = class {
             this.flags = flags;
             this.traits = userTraits;
             if (segments) {
-                if (!this.segments) {
-                    segments = segments.map((s)=>{
-                        return {...s, rules:JSON.parse(s.rules)};
-                    });
-                    this.segments = segments;
-                }
-               Promise.all(this.segments.map((segment)=>{
-                  return engine(userTraits, segment.rules)
-                      .then((res)=>{
-                          userSegments[segment.name] = res.result;
-                      })
-               }))
-                   .then(()=>{
-                       this.userSegments = userSegments;
-                       if (!disableCache) {
-                           AsyncStorage.setItem(BULLET_TRAIN_KEY, JSON.stringify(this.flags))
-                       }
-                       onChange && onChange(this.oldFlags, { isFromServer: true });
-                   })
-            } else {
-                if (!disableCache) {
-                    AsyncStorage.setItem(BULLET_TRAIN_KEY, JSON.stringify(this.flags))
-                }
-                onChange && onChange(this.oldFlags, { isFromServer: true });
+                let userSegments = {};
+                segments.map((s)=>{
+                    userSegments[s.name] = s;
+                });
+                this.segments = userSegments;
             }
+            onChange && onChange(this.oldFlags, { isFromServer: true });
         };
 
         if (identity) {
             return Promise.all([
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
-                this.segments? Promise.resolve(this.segments):this.getJSON(api + 'segments/'),
+                this.segments? Promise.resolve(null):this.getJSON(api + 'segments/'),
             ])
                 .then((res) => {
                     handleResponse(res[0],res[1])
@@ -150,8 +130,11 @@ const BulletTrain = class {
 
     logout() {
         this.identity = null;
-        if (this.initialised && !this.interval)
+        this.segments = null;
+        this.traits = null;
+        if (this.initialised && !this.interval) {
             this.getFlags();
+        }
     }
 
     startListening(ticks = 1000) {
@@ -159,6 +142,10 @@ const BulletTrain = class {
             return;
         }
         this.interval = setInterval(this.getFlags, ticks);
+    }
+
+    getSegments() {
+        return this.segments;
     }
 
     stopListening() {

@@ -10,9 +10,10 @@ import {
   StyleSheet,
   Button,
   Text,
-  View
+  View,
+  ScrollView,
 } from 'react-native';
-import bulletTrain from "./bullet-train";
+import bulletTrain from "react-native-bullet-train";
 
 const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
 
@@ -66,10 +67,7 @@ export default class App extends Component<Props> {
     const { isLoading, logs } = this.state;
     const { submitTrait } = this;
     return isLoading ? <Text>Loading</Text> : (
-        <View style={{ padding: 50 }}>
-          <Text style={{ fontSize: isNaN(fontSize)? 12: fontSize }}>
-            {JSON.stringify(bulletTrain.flags)}
-          </Text>
+        <ScrollView style={{ padding: 50 }}>
           {bulletTrain.identity ? (
               <View>
                 <Button title={"logout"} onPress={this.logout}/>
@@ -89,15 +87,18 @@ export default class App extends Component<Props> {
                 </View>
               </View>
           ) : <Button title={"login as sample user"} onPress={this.login}/>}
+          <Text style={{ fontSize: isNaN(fontSize)? 12: fontSize }}>
+            {JSON.stringify(bulletTrain.flags)}
+          </Text>
           <Text style={styles.title}>
             Events
           </Text>
           {logs.map(({ timestamp, data, params, segments, oldData }, i) => (
               <Text key={i}>
-                {timestamp}: {data} {params} {segments&&JSON.stringify(segments)} {oldData}
+                {timestamp}: {data} {params} {segments} {oldData}
               </Text>
           ))}
-        </View>
+        </ScrollView>
     );
   }
 
@@ -106,9 +107,10 @@ export default class App extends Component<Props> {
       ...params,
       isLoading: false,
       logs: [{
-        timestamp: new Date().toDateString(),
+        timestamp: new Date().toTimeString(),
         params: JSON.stringify(params),
         oldData: JSON.stringify(oldFlags),
+        segments: bulletTrain.getSegments() ? Object.keys(bulletTrain.getSegments()).join(", ") : null,
         data: JSON.stringify(bulletTrain.getAllFlags()),
       }].concat(this.state.logs)
     });

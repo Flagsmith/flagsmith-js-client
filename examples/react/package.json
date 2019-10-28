@@ -36,6 +36,7 @@
     "webpack-hot-middleware": "^2.10.0"
   },
   "dependencies": {
+    "bullet-train-client": "file://../../bullet-train-client",
     "react": "^0.14.6",
     "react-dom": "^0.14.6"
   }

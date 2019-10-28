@@ -5,7 +5,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "deploy": "npm run build && cd ./bullet-train-client/ && npm publish && cd ../react-native-bullet-train && npm publish",
-    "start": "node_modules/.bin/webpack --watch & cd ./bullet-train-client/example && npm start",
+    "start": "node_modules/.bin/webpack --watch",
     "build": "node_modules/.bin/webpack"
   },
   "repository": {
@@ -36,6 +36,6 @@
     "@callstack/async-storage": "^1.1.0",
     "bullet-train-rules-engine": "0.0.7",
     "deep-assign": "^2.0.0",
-    "whatwg-fetch": "^2.0.3"
+    "isomorphic-unfetch": "^3.0.0"
   }
 }
