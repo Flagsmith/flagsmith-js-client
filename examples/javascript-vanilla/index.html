@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loaded" class="hidden">
+    <div id="logged-out">
+        <button id="js-login">
+            Login
+        </button>
+    </div>
+    <div class="hidden" id="logged-in">
+        <div>
+            <div>
+                <div>
+                    Button Clicks: <span id="js-button-clicks"/>
+                </div>
+                <button id="js-decrement">
+                    Decrement trait
+                </button>
+                <button id="js-increment">
+                    Increment trait
+                </button>
+            </div>
+            <button id="js-toggle-trait">
+                Toggle user trait
+            </button>
+            <div>
+                example_trait: <span id="js-example-trait"/>
+            </div>
+        </div>
+        <button id="js-logout">
+            Logout
+        </button>
+    </div>
+    <div id="instant_messaging">
+        You have the instant messaging feature
+    </div>
+    <div id="no_instant_messaging">
+        You do not have the feature
+    </div>
+    <span class="bt_font_size">
+            Font size controlled by BulletTrain
+        </span>
+</div>
+<div id="loading">
+    Loading
+</div>
+
+<script src="../../bullet-train-client/lib/index.js"></script>
+<script src="./main.js"></script>
+
+</body>
+</html>

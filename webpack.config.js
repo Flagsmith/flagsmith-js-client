@@ -1,8 +1,7 @@
 const path = require('path');
 const defaultConfig = {
-    mode: "development",
-    devtool: 'eval',
-    target: 'node',
+    mode: "production",
+    devtool: 'source-map',
     module: {
         rules: [
             {
@@ -18,7 +17,8 @@ const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web
     output: {
         filename: "index.js",
         library: "bullet-train",
-        libraryTarget: "umd",
+        libraryTarget: 'umd',
+        globalObject: 'typeof self !== \'undefined\' ? self : this',
         path: path.join(__dirname, '/bullet-train-client/lib'),
     },
     entry: {
