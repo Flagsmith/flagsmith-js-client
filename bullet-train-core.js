@@ -61,7 +61,7 @@ const BulletTrain = class {
         if (identity) {
             return Promise.all([
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
-                this.segments? Promise.resolve(null):this.getJSON(api + 'segments/'),
+                // this.getJSON(api + 'segments/?identifier='+ encodeURIComponent(identity)),
             ])
                 .then((res) => {
                     handleResponse(res[0],res[1])
@@ -145,7 +145,8 @@ const BulletTrain = class {
     }
 
     getSegments() {
-        return this.segments;
+        // noop for now
+        // return this.segments;
     }
 
     stopListening() {

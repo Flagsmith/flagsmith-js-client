@@ -93,9 +93,9 @@ export default class App extends Component<Props> {
           <Text style={styles.title}>
             Events
           </Text>
-          {logs.map(({ timestamp, data, params, segments, oldData }, i) => (
+          {logs.map(({ timestamp, data, params, oldData }, i) => (
               <Text key={i}>
-                {timestamp}: {data} {params} {segments} {oldData}
+                {timestamp}: {data} {params} oldData}
               </Text>
           ))}
         </ScrollView>
@@ -110,7 +110,6 @@ export default class App extends Component<Props> {
         timestamp: new Date().toTimeString(),
         params: JSON.stringify(params),
         oldData: JSON.stringify(oldFlags),
-        segments: bulletTrain.getSegments() ? Object.keys(bulletTrain.getSegments()).join(", ") : null,
         data: JSON.stringify(bulletTrain.getAllFlags()),
       }].concat(this.state.logs)
     });

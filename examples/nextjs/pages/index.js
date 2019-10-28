@@ -88,18 +88,10 @@ class HomePage extends PureComponent {
                 <h3>
                     Events
                 </h3>
-                {logs.map(({ timestamp, data, segments, params, oldData }, i) => (
+                {logs.map(({ timestamp, data, params, oldData }, i) => (
                     <div style={{padding:10, backgroundColor:i%2?"#eaeaea": "white", position:'relative'}} key={i}>
                         <div style={{position:'absolute', top:10, right:10}}>
                             {timestamp}
-                        </div>
-                        <div>
-                            <div>
-                                <strong>
-                                    Segments
-                                </strong>
-                            </div>
-                            {segments}
                         </div>
                         <div>
                             <div>
@@ -130,7 +122,6 @@ class HomePage extends PureComponent {
             logs: [{
                 timestamp: new Date().toTimeString(),
                 params: JSON.stringify(params),
-                segments: bulletTrain.getSegments() ? Object.keys(bulletTrain.getSegments()).join(", ") : null,
                 data: JSON.stringify(bulletTrain.getAllFlags(), null, 2),
             }].concat(this.state.logs)
         });
