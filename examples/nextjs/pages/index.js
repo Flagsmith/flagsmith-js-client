@@ -1,8 +1,10 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
+import withConfig from '../common/providers/withConfig';
+
 import bulletTrain from 'bullet-train-client';
 const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
-
-class HomePage extends PureComponent {
+//Define default flags
+class HomePage extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
@@ -11,29 +13,12 @@ class HomePage extends PureComponent {
         };
     }
 
-    componentWillMount() {
-        const { handleFlags, handleFlagsError } = this;
-        bulletTrain.init({
-            environmentID,
-            onChange: handleFlags,
-            onError: handleFlagsError,
-            defaultFlags: {
-                default_feature: true,
-                font_size: 12,
-            }
-        });
-        // bulletTrain.startListening(2000)
-
-    }
-
     logout = () => {
         bulletTrain.logout();
-        this.forceUpdate();
     };
 
     login = () => {
         bulletTrain.identify("bullet_train_sample_user");
-        this.forceUpdate();
     };
 
     submitTrait = () => {
@@ -45,13 +30,12 @@ class HomePage extends PureComponent {
     };
 
     render() {
-
         const fontSize = parseInt(bulletTrain.getValue("font_size"));
         const trait = bulletTrain.getTrait("example_trait") + "";
         const buttonClicks = bulletTrain.getTrait("button_clicks");
         const { submitTrait } = this;
         const { isLoading, logs } = this.state;
-        return isLoading ? <div>Loading</div> : (
+        return (
             <div>
                 <h2>{environmentID}</h2>
                 <p style={{ fontSize }}>
@@ -88,7 +72,7 @@ class HomePage extends PureComponent {
                 <h3>
                     Events
                 </h3>
-                {logs.map(({ timestamp, data, params, oldData }, i) => (
+                {logs.map(({ timestamp, data,  params, oldData }, i) => (
                     <div style={{padding:10, backgroundColor:i%2?"#eaeaea": "white", position:'relative'}} key={i}>
                         <div style={{position:'absolute', top:10, right:10}}>
                             {timestamp}
@@ -130,8 +114,6 @@ class HomePage extends PureComponent {
     handleFlagsError = (data) => {
 
     };
-
 }
 
-
-export default HomePage;
+export default withConfig(HomePage);

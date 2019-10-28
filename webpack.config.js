@@ -1,13 +1,18 @@
-const path = require('path');
+var path = require("path");
+
 const defaultConfig = {
-    mode: "production",
+    entry: './index.js',
+    mode: "development",
     devtool: 'source-map',
+    target: "node",
     module: {
         rules: [
             {
-                test: /\.(js)$/,
-                exclude: /node_modules/,
-                use: ['babel-loader']
+                test: /\.js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader'
+                }
             }
         ]
     }
@@ -15,11 +20,10 @@ const defaultConfig = {
 
 const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web client
     output: {
+        libraryTarget:'umd',
         filename: "index.js",
-        library: "bullet-train",
-        libraryTarget: 'umd',
-        globalObject: 'typeof self !== \'undefined\' ? self : this',
         path: path.join(__dirname, '/bullet-train-client/lib'),
+        globalObject: 'this',
     },
     entry: {
         main: './index.js'

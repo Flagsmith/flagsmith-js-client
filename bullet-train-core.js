@@ -1,6 +1,7 @@
 let fetch;
 let AsyncStorage;
 const BULLET_TRAIN_KEY = "BULLET_TRAIN_DB";
+const defaultAPI = 'https://api.bullet-train.io/api/v1/';
 const BulletTrain = class {
 
     constructor(props) {
@@ -27,9 +28,9 @@ const BulletTrain = class {
             .then(res => res.json());
     };
 
-    getFlags = () => {
+    getFlags = (resolve,reject) => {
         const { onChange, onError, identity, api, disableCache } = this;
-
+        let resolved = false;
         const handleResponse = ({ flags: features, traits }, segments) => {
             // Handle server response
             let flags = {};
@@ -55,13 +56,14 @@ const BulletTrain = class {
                 });
                 this.segments = userSegments;
             }
-            onChange && onChange(this.oldFlags, { isFromServer: true });
+            if (onChange) {
+                onChange(this.oldFlags, { isFromServer: true });
+            }
         };
 
         if (identity) {
             return Promise.all([
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
-                // this.getJSON(api + 'segments/?identifier='+ encodeURIComponent(identity)),
             ])
                 .then((res) => {
                     handleResponse(res[0],res[1])
@@ -74,7 +76,16 @@ const BulletTrain = class {
             ])
                 .then((res) => {
                     handleResponse({flags: res[0]},null)
+                    console.log("GOT RESPONSE FROM BULLET TRAIN")
+                    if (resolve && !resolved) {
+                        resolved = true;
+                        resolve();
+                    }
                 }).catch(({ message }) => {
+                    if (reject && !resolved) {
+                        resolved = true;
+                        reject(message);
+                    }
                     onError && onError({ message })
                 });
         }
@@ -82,40 +93,46 @@ const BulletTrain = class {
 
     init({
              environmentID,
-             api = 'https://api.bullet-train.io/api/v1/',
+             api = defaultAPI,
              onChange,
              disableCache,
              onError,
-             defaultFlags
+             defaultFlags,
+             state
          }) {
 
-        this.environmentID = environmentID;
-        this.api = api;
-        this.interval = null;
-        this.disableCache = disableCache;
-        this.onChange = onChange;
-        this.onError = onError;
-        this.flags = Object.assign({}, defaultFlags) || {};
-        this.initialised = true;
+        console.log("Initialising");
+        return new Promise((resolve, reject)=>{
+            this.environmentID = environmentID;
+            this.api = api;
+            this.interval = null;
+            this.disableCache = disableCache;
+            this.onChange = onChange;
+            this.onError = onError;
+            this.flags = Object.assign({}, defaultFlags) || {};
+            this.initialised = true;
+            this.setState(state)
+            if (!environmentID) {
+                reject('Please specify a environment id')
+                throw('Please specify a environment id');
+            }
+            if (!onChange) {
+                reject('Please specify a change event')
+                throw('Please specify an onChange event');
+            }
 
-        if (!environmentID) {
-            throw('Please specify a environment id');
-        }
-        if (!onChange) {
-            throw('Please specify an onChange event');
-        }
+            //If the user specified default flags emit a changed event immediately
 
-        //If the user specified default flags emit a changed event immediately
-
-        if (!disableCache) {
-            AsyncStorage.getItem(BULLET_TRAIN_KEY, (err, res) => {
-                this.flags = res ? JSON.parse(res) : defaultFlags;
-                if (this.flags) {
-                    onChange(null, { isFromServer: false });
-                }
-                this.getFlags();
-            });
-        }
+            if (!disableCache) {
+                AsyncStorage.getItem(BULLET_TRAIN_KEY, (err, res) => {
+                    this.flags = res ? JSON.parse(res) : defaultFlags;
+                    if (this.flags && this.onChange) {
+                        this.onChange(null, { isFromServer: false });
+                    }
+                    this.getFlags(resolve, reject);
+                });
+            }
+        })
     }
 
     getAllFlags() {
@@ -126,6 +143,29 @@ const BulletTrain = class {
         this.identity = userId;
         if (this.initialised && !this.interval)
             this.getFlags();
+    }
+
+    getState() {
+        return {
+            api: this.api,
+            environmentID: this.environmentID,
+            flags: this.flags,
+            identity: this.identity,
+            segments: this.segments,
+            traits: this.traits,
+        }
+    }
+
+    setState(state) {
+        if (state) {
+                this.initialised = true;
+                this.api = state.api || this.api  || defaultAPI;
+                this.environmentID = state.environmentID || this.environmentID ;
+                this.flags = state.flags || this.flags;
+                this.identity = state.identity || this.identity;
+                this.segments = state.segments || this.segments;
+                this.traits = state.traits || this.traits;
+        }
     }
 
     logout() {

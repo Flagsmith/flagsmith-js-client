@@ -1,6 +1,12 @@
+let fetch = require("unfetch").default;
+if (typeof window === 'undefined')  {
+    fetch  = require('node-fetch').default;
+}
+
 import AsyncStorage from "@callstack/async-storage";
-import fetch from 'isomorphic-unfetch';
 const bt = require('./bullet-train-core');
 const bulletTrain = bt({AsyncStorage, fetch});
-global.bulletTrain = bulletTrain;
-module.exports = bulletTrain;
+if (typeof window !== "undefined") {
+    window.bulletTrain = bulletTrain;
+}
+export default bulletTrain;
