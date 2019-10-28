@@ -1,46 +1,12 @@
-<img src="http://g.recordit.co/TY8wciTsQH.gif"/>
+<img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
 
+## Bullet Train with next.js and redux
+This repository contains integration with next.js and Redux with SSR support.
+Basic flow: 
 
-## Prerequisites
+- _app.js (SERVER) awaits for bulletTrain to initialise and callback with flags
+- _app.js (SERVER) triggers an action with the bulletTrain state
+- reducer.js (SERVER) stores the Bullet Train state in an object called config
+- pages/index.js (SERVER) renders markup after Bullet Train has data for getTrait, getValue etc
 
-What things you need to install the software and how to install them
-
-https://workperk-api.lollipop.digital/
-https://workperk.lollipop.digital/
-
-| Location                                                     | Suggested Version       |
-| -------------                                                |:-------------:|
-| <a href="https://nodejs.org/en/">NodeJS</a>                     | >= 10.0.0 |
-| <a href="https://nodejs.org/en/">npm</a>                        | >= 6.0.0 |
-
-# Deployment with Now
-Out the box, this setup supports deploying to https://zeit.co
-```$xslt
-npm i now -g
-now
-```
-
-## Installing
-```
-npm i
-```
-
-## Running
-**Development**
-
-Hot reloading for client / server
-```
-npm run dev
-```
- 
-## Mobile
-**Preinstall**
-
-Install cocoapods for iOS
-```
-sudo gem install coocapods
-```
- 
-- /pages/_document - the "index.html"
-- /pages/_app - the head and body go here
-- /pages/name.js - routing is defined by filename
+- _app.js (CLIENT) initialises bulletTrain on the client with the server state setState and registers an onChange function which triggers a redux action.
