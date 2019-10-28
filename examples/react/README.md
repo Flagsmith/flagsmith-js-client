@@ -2,3 +2,13 @@
 
 ## Bullet Train with React
 This repository contains basic integration with a standard create-react-app application.
+
+## Installation 
+```
+npm i
+```
+## Running 
+
+```
+npm start
+```

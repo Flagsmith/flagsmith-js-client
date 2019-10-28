@@ -2,3 +2,13 @@
 
 ## Bullet Train with React Native
 This repository contains basic integration with a standard react-native init application.
+
+## Installation 
+```
+npm i
+```
+## Running 
+
+```
+react-native run-ios|android
+```
