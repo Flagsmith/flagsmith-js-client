@@ -2,7 +2,7 @@ var path = require("path");
 
 const defaultConfig = {
     entry: './index.js',
-    mode: "development",
+    mode: "production",
     devtool: 'source-map',
     target: "node",
     module: {

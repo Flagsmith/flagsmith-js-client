@@ -1,43 +1,33 @@
 {
   "name": "bullet-train-client-example",
-  "version": "1.0.0",
   "description": "Bullet Train client example",
-  "scripts": {
-    "start": "node server.js",
-    "lint": "eslint src"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/SolidStateGroup/bullet-train-js-client"
-  },
-  "keywords": [
-    "feature flagger",
-    "continuous deployment"
-  ],
-  "author": "SSG",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/SolidStateGroup/bullet-train-js-client/issues"
-  },
-  "homepage": "https://bullet-train.io",
-  "devDependencies": {
-    "babel-core": "^6.0.20",
-    "babel-eslint": "^10.0.1",
-    "babel-loader": "^6.0.1",
-    "babel-preset-es2015": "^6.0.15",
-    "babel-preset-react": "^6.0.15",
-    "babel-preset-stage-0": "^6.0.15",
-    "eslint": "^5.12.0",
-    "eslint-plugin-react": "^3.6.2",
-    "express": "^4.13.4",
-    "react-hot-loader": "^1.3.0",
-    "webpack": "^1.12.2",
-    "webpack-dev-middleware": "^1.6.1",
-    "webpack-hot-middleware": "^2.10.0"
-  },
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "bullet-train-client": "file://../../bullet-train-client",
-    "react": "^0.14.6",
-    "react-dom": "^0.14.6"
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-scripts": "3.2.0",
+    "bullet-train-client": "file://../../bullet-train-client"
+  },
+  "scripts": {
+    "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
+    "build": "SKIP_PREFLIGHT_CHECK=true react-scripts build",
+    "test": "SKIP_PREFLIGHT_CHECK=true react-scripts test",
+    "eject": "SKIP_PREFLIGHT_CHECK=true react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

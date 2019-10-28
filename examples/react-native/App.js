@@ -26,7 +26,7 @@ export default class App extends Component<Props> {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { handleFlags, handleFlagsError } = this;
     bulletTrain.init({
       environmentID,
