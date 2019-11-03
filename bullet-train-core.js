@@ -116,10 +116,6 @@ const BulletTrain = class {
                 reject('Please specify a environment id')
                 throw('Please specify a environment id');
             }
-            if (!onChange) {
-                reject('Please specify a change event')
-                throw('Please specify an onChange event');
-            }
 
             //If the user specified default flags emit a changed event immediately
 
