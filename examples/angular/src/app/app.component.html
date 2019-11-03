@@ -1,0 +1,32 @@
+<!-- Toolbar -->
+
+<div class="content" role="main">
+  <h2>{{environmentID}}</h2>
+  <div *ngIf="identity">
+    <div>
+      Button Clicks: {{buttonClicks}}
+      <button (click)="increment(-1)">
+      Decrement trait
+      </button>
+      <button (click)="increment(1)">
+      Increment trait
+      </button>
+      <button (click)="submitTrait()">
+        Toggle user trait
+      </button>
+      <div>
+        example_trait: {{trait}}
+      </div>
+      <button (click)="logout()">
+        logout
+      </button>
+    </div>
+  </div>
+  <div *ngIf="!identity">
+    <button (click)="login()">
+      Login as sample user
+    </button>
+  </div>
+</div>
+
+
