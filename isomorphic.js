@@ -1,4 +1,8 @@
 let fetch = require("unfetch").default;
+if (typeof window === 'undefined')  {
+    fetch  = require('node-fetch').default;
+}
+
 import AsyncStorage from "@callstack/async-storage";
 const bt = require('./bullet-train-core');
 const bulletTrain = bt({AsyncStorage, fetch});

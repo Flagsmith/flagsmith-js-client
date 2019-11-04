@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import withConfig from '../common/providers/withConfig';
 
-import bulletTrain from 'bullet-train-client';
+import bulletTrain from 'bullet-train-client/isomorphic';
 const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
 //Define default flags
 class HomePage extends Component {
@@ -98,22 +98,6 @@ class HomePage extends Component {
             </div>
         );
     }
-
-    handleFlags = (oldFlags, params) => {
-        this.setState({
-            ...params,
-            isLoading: false,
-            logs: [{
-                timestamp: new Date().toTimeString(),
-                params: JSON.stringify(params),
-                data: JSON.stringify(bulletTrain.getAllFlags(), null, 2),
-            }].concat(this.state.logs)
-        });
-    };
-
-    handleFlagsError = (data) => {
-
-    };
 }
 
 export default withConfig(HomePage);

@@ -1,8 +1,8 @@
 {
   "name": "bullet-train-client",
-  "version": "0.0.75",
+  "version": "0.0.80",
   "description": "Feature flagging to support continuous development",
-  "main": "./lib/index.js",
+  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/SolidStateGroup/bullet-train-js-client"

@@ -81,6 +81,12 @@ bulletTrain.init({
 | ```identify(userId)```     | Identify as a user, this will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```
 | ```logout()```     | Stop identifying as a user, this will trigger a call to ```getFlags()```
 
+## Serverside Support with Next.js
+This library now supports server side rendering! In order to use this, use the following instead of the standard bullet-train-client:
+```
+import bulletTrain from 'bullet-train-client/isomorphic';
+```
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/kyle-ssg/c36a03aebe492e45cbd3eefb21cb0486) for details on our code of conduct, and the process for submitting pull requests to us.

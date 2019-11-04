@@ -40,5 +40,8 @@ buck-out/
 android/app/libs
 android/keystores/debug.keystore
 
-bullet-train-client/lib
+bullet-train-client/index.js
+bullet-train-client/index.js.map
+bullet-train-client/isomorphic.js
+bullet-train-client/isomorphic.js.map
 react-native-bullet-train/lib

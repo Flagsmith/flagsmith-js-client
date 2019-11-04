@@ -101,7 +101,6 @@ const BulletTrain = class {
              state
          }) {
 
-        console.log("Initialising");
         return new Promise((resolve, reject)=>{
             this.environmentID = environmentID;
             this.api = api;

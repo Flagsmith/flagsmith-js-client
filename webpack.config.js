@@ -22,11 +22,23 @@ const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web
     output: {
         libraryTarget:'umd',
         filename: "index.js",
-        path: path.join(__dirname, '/bullet-train-client/lib'),
+        path: path.join(__dirname, '/bullet-train-client/'),
         globalObject: 'this',
     },
     entry: {
         main: './index.js'
+    }
+});
+
+const isomorphicBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web client
+    output: {
+        libraryTarget:'umd',
+        filename: "isomorphic.js",
+        path: path.join(__dirname, '/bullet-train-client/'),
+        globalObject: 'this',
+    },
+    entry: {
+        main: './isomorphic.js'
     }
 });
 
@@ -46,5 +58,5 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
 });
 
 module.exports = [
-    webBundle, reactNativeBundle
+    webBundle, reactNativeBundle, isomorphicBundle
 ];

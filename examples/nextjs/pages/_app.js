@@ -3,7 +3,7 @@ import Head from 'next/head';
 import React from 'react';
 
 import { Provider } from 'react-redux';
-import bulletTrain from 'bullet-train-client';
+import bulletTrain from 'bullet-train-client/isomorphic';
 import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
 import createStore from '../common/store';
@@ -28,7 +28,7 @@ class MyApp extends App {
             });
 
             await Promise.all([
-                ctx.store.dispatch(AppActions.startup({ serverLoaded:true, config:bulletTrain.getState() })),
+                ctx.store.dispatch(AppActions.startup({ serverLoaded:true, config: bulletTrain.getState() })),
             ]);
         }
 
