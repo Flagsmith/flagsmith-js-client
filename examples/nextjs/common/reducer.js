@@ -13,8 +13,6 @@ function defaultReducer(
     switch (action.type) {
         case Actions.STARTUP_LOADED:
             return { ...state, ...action.data };
-        case Actions.CONFIG_LOADED:
-            return { ...state, config:action.data };
         default:
             return state;
     }

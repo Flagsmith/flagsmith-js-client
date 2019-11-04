@@ -11,40 +11,43 @@ import createStore from '../common/store';
 class MyApp extends App {
     static async getInitialProps({ Component, ctx }) {
         let pageProps;
-        if (ctx.pathname === '/_error') {
+        if (!ctx.pathname || ctx.pathname === '/_error') {
             return;
         }
 
-        if (!ctx.pathname) {
-            return;
+        if (typeof window === "undefined") {
+            var environmentID = 'tKnQSzLyxwkMWAABCJP9Yi'
+            await bulletTrain.init({
+                environmentID: environmentID,
+                defaultFlags: {
+                    font_size: 10
+                },
+                onChange: function () {
+                    console.log("CHANGED")
+                }
+            });
+
+            await Promise.all([
+                ctx.store.dispatch(AppActions.startup({ serverLoaded:true, config:bulletTrain.getState() })),
+            ]);
         }
-        //Intialise Bullet Train
-        var environmentID = 'tKnQSzLyxwkMWAABCJP9Yi'
-        await bulletTrain.init({
-            environmentID: environmentID,
-            defaultFlags: {
-                font_size: 10
-            },
-            onChange: function () {
-                console.log("CHANGED")
-            }
-        });
-        await ctx.store.dispatch(AppActions.startup({ serverLoaded:true, config:bulletTrain.getState() })); // Post startup action with token and locale
+
+
         if (Component.getInitialProps) { // Wait for pages to complete any async getInitialProps
             pageProps = await Component.getInitialProps({ ctx });
         }
         return { pageProps };
     }
 
-    constructor(props) {
+    constructor(props)
+    {
         super(props);
-        if (typeof window !== 'undefined') {
-            // Restore bullet-train state
+        if ((typeof window !== "undefined") && !this.props.store.getState().clientLoaded) {
             bulletTrain.setState(this.props.store.getState().config);
             bulletTrain.onChange = ()=> {
-                this.props.store.dispatch(AppActions.configLoaded(bulletTrain.getState()))
+                this.props.store.dispatch(AppActions.startup({ serverLoaded:true, config:bulletTrain.getState() }));
             }
-            this.props.store.dispatch(AppActions.startup({ clientLoaded:true, config:bulletTrain.getState() }));
+            this.props.store.dispatch(AppActions.startup({ clientLoaded:true })); // Post startup action with token and locale
         }
     }
 
