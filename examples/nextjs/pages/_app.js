@@ -16,7 +16,7 @@ class MyApp extends App {
         }
 
         if (typeof window === "undefined") {
-            var environmentID = 'tKnQSzLyxwkMWAABCJP9Yi'
+            var environmentID = 'uCDQzKWgejrutqSYYsKWen'
             await bulletTrain.init({
                 environmentID: environmentID,
                 defaultFlags: {

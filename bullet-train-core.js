@@ -76,7 +76,6 @@ const BulletTrain = class {
             ])
                 .then((res) => {
                     handleResponse({flags: res[0]},null)
-                    console.log("GOT RESPONSE FROM BULLET TRAIN")
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();

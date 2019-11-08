@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import withConfig from '../common/providers/withConfig';
 
 import bulletTrain from 'bullet-train-client/isomorphic';
-const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
+const environmentID = "uCDQzKWgejrutqSYYsKWen";
 //Define default flags
 class HomePage extends Component {
     constructor(props, context) {

@@ -9,7 +9,7 @@ import bulletTrain from 'bullet-train-client';
 export class AppComponent {
   logs = [];
   loading = true;
-  environmentID = 'tKnQSzLyxwkMWAABCJP9Yi';
+  environmentID = 'uCDQzKWgejrutqSYYsKWen';
   identity = null;
   buttonClicks = null;
   trait = null;

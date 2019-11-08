@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import bulletTrain from "react-native-bullet-train";
 
-const environmentID = "tKnQSzLyxwkMWAABCJP9Yi";
+const environmentID = "uCDQzKWgejrutqSYYsKWen";
 
 export default class App extends Component<Props> {
   constructor(props, context) {

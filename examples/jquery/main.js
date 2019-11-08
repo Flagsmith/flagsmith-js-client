@@ -1,4 +1,4 @@
-var environmentID = 'tKnQSzLyxwkMWAABCJP9Yi'
+var environmentID = 'uCDQzKWgejrutqSYYsKWen'
 
 function identify() {
     bulletTrain.identify("bullet_train_sample_user")
