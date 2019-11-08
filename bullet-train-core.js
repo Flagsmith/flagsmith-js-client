@@ -25,6 +25,19 @@ const BulletTrain = class {
         if (method !== "GET")
             options.headers['Content-Type'] = 'application/json; charset=utf-8'
         return fetch(url, options)
+            .then(res => {
+                    if (res.status >= 200 && res.status < 300) {
+                        return res;
+                    }
+                    return res.text()
+                        .then((res)=>{
+                            let err = res;
+                            try {
+                              err = JSON.parse(res);
+                            } catch (e) {}
+                            return Promise.reject(err);
+                        })
+            })
             .then(res => res.json());
     };
 
@@ -80,12 +93,12 @@ const BulletTrain = class {
                         resolved = true;
                         resolve();
                     }
-                }).catch(({ message }) => {
+                }).catch((err) => {
                     if (reject && !resolved) {
                         resolved = true;
-                        reject(message);
+                        reject(err);
                     }
-                    onError && onError({ message })
+                    onError && onError(err)
                 });
         }
     };
