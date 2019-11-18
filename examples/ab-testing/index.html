@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <style>
+        body, html {
+            width: 100%;
+            margin: 0;
+            font-family: sans-serif;
+        }
+        .hidden {
+            display: none;
+        }
+        .hero {
+            width: 100vw;
+            height: 100vh;
+        }
+        .hero-inner {
+            background-color: rgba(0,0,0,0.5);
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        h1 {
+            color: white;
+            font-size: 5em;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            color: white;
+        }
+        .btn {
+            /* Positioning and sizing */
+             background-color: #4CAF50;
+            cursor: pointer;
+            color: white;
+            display: block;
+            width: 250px;
+            margin: 20px;
+            padding: 20px;
+            font-size: 1em;
+            border: none;
+        }
+        .row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loaded" class="hidden">
+    <div class="hero">
+        <div class="hero-inner">
+                <h1>A/B/N Testing</h1>
+                <h2>This hero image was served Bullet Train segments, click login to get a new random a/b result.</h2>            <div class="row">
+                <button type="button" class="btn js-random">Login as random a/b user...</button>
+                <button type="button" class="btn js-special">Login as special user...</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loading">
+    Loading
+</div>
+<script src="../../bullet-train-client/index.js"></script>
+<script src="./main.js"></script>
+
+</body>
+</html>
