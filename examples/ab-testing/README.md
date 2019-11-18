@@ -2,8 +2,8 @@
 
 ## Bullet Train A/B Testing
 <img src="./example.png"/>
-This repository contains an example of an a/b test. This is done by creating a feature and a percentage split segment then overriding the feature's value for users belonging to that segment.
-
+This repository contains an example of an a/b test. This is accomplished by creating a feature and overriding the feature's value for a segment with a percentage split rule.
+See [https://jsfiddle.net/7e3fdqvx/5/](https://jsfiddle.net/7e3fdqvx/5/)
 ## Installation 
 None! Just open index.html in your preferred browser.
 
