@@ -6,9 +6,6 @@ This repository contains an example of an a/b test. This is accomplished by crea
 
 An example of this can be ran at https://jsfiddle.net/vw0af7zq/.
 
-## Installation 
-None! Just open index.html in your preferred browser.
-
 ## How was this feature created in Bullet Train?
 
 **Step 1: Create a remote config called hero**
@@ -30,4 +27,6 @@ This will mean you can override features for 50% of your users.
 This overrides the hero image for a particular user, the same can be done for a particular segment of users.
 You can always override your % split override for particular users or other segments.
 
+## Running the example 
+Just clone and open index.html in your preferred browser.
 
