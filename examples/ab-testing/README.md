@@ -2,7 +2,7 @@
 
 ## Bullet Train A/B Testing
 <img src="./example.png"/>
-This repository contains an example of an a/b test.
+This repository contains an example of an a/b test. This is done by creating a feature and a percentage split segment then overriding the feature's value for users belonging to that segment.
 
 ## Installation 
 None! Just open index.html in your preferred browser.
@@ -25,6 +25,7 @@ This will mean you can override features for 50% of your users.
 
 <img src="./step3.png"/>
 
+This overrides the hero image for a particular user, the same can be done for a particular segment of users.
 You can always override your % split override for particular users or other segments.
 
 
