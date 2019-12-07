@@ -110,6 +110,7 @@ const BulletTrain = class {
              disableCache,
              onError,
              defaultFlags,
+             preventFetch,
              state
          }) {
 
@@ -136,7 +137,9 @@ const BulletTrain = class {
                     if (this.flags && this.onChange) {
                         this.onChange(null, { isFromServer: false });
                     }
-                    this.getFlags(resolve, reject);
+                    if (!preventFetch) {
+                        this.getFlags(resolve, reject);
+                    }
                 });
             }
         })

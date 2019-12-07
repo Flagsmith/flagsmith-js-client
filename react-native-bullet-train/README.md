@@ -55,6 +55,7 @@ bulletTrain.init({
 | ```onError```     | Callback function on failure to retrieve flags. ``` (error)=>{...} ``` | | null
 | ```defaultFlags```     | Allows you define default features, these will all be overridden on first retrieval of features. | | null
 | ```disableCache```     | If you want to disable local storage of feature flags. | | false
+| ```preventFetch```     | If you want to disable fetching flags and call getFlags later. | | false
 | ```api```     | Use this property to define where you're getting feature flags from, e.g. if you're self hosting. | | https://featureflagger.3qqe.flynnhub.com/api/
 
 **Available Functions**
