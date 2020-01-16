@@ -3,13 +3,12 @@ var path = require("path");
 const defaultConfig = {
     entry: './index.js',
     mode: "production",
-    devtool: 'source-map',
     target: "node",
     module: {
         rules: [
             {
                 test: /\.js$/,
-                exclude: /(node_modules|bower_components)/,
+                exclude: /node_modules\/(?!.)/,
                 use: {
                     loader: 'babel-loader'
                 }
@@ -33,7 +32,7 @@ const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web
 const isomorphicBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web client
     output: {
         libraryTarget:'umd',
-        filename: "isomorphic.js",
+        filename: "isomorphic-es6.js",
         path: path.join(__dirname, '/bullet-train-client/'),
         globalObject: 'this',
     },
@@ -57,6 +56,19 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
     }
 });
 
+const isomorphicBundle2 = Object.assign({}, defaultConfig, { //Bundle 4: compile the react native client for the example project
+    entry: {
+        main: './bullet-train-client/isomorphic-es6.js'
+    },
+    output: {
+        libraryTarget:'umd',
+        filename: "isomorphic.js",
+        path: path.join(__dirname, '/bullet-train-client/'),
+        globalObject: 'this',
+    },
+});
+
 module.exports = [
-    webBundle, reactNativeBundle, isomorphicBundle
+    webBundle, reactNativeBundle, isomorphicBundle,
+    // isomorphicBundle2
 ];
