@@ -10,9 +10,9 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.7.1",
     "react": "16.9.0",
-    "react-native": "0.61.2",
-    "react-native-bullet-train": "file://./react-native-bullet-train"
+    "react-native": "0.61.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

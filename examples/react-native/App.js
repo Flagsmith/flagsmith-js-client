@@ -13,8 +13,8 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import bulletTrain from "react-native-bullet-train";
-
+import bulletTrain from "./react-native-bullet-train";
+import AsyncStorage from '@react-native-community/async-storage';
 const environmentID = "uCDQzKWgejrutqSYYsKWen";
 
 export default class App extends Component<Props> {
@@ -30,6 +30,9 @@ export default class App extends Component<Props> {
     const { handleFlags, handleFlagsError } = this;
     bulletTrain.init({
       environmentID,
+      cacheFlags: true,
+      AsyncStorage,
+      enableLogs: true,
       onChange: handleFlags,
       onError: handleFlagsError,
       defaultFlags: {

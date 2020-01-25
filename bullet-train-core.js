@@ -69,6 +69,7 @@ const BulletTrain = class {
                 });
                 this.segments = userSegments;
             }
+            this.updateStorage();
             if (onChange) {
                 onChange(this.oldFlags, { isFromServer: true });
             }
@@ -107,10 +108,12 @@ const BulletTrain = class {
              environmentID,
              api = defaultAPI,
              onChange,
-             disableCache,
+             cacheFlags,
              onError,
              defaultFlags,
              preventFetch,
+             enableLogs,
+             AsyncStorage:_AsyncStorage,
              state
          }) {
 
@@ -118,11 +121,16 @@ const BulletTrain = class {
             this.environmentID = environmentID;
             this.api = api;
             this.interval = null;
-            this.disableCache = disableCache;
             this.onChange = onChange;
             this.onError = onError;
+            this.enableLogs = enableLogs;
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
+            this.timer = this.enableLogs ? new Date().valueOf() : null;
+            if (_AsyncStorage) {
+                AsyncStorage = _AsyncStorage;
+            }
+            this.cacheFlags = typeof AsyncStorage !== 'undefined' && cacheFlags;
             this.setState(state)
             if (!environmentID) {
                 reject('Please specify a environment id')
@@ -130,17 +138,31 @@ const BulletTrain = class {
             }
 
             //If the user specified default flags emit a changed event immediately
-
-            if (!disableCache) {
+            if (cacheFlags) {
                 AsyncStorage.getItem(BULLET_TRAIN_KEY, (err, res) => {
-                    this.flags = res ? JSON.parse(res) : defaultFlags;
-                    if (this.flags && this.onChange) {
-                        this.onChange(null, { isFromServer: false });
-                    }
-                    if (!preventFetch) {
-                        this.getFlags(resolve, reject);
+                    if (res) {
+                        try {
+                            var json = JSON.parse(res);
+                            this.setState(json);
+                            this.log("Retrieved flags from cache", json);
+
+                            if (this.flags) { // retrieved flags from local storage
+                                if (this.onChange) {
+                                    this.onChange(null, { isFromServer: false });
+                                }
+                                resolve();
+                                this.getFlags(Promise.resolve, Promise.reject);
+
+                            } else {
+                                this.getFlags(resolve, reject);
+                            }
+                        } catch(e) {
+                            this.log("Exception fetching cached logs", e);
+                        }
                     }
                 });
+            } else if (!preventFetch) {
+                this.getFlags(resolve, reject);
             }
         })
     }
@@ -175,6 +197,20 @@ const BulletTrain = class {
                 this.identity = state.identity || this.identity;
                 this.segments = state.segments || this.segments;
                 this.traits = state.traits || this.traits;
+        }
+    }
+
+    log(...args) {
+        if (this.enableLogs) {
+            console.log.apply(this, ["BULLET TRAIN:", new Date().valueOf()-this.timer,"ms", ...args]);
+        }
+    }
+
+    updateStorage() {
+        if (this.cacheFlags) {
+            const state = JSON.stringify(this.getState());
+            this.log("Setting storage", state);
+            AsyncStorage.setItem(BULLET_TRAIN_KEY, state);
         }
     }
 

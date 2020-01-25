@@ -56,19 +56,22 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
     }
 });
 
-const isomorphicBundle2 = Object.assign({}, defaultConfig, { //Bundle 4: compile the react native client for the example project
+const reactNativeExampleBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile the react native client for the example project
     entry: {
-        main: './bullet-train-client/isomorphic-es6.js'
+        main: './index.react-native.js'
+    },
+    externals: {
+        'react-native': 'react-native'
     },
     output: {
-        libraryTarget:'umd',
-        filename: "isomorphic.js",
-        path: path.join(__dirname, '/bullet-train-client/'),
-        globalObject: 'this',
-    },
+        filename: "index.js",
+        library: "bullet-train",
+        libraryTarget: "umd",
+        path: path.join(__dirname, '/examples/react-native/react-native-bullet-train'),
+    }
 });
 
 module.exports = [
-    webBundle, reactNativeBundle, isomorphicBundle,
+    webBundle, reactNativeBundle, isomorphicBundle,reactNativeExampleBundle
     // isomorphicBundle2
 ];
