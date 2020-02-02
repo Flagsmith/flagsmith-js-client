@@ -1,0 +1,16 @@
+{
+  "name": "deno-example",
+  "version": "1.0.0",
+  "description": "Using Bullet Train with Deno",
+  "scripts": {
+    "build": "deno bundle ./app/index.ts ./out.ts",
+    "dev": "nodemon --exec deno --allow-net --allow-env ./app/index.ts",
+    "docker:build": "docker build . -t bullet-train-deno",
+    "start": "npm run build && deno --allow-net --allow-env ./out.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
