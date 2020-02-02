@@ -19,6 +19,8 @@ class MyApp extends App {
             var environmentID = 'uCDQzKWgejrutqSYYsKWen'
             await bulletTrain.init({
                 environmentID: environmentID,
+                cacheFlags: true,
+                enableLogs: true,
                 defaultFlags: {
                     font_size: 10
                 },

@@ -19,6 +19,8 @@ export default class App extends Component {
       environmentID,
       onChange: handleFlags,
       onError: handleFlagsError,
+      cacheFlags: true,
+      enableLogs: true,
       defaultFlags: {
         default_feature: true,
         font_size: 12,

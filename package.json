@@ -5,7 +5,7 @@
     "prepublish": "npm run build",
     "deploy": "npm run build && cd ./bullet-train-client/ && npm publish && cd ../react-native-bullet-train && npm publish",
     "start": "node_modules/.bin/webpack --watch",
-    "build": "node_modules/.bin/webpack"
+    "build": "node_modules/.bin/webpack && babel ./bullet-train-client/isomorphic-es6.js --out-file bullet-train-client/isomorphic.js"
   },
   "repository": {
     "type": "git",
@@ -23,10 +23,12 @@
   },
   "homepage": "https://bullet-train.io",
   "devDependencies": {
+    "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/preset-env": "^7.6.3",
     "babel-loader": "^8.0.6",
+    "babel-preset-minify": "^0.5.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
   },

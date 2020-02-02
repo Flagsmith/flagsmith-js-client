@@ -33,6 +33,8 @@ $("#js-decrement").on("click", function (){
 //Intialise Bullet Train
 bulletTrain.init({
     environmentID: environmentID,
+    cacheFlags: true,
+    enableLogs: true,
     defaultFlags: {
         font_size: 10
     },
