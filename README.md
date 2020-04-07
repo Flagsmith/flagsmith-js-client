@@ -63,7 +63,8 @@ bulletTrain.init({
 | ```cacheFlags```     | Any time flags are retrieved they will be cached, flags and identities will then be retrieved from local storage before hitting the API ``` | | null
 | ```enableLogs```     | Enables logging for key bullet train events ``` | | null
 | ```defaultFlags```     | Allows you define default features, these will all be overridden on first retrieval of features. | | null
-| ```api```     | Use this property to define where you're getting feature flags from, e.g. if you're self hosting. | | https://featureflagger.3qqe.flynnhub.com/api/
+| ```preventFetch```     | Use this if you want to prevent fetching on init(), e.g. if you want to do some initialisation or call identify. | | false
+| ```api```     | Use this property to define where you're getting feature flags from, e.g. if you're self hosting. | | https://api.bullet-train.io/api/v1/
 
 **Available Functions**
 
