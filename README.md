@@ -31,7 +31,7 @@ bulletTrain.identify("bullet_train_sample_user");
 bulletTrain.init({
 	environmentID:"<YOUR_ENVIRONMENT_KEY>",
     cacheFlags: true,
-	onChange: (oldFlags,params)=>{ //Occurs whenever flags are changed
+	onChange: (oldFlags,params)=>{ // callback function for when the flags are retrieved
 	
 		const {isFromServer} = params; //determines if the update came from the server or local cached storage
 		
