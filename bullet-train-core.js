@@ -270,6 +270,27 @@ const BulletTrain = class {
             .then(this.getFlags)
     };
 
+    setTraits = (traits) => {
+        const { getJSON, identity, api } = this;
+
+        if (!traits || typeof traits !== 'object') {
+            console.error("Expected object for bulletTrain.setTraits");
+        }
+
+        const body = Object.keys(traits).map((key)=>(
+            {
+                "identity": {
+                    "identifier": identity
+                },
+                "trait_key": key,
+                "trait_value": traits[key]
+            }
+        ))
+
+        return getJSON(`${api}traits/`, 'PUT', JSON.stringify(body))
+            .then(this.getFlags)
+    };
+
     incrementTrait = (trait_key, increment_by) => {
         const { getJSON, identity, api } = this;
         return getJSON(`${api}traits/increment-value/`, 'POST', JSON.stringify({ trait_key, increment_by, identifier:identity }))
