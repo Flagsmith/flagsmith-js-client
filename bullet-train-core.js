@@ -143,8 +143,10 @@ const BulletTrain = class {
                     if (res) {
                         try {
                             var json = JSON.parse(res);
-                            this.setState(json);
-                            this.log("Retrieved flags from cache", json);
+                            if (json && json.api === this.api) {
+                                this.setState(json);
+                                this.log("Retrieved flags from cache", json);
+                            }
 
                             if (this.flags) { // retrieved flags from local storage
                                 if (this.onChange) {
@@ -287,7 +289,7 @@ const BulletTrain = class {
             }
         ))
 
-        return getJSON(`${api}traits/`, 'PUT', JSON.stringify(body))
+        return getJSON(`${api}traits/bulk/`, 'PUT', JSON.stringify(body))
             .then(this.getFlags)
     };
 
