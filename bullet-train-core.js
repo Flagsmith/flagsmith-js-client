@@ -269,7 +269,11 @@ const BulletTrain = class {
         }
 
         return getJSON(`${api}traits/`, 'POST', JSON.stringify(body))
-            .then(this.getFlags)
+            .then(()=>{
+                if (this.initialised) {
+                    this.getFlags()
+                }
+            })
     };
 
     setTraits = (traits) => {
@@ -290,7 +294,11 @@ const BulletTrain = class {
         ))
 
         return getJSON(`${api}traits/bulk/`, 'PUT', JSON.stringify(body))
-            .then(this.getFlags)
+            .then(()=>{
+                if (this.initialised) {
+                    this.getFlags()
+                }
+            })
     };
 
     incrementTrait = (trait_key, increment_by) => {

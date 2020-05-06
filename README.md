@@ -84,6 +84,13 @@ bulletTrain.init({
 | ```identify(userId)```     | Identify as a user, this will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```
 | ```logout()```     | Stop identifying as a user, this will trigger a call to ```getFlags()```
 
+## Notes on initialisation
+
+``identify``, ``setTrait`` and ``setTraits`` all trigger calls to ``getFlags``, which in turn hits the get flags endpoint. This is due to identities and traits affecting flags that are returned.
+ 
+However, you can avoid these extra calls to get flags if you call these finctions before  ``bulletTrain.init``. 
+
+
 ## Serverside Support with Next.js
 This library now supports server side rendering! In order to use this, use the following instead of the standard bullet-train-client:
 ```

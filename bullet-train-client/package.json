@@ -1,6 +1,6 @@
 {
   "name": "bullet-train-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "repository": {
