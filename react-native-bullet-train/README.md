@@ -82,7 +82,7 @@ bulletTrain.init({
 
 ``identify``, ``setTrait`` and ``setTraits`` all trigger calls to ``getFlags``, which in turn hits the get flags endpoint. This is due to identities and traits affecting flags that are returned.
  
-However, you can avoid these extra calls to get flags if you call these finctions before  ``bulletTrain.init``. 
+However, you can avoid these extra calls to get flags if you call these functions before  ``bulletTrain.init``. 
 
 ## Contributing
 
