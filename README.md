@@ -1,12 +1,14 @@
 <img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
 
 # Bullet Train Client
+
 [![npm version](https://badge.fury.io/js/bullet-train-client.svg)](https://badge.fury.io/js/bullet-train-client)
 [![](https://data.jsdelivr.com/v1/package/npm/bullet-train-client/badge)](https://www.jsdelivr.com/package/npm/bullet-train-client)
 
 The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Bullet Train allows you to manage feature flags and remote config across multiple projects, environments and organisations.
 
 ## Getting Started
+
 **For full documentation visit [https://docs.bullet-train.io/clients/javascript/](https://docs.bullet-train.io/clients/javascript/)**
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See running in production for notes on how to deploy the project on a live system.
@@ -29,27 +31,26 @@ import bulletTrain from "bullet-train-client or react-native-bullet-train"; //Ad
 bulletTrain.identify("bullet_train_sample_user");
 
 bulletTrain.init({
-	environmentID:"<YOUR_ENVIRONMENT_KEY>",
+    environmentID:"<YOUR_ENVIRONMENT_KEY>",
     cacheFlags: true,
-	onChange: (oldFlags,params)=>{ // callback function for when the flags are retrieved
-	
-		const {isFromServer} = params; //determines if the update came from the server or local cached storage
-		
-		//Check for a feature
-		if (bulletTrain.hasFeature("myCoolFeature")){
-			myCoolFeature();
-		}
-				
-		//Or, use the value of a feature
-		const bannerSize = bulletTrain.getValue("bannerSize");
-		
-		//Check whether value has changed
-		const bannerSizeOld = oldFlags["bannerSize"] && oldFlags["bannerSize"].value;
-		if (bannerSize !== bannerSizeOld) {
-		
-		}
+    onChange: (oldFlags,params)=>{ // callback function for when the flags are retrieved
 
-	}
+        const {isFromServer} = params; //determines if the update came from the server or local cached storage
+
+        //Check for a feature
+        if (bulletTrain.hasFeature("myCoolFeature")){
+            myCoolFeature();
+        }
+
+        //Or, use the value of a feature
+        const bannerSize = bulletTrain.getValue("bannerSize");
+
+        //Check whether value has changed
+        const bannerSizeOld = oldFlags["bannerSize"] && oldFlags["bannerSize"].value;
+        if (bannerSize !== bannerSizeOld) {
+
+        }
+    }
 });
 ```
 
@@ -71,8 +72,8 @@ bulletTrain.init({
 | Property        | Description |
 | ------------- |:-------------:|
 | ```init```     | Initialise the sdk against a particular environment
-| ```hasFeature(key)```     | Get the value of a particular feature e.g. ```bulletTrain.hasFeature("powerUserFeature") // true```
-| ```getValue(key)```     | Get the value of a particular feature e.g. ```bulletTrain.getValue("font_size") // 10```
+| ```hasFeature(key)```     | Get the boolean value of a particular *Feature Flag*  e.g. ```bulletTrain.hasFeature("powerUserFeature") // true```
+| ```getValue(key)```     | Get the value of a particular *Remote Config Value* e.g. ```bulletTrain.getValue("font_size") // 10```
 | ```getTrait(key)```     | Once used with an identified user you can get the value of any trait that is set for them e.g. ```bulletTrain.getTrait("accepted_cookie_policy")```
 | ```setTrait(key, value)```     | Once used with an identified user you can set the value of any trait relevant to them e.g. ```bulletTrain.setTrait("accepted_cookie_policy", true)```
 | ```setTraits(object)```     | Set multiple traits e.g. ```bulletTrain.setTraits({foo:"bar",numericProp:1,boolProp:true})```. Setting a value of null for a trait will remove that trait.
