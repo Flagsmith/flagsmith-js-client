@@ -59,7 +59,6 @@ const BulletTrain = class {
             traits.forEach(trait => {
                 userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value
             });
-            this.oldFlags = flags;
             this.flags = flags;
             this.traits = userTraits;
             if (segments) {
@@ -73,6 +72,7 @@ const BulletTrain = class {
             if (onChange) {
                 onChange(this.oldFlags, { isFromServer: true });
             }
+            this.oldFlags = this.flags;
         };
 
         if (identity) {
@@ -152,6 +152,7 @@ const BulletTrain = class {
                                 if (this.onChange) {
                                     this.onChange(null, { isFromServer: false });
                                 }
+                                this.oldFlags = this.flags;
                                 resolve();
                                 this.getFlags(Promise.resolve, Promise.reject);
 
