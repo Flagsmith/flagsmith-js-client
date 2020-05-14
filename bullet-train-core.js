@@ -143,7 +143,7 @@ const BulletTrain = class {
                     if (res) {
                         try {
                             var json = JSON.parse(res);
-                            if (json && json.api === this.api) {
+                            if (json && json.api === this.api && json.environmentID === this.environmentID) {
                                 this.setState(json);
                                 this.log("Retrieved flags from cache", json);
                             }
