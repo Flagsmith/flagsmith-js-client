@@ -2,6 +2,7 @@ let fetch;
 let AsyncStorage;
 const BULLET_TRAIN_KEY = "BULLET_TRAIN_DB";
 const defaultAPI = 'https://api.bullet-train.io/api/v1/';
+const deepEqual = require('fast-deep-equal');
 const BulletTrain = class {
 
     constructor(props) {
@@ -26,30 +27,31 @@ const BulletTrain = class {
             options.headers['Content-Type'] = 'application/json; charset=utf-8'
         return fetch(url, options)
             .then(res => {
-                    if (res.status >= 200 && res.status < 300) {
-                        return res;
-                    }
-                    return res.text()
-                        .then((res)=>{
-                            let err = res;
-                            try {
-                              err = JSON.parse(res);
-                            } catch (e) {}
-                            return Promise.reject(err);
-                        })
+                if (res.status >= 200 && res.status < 300) {
+                    return res;
+                }
+                return res.text()
+                    .then((res) => {
+                        let err = res;
+                        try {
+                            err = JSON.parse(res);
+                        } catch (e) {
+                        }
+                        return Promise.reject(err);
+                    })
             })
             .then(res => res.json());
     };
 
-    getFlags = (resolve,reject) => {
+    getFlags = (resolve, reject) => {
         const { onChange, onError, identity, api, disableCache } = this;
         let resolved = false;
         const handleResponse = ({ flags: features, traits }, segments) => {
             // Handle server response
             let flags = {};
             let userTraits = {};
-            features = features||[];
-            traits = traits||[];
+            features = features || [];
+            traits = traits || [];
             features.forEach(feature => {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     enabled: feature.enabled,
@@ -59,20 +61,29 @@ const BulletTrain = class {
             traits.forEach(trait => {
                 userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value
             });
-            this.flags = flags;
-            this.traits = userTraits;
+            this.oldFlags = {
+                ...this.flags
+            };
             if (segments) {
                 let userSegments = {};
-                segments.map((s)=>{
+                segments.map((s) => {
                     userSegments[s.name] = s;
                 });
                 this.segments = userSegments;
             }
+            const flagsEqual = deepEqual(this.flags, flags);
+            const traitsEqual = deepEqual(this.traits, userTraits);
+            this.flags = flags;
+            this.traits = userTraits;
             this.updateStorage();
             if (onChange) {
-                onChange(this.oldFlags, { isFromServer: true });
+                onChange(this.oldFlags, {
+                    isFromServer: true,
+                    flagsChanged:!flagsEqual,
+                    traitsChanged: !traitsEqual
+                });
             }
-            this.oldFlags = this.flags;
+
         };
 
         if (identity) {
@@ -80,7 +91,7 @@ const BulletTrain = class {
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
-                    handleResponse(res[0],res[1])
+                    handleResponse(res[0], res[1])
                 }).catch(({ message }) => {
                     onError && onError({ message })
                 });
@@ -89,7 +100,7 @@ const BulletTrain = class {
                 this.getJSON(api + "flags/")
             ])
                 .then((res) => {
-                    handleResponse({flags: res[0]},null)
+                    handleResponse({ flags: res[0] }, null)
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -113,11 +124,11 @@ const BulletTrain = class {
              defaultFlags,
              preventFetch,
              enableLogs,
-             AsyncStorage:_AsyncStorage,
+             AsyncStorage: _AsyncStorage,
              state
          }) {
 
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
             this.api = api;
             this.interval = null;
@@ -159,7 +170,7 @@ const BulletTrain = class {
                             } else {
                                 this.getFlags(resolve, reject);
                             }
-                        } catch(e) {
+                        } catch (e) {
                             this.log("Exception fetching cached logs", e);
                         }
                     }
@@ -193,19 +204,19 @@ const BulletTrain = class {
 
     setState(state) {
         if (state) {
-                this.initialised = true;
-                this.api = state.api || this.api  || defaultAPI;
-                this.environmentID = state.environmentID || this.environmentID ;
-                this.flags = state.flags || this.flags;
-                this.identity = state.identity || this.identity;
-                this.segments = state.segments || this.segments;
-                this.traits = state.traits || this.traits;
+            this.initialised = true;
+            this.api = state.api || this.api || defaultAPI;
+            this.environmentID = state.environmentID || this.environmentID;
+            this.flags = state.flags || this.flags;
+            this.identity = state.identity || this.identity;
+            this.segments = state.segments || this.segments;
+            this.traits = state.traits || this.traits;
         }
     }
 
     log(...args) {
         if (this.enableLogs) {
-            console.log.apply(this, ["BULLET TRAIN:", new Date().valueOf()-this.timer,"ms", ...args]);
+            console.log.apply(this, ["BULLET TRAIN:", new Date().valueOf() - this.timer, "ms", ...args]);
         }
     }
 
@@ -270,7 +281,7 @@ const BulletTrain = class {
         }
 
         return getJSON(`${api}traits/`, 'POST', JSON.stringify(body))
-            .then(()=>{
+            .then(() => {
                 if (this.initialised) {
                     this.getFlags()
                 }
@@ -284,7 +295,7 @@ const BulletTrain = class {
             console.error("Expected object for bulletTrain.setTraits");
         }
 
-        const body = Object.keys(traits).map((key)=>(
+        const body = Object.keys(traits).map((key) => (
             {
                 "identity": {
                     "identifier": identity
@@ -295,7 +306,7 @@ const BulletTrain = class {
         ))
 
         return getJSON(`${api}traits/bulk/`, 'PUT', JSON.stringify(body))
-            .then(()=>{
+            .then(() => {
                 if (this.initialised) {
                     this.getFlags()
                 }
@@ -304,7 +315,11 @@ const BulletTrain = class {
 
     incrementTrait = (trait_key, increment_by) => {
         const { getJSON, identity, api } = this;
-        return getJSON(`${api}traits/increment-value/`, 'POST', JSON.stringify({ trait_key, increment_by, identifier:identity }))
+        return getJSON(`${api}traits/increment-value/`, 'POST', JSON.stringify({
+            trait_key,
+            increment_by,
+            identifier: identity
+        }))
             .then(this.getFlags)
     };
 

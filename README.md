@@ -59,7 +59,7 @@ bulletTrain.init({
 | Property        | Description           | Required  | Default Value  |
 | ------------- |:-------------:| -----:| -----:|
 | ```environmentID```     | Defines which project environment you wish to get flags for. *example ACME Project - Staging.* | **YES** | null
-| ```onChange```     | Your callback function for when the flags are retrieved ``` (flags,{isFromServer:true/false})=>{...} ``` | **YES** | null
+| ```onChange```     | Your callback function for when the flags are retrieved ``` (flags,{isFromServer:true/false, flagsChanged:true/false, traitsChanged:true/false})=>{...} ``` | **YES** | null
 | ```onError```     | Callback function on failure to retrieve flags. ``` (error)=>{...} ``` | | null
 | ```cacheFlags```     | Any time flags are retrieved they will be cached, flags and identities will then be retrieved from local storage before hitting the API ``` | | null
 | ```enableLogs```     | Enables logging for key bullet train events ``` | | null
@@ -90,6 +90,10 @@ bulletTrain.init({
 ``identify``, ``setTrait`` and ``setTraits`` all trigger calls to ``getFlags``, which in turn hits the get flags endpoint. This is due to identities and traits affecting flags that are returned.
  
 However, you can avoid these extra calls to get flags if you call these functions before  ``bulletTrain.init``. 
+
+## Developing the client
+
+To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``bullet-train-core.js`` will compile the library to ``bullet-train-client/index`` and ``react-native-bullet-train/index.js``. The examples in ``/examples`` use the locally compiled library.
 
 
 ## Serverside Support with Next.js
