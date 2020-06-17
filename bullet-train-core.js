@@ -3,6 +3,11 @@ let AsyncStorage;
 const BULLET_TRAIN_KEY = "BULLET_TRAIN_DB";
 const defaultAPI = 'https://api.bullet-train.io/api/v1/';
 const deepEqual = require('fast-deep-equal');
+
+const initError = function (caller) {
+    return  "Attempted to " + caller + " a user before calling bulletTrain.init. Call bulletTrain.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
+}
+
 const BulletTrain = class {
 
     constructor(props) {
@@ -272,6 +277,11 @@ const BulletTrain = class {
     setTrait = (key, trait_value) => {
         const { getJSON, identity, api } = this;
 
+        if (!api) {
+            console.error(initError("setTrait"))
+            return
+        }
+
         const body = {
             "identity": {
                 "identifier": identity
@@ -290,6 +300,11 @@ const BulletTrain = class {
 
     setTraits = (traits) => {
         const { getJSON, identity, api } = this;
+
+        if (!api) {
+            console.error(initError("setTraits"))
+            return
+        }
 
         if (!traits || typeof traits !== 'object') {
             console.error("Expected object for bulletTrain.setTraits");
