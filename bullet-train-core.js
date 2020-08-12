@@ -192,8 +192,10 @@ const BulletTrain = class {
 
     identify(userId) {
         this.identity = userId;
-        if (this.initialised && !this.interval)
-            this.getFlags();
+        if (this.initialised && !this.interval) {
+            return this.getFlags();
+        }
+        return Promise.resolve();
     }
 
     getState() {
