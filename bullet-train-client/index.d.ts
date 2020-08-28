@@ -5,7 +5,7 @@ declare module 'bullet-train-client' {
     export function init(config: {
         environmentID: string // your Bullet Train environment id
         api?: string // the api you wish to use, important if self hosting
-        AsyncStorage: any // an AsyncStorage implementation
+        AsyncStorage?: any // an AsyncStorage implementation
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
         preventFetch?: boolean // whether to prevent fetching flags on init
         enableLogs?: boolean // whether to enable logs
@@ -13,7 +13,7 @@ declare module 'bullet-train-client' {
         state?: IState // set a predefined state, useful for isomorphic applications
         onError?: (res:{message:string}) => void // triggered if there was an api error
         defaultFlags?: IFlags //
-    }): void
+    }): Promise<void>
 
     /**
      * Trigger a manual fetch of the environment features
@@ -141,7 +141,7 @@ declare module 'bullet-train-client/isomorphic' {
     export function init(config: {
         environmentID: string // your Bullet Train environment id
         api?: string // the api you wish to use, important if self hosting
-        AsyncStorage: any // an AsyncStorage implementation
+        AsyncStorage?: any // an AsyncStorage implementation
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
         preventFetch?: boolean // whether to prevent fetching flags on init
         enableLogs?: boolean // whether to enable logs
@@ -149,7 +149,7 @@ declare module 'bullet-train-client/isomorphic' {
         state?: IState // set a predefined state, useful for isomorphic applications
         onError?: (res:{message:string}) => void // triggered if there was an api error
         defaultFlags?: IFlags //
-    }): void
+    }): Promise<void>
 
     /**
      * Trigger a manual fetch of the environment features
