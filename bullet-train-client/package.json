@@ -16,5 +16,6 @@
   "bugs": {
     "url": "https://github.com/SolidStateGroup/bullet-train-js-client/issues"
   },
-  "homepage": "https://bullet-train.io"
+  "homepage": "https://bullet-train.io",
+  "types": "./index.d.ts"
 }
