@@ -58,9 +58,16 @@ export default class App extends Component {
     return isLoading ? <div>Loading</div> : (
         <div>
           <h2>{environmentID}</h2>
+          <strong>flags</strong>
           <p style={{ fontSize }}>
             {JSON.stringify(flagsmith.flags)}
           </p>
+          <div>
+            <strong>
+              Traits
+            </strong>
+          </div>
+          {JSON.stringify(flagsmith.traits)}
           {flagsmith.identity ? (
               <div>
                 <div>
@@ -96,14 +103,6 @@ export default class App extends Component {
               <div style={{padding:10, backgroundColor:i%2?"#eaeaea": "white", position:'relative'}} key={i}>
                 <div style={{position:'absolute', top:10, right:10}}>
                   {timestamp}
-                </div>
-                <div>
-                  <div>
-                    <strong>
-                      Traits
-                    </strong>
-                  </div>
-                  {data}
                 </div>
                 <div>
                   <div>

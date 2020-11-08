@@ -170,13 +170,20 @@ const Flagsmith = class {
                                 }
                                 this.oldFlags = this.flags;
                                 resolve();
-                                this.getFlags(Promise.resolve, Promise.reject);
-
+                                if (!preventFetch) {
+                                    this.getFlags(Promise.resolve, Promise.reject);
+                                }
                             } else {
-                                this.getFlags(resolve, reject);
+                                if (!preventFetch) {
+                                  this.getFlags(resolve, reject);
+                                }
                             }
                         } catch (e) {
                             this.log("Exception fetching cached logs", e);
+                        }
+                    } else {
+                        if (!preventFetch) {
+                            this.getFlags(resolve, reject)
                         }
                     }
                 });
