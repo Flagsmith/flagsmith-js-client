@@ -4,7 +4,7 @@
 [![npm version](https://badge.fury.io/js/bullet-train-client.svg)](https://badge.fury.io/js/bullet-train-client)
 [![](https://data.jsdelivr.com/v1/package/npm/bullet-train-client/badge)](https://www.jsdelivr.com/package/npm/bullet-train-client)
 
-The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Bullet Train allows you to manage feature flags and remote config across multiple projects, environments and organisations.
+The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
 
 ## Getting Started
 **For full documentation visit [https://docs.bullet-train.io/clients/javascript/](https://docs.bullet-train.io/clients/javascript/)**
@@ -56,7 +56,7 @@ flagsmith.init({
 | ```onError```     | Callback function on failure to retrieve flags. ``` (error)=>{...} ``` | | null
 | ```AsyncStorage```     | Needed for cacheFlags option, used to tell the library what implementation of AsyncStorage your app uses, i.e. ReactNative.AsyncStorage vs @react-native-community/async-storage. | | null
 | ```cacheFlags```     | Any time flags are retrieved they will be cached, flags and identities will then be retrieved from local storage before hitting the API ``` | | null
-| ```enableLogs```     | Enables logging for key bullet train events ``` | | null
+| ```enableLogs```     | Enables logging for key Flagsmith events ``` | | null
 | ```defaultFlags```     | Allows you define default features, these will all be overridden on first retrieval of features. | | null
 | ```preventFetch```     | If you want to disable fetching flags and call getFlags later. | | false
 | ```api```     | Use this property to define where you're getting feature flags from, e.g. if you're self hosting. | | https://featureflagger.3qqe.flynnhub.com/api/
