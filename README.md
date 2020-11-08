@@ -62,7 +62,7 @@ flagsmith.init({
 | ```onChange```     | Your callback function for when the flags are retrieved ``` (flags,{isFromServer:true/false, flagsChanged:true/false, traitsChanged:true/false})=>{...} ``` | **YES** | null
 | ```onError```     | Callback function on failure to retrieve flags. ``` (error)=>{...} ``` | | null
 | ```cacheFlags```     | Any time flags are retrieved they will be cached, flags and identities will then be retrieved from local storage before hitting the API ``` | | null
-| ```enableLogs```     | Enables logging for key bullet train events ``` | | null
+| ```enableLogs```     | Enables logging for key Flagsmith events ``` | | null
 | ```defaultFlags```     | Allows you define default features, these will all be overridden on first retrieval of features. | | null
 | ```preventFetch```     | Use this if you want to prevent fetching on init(), e.g. if you want to do some initialisation or call identify. | | false
 | ```api```     | Use this property to define where you're getting feature flags from, e.g. if you're self hosting. | | https://api.bullet-train.io/api/v1/
@@ -92,7 +92,7 @@ However, you can avoid these extra calls to get flags if you call these function
 
 ## Developing the client
 
-To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``flagsmith-core.js`` will compile the library to ``flagsmith/index`` and ``react-native-bullet-train/index.js``. The examples in ``/examples`` use the locally compiled library.
+To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``flagsmith-core.js`` will compile the library to ``flagsmith/index`` and ``react-native-flagsmith/index.js``. The examples in ``/examples`` use the locally compiled library.
 
 
 ## Serverside Support with Next.js

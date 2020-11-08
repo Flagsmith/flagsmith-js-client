@@ -50,7 +50,7 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
     },
     output: {
         filename: "index.js",
-        library: "bullet-train",
+        library: "flagsmith",
         libraryTarget: "umd",
         path: path.join(__dirname, '/react-native-flagsmith/lib'),
     }
@@ -65,7 +65,7 @@ const reactNativeExampleBundle = Object.assign({}, defaultConfig, { //Bundle 4: 
     },
     output: {
         filename: "index.js",
-        library: "bullet-train",
+        library: "flagsmith",
         libraryTarget: "umd",
         path: path.join(__dirname, '/examples/react-native/react-native-flagsmith'),
     }
