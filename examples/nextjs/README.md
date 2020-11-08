@@ -4,12 +4,12 @@
 This repository contains integration with next.js and Redux with SSR support.
 Basic flow: 
 
-- _app.js (SERVER) awaits for bulletTrain to initialise and callback with flags
-- _app.js (SERVER) triggers an action with the bulletTrain state
+- _app.js (SERVER) awaits for Flagsmith to initialise and callback with flags
+- _app.js (SERVER) triggers an action with the Flagsmith state
 - reducer.js (SERVER) stores the Flagsmith state in an object called config
 - pages/index.js (SERVER) renders markup after Flagsmith has data for getTrait, getValue etc
 
-- _app.js (CLIENT) initialises bulletTrain on the client with the server state setState and registers an onChange function which triggers a redux action.
+- _app.js (CLIENT) initialises Flagsmith on the client with the server state setState and registers an onChange function which triggers a redux action.
 
 ## Installation 
 ```

@@ -4,9 +4,9 @@ if (typeof window === 'undefined')  {
 }
 
 import AsyncStorage from "@callstack/async-storage";
-const bt = require('./flagsmith-core');
-const bulletTrain = bt({AsyncStorage, fetch});
+const core = require('./flagsmith-core');
+const flagsmith = core({AsyncStorage, fetch});
 if (typeof window !== "undefined") {
-    window.bulletTrain = bulletTrain;
+    window.flagsmith = flagsmith;
 }
-export default bulletTrain;
+export default flagsmith;
