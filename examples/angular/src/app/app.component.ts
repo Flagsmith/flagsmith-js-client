@@ -49,7 +49,7 @@ export class AppComponent {
   };
 
   login = () => {
-    bulletTrain.identify('bullet_train_sample_user');
+    bulletTrain.identify('flagsmith_sample_user');
   };
 
   submitTrait = () => {

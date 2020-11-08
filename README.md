@@ -28,7 +28,7 @@ React Native:
 ```javascript
 import bulletTrain from "bullet-train-client or react-native-bullet-train"; //Add this line if you're using bulletTrain via npm
 
-bulletTrain.identify("bullet_train_sample_user");
+bulletTrain.identify("flagsmith_sample_user");
 
 bulletTrain.init({
     environmentID:"<YOUR_ENVIRONMENT_KEY>",

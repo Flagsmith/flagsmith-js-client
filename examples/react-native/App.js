@@ -54,7 +54,7 @@ export default class App extends Component<Props> {
   }
 
   login = () => {
-    bulletTrain.identify("bullet_train_sample_user");
+    bulletTrain.identify("flagsmith_sample_user");
     this.forceUpdate();
   };
 

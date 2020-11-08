@@ -3,7 +3,7 @@ var environmentID = 'QjgYur4LQTwe5HpvbvhpzK'
 $(document).ready(function () {
     //Intialise Bullet Train
     $('.js-special').on('click', function () {
-        bulletTrain.identify('bullet_train_sample_user')
+        bulletTrain.identify('flagsmith_sample_user')
     });
     $('.js-random').on('click', function () {
         bulletTrain.identify("random_" + Math.floor(Math.random() * 10))

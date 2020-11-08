@@ -1,7 +1,7 @@
 var environmentID = 'uCDQzKWgejrutqSYYsKWen'
 
 function identify() {
-    bulletTrain.identify("bullet_train_sample_user")
+    bulletTrain.identify("flagsmith_sample_user")
 }
 
 function toggleTrait () {
@@ -9,7 +9,7 @@ function toggleTrait () {
 }
 
 function login () {
-    bulletTrain.identify("bullet_train_sample_user");
+    bulletTrain.identify("flagsmith_sample_user");
 };
 
 function logout () {
