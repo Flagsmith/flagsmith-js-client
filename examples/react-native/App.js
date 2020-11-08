@@ -13,7 +13,7 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import bulletTrain from "./react-native-bullet-train";
+import flagsmith from "./react-native-bullet-train";
 import AsyncStorage from '@react-native-community/async-storage';
 const environmentID = "uCDQzKWgejrutqSYYsKWen";
 
@@ -28,7 +28,7 @@ export default class App extends Component<Props> {
 
   componentDidMount() {
     const { handleFlags, handleFlagsError } = this;
-    bulletTrain.init({
+    flagsmith.init({
       environmentID,
       cacheFlags: true,
       AsyncStorage,
@@ -40,38 +40,38 @@ export default class App extends Component<Props> {
         font_size: 12,
       }
     });
-    bulletTrain.startListening(2000)
+    flagsmith.startListening(2000)
 
   }
 
   logout = () => {
-    bulletTrain.logout();
+    flagsmith.logout();
     this.forceUpdate();
   };
 
   submitTrait = () => {
-    bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
+    flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
   }
 
   login = () => {
-    bulletTrain.identify("flagsmith_sample_user");
+    flagsmith.identify("flagsmith_sample_user");
     this.forceUpdate();
   };
 
   increment = (value)=> {
-    bulletTrain.incrementTrait("button_clicks", value)
+    flagsmith.incrementTrait("button_clicks", value)
   };
 
   render() {
 
-    const trait = bulletTrain.getTrait("example_trait") + "";
-    const fontSize = parseInt(bulletTrain.getValue("font_size"));
-    const buttonClicks = bulletTrain.getTrait("button_clicks");
+    const trait = flagsmith.getTrait("example_trait") + "";
+    const fontSize = parseInt(flagsmith.getValue("font_size"));
+    const buttonClicks = flagsmith.getTrait("button_clicks");
     const { isLoading, logs } = this.state;
     const { submitTrait } = this;
     return isLoading ? <Text>Loading</Text> : (
         <ScrollView style={{ padding: 50 }}>
-          {bulletTrain.identity ? (
+          {flagsmith.identity ? (
               <View>
                 <Button title={"logout"} onPress={this.logout}/>
                 <View>
@@ -91,7 +91,7 @@ export default class App extends Component<Props> {
               </View>
           ) : <Button title={"login as sample user"} onPress={this.login}/>}
           <Text style={{ fontSize: isNaN(fontSize)? 12: fontSize }}>
-            {JSON.stringify(bulletTrain.flags)}
+            {JSON.stringify(flagsmith.flags)}
           </Text>
           <Text style={styles.title}>
             Events
@@ -113,7 +113,7 @@ export default class App extends Component<Props> {
         timestamp: new Date().toTimeString(),
         params: JSON.stringify(params),
         oldData: JSON.stringify(oldFlags),
-        data: JSON.stringify(bulletTrain.getAllFlags()),
+        data: JSON.stringify(flagsmith.getAllFlags()),
       }].concat(this.state.logs)
     });
   };

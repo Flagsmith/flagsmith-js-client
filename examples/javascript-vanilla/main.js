@@ -1,23 +1,23 @@
 var environmentID = 'uCDQzKWgejrutqSYYsKWen'
 
 function identify() {
-    bulletTrain.identify("flagsmith_sample_user")
+    flagsmith.identify("flagsmith_sample_user")
 }
 
 function toggleTrait () {
-    bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
+    flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
 }
 
 function login () {
-    bulletTrain.identify("flagsmith_sample_user");
+    flagsmith.identify("flagsmith_sample_user");
 };
 
 function logout () {
-    bulletTrain.logout();
+    flagsmith.logout();
 };
 
 function increment (value) {
-    bulletTrain.incrementTrait("button_clicks", value)
+    flagsmith.incrementTrait("button_clicks", value)
 };
 
 document.getElementById("js-login").addEventListener("click", login);
@@ -31,7 +31,7 @@ document.getElementById("js-decrement").addEventListener("click", function (){
 });
 
 //Intialise Bullet Train
-bulletTrain.init({
+flagsmith.init({
     cacheFlags: true,
     enableLogs: true,
     environmentID: environmentID,
@@ -42,17 +42,17 @@ bulletTrain.init({
         document.getElementById("loaded").classList.remove("hidden")
         document.getElementById("loading").classList.add("hidden")
 
-        console.log("Received flags", bulletTrain.getAllFlags())
+        console.log("Received flags", flagsmith.getAllFlags())
 
-        if (bulletTrain.identity) {
+        if (flagsmith.identity) {
             document.getElementById("logged-in").classList.remove("hidden")
             document.getElementById("logged-out").classList.add("hidden")
-            document.getElementById("js-button-clicks").innerText = bulletTrain.getTrait("button_clicks");
-            document.getElementById("js-example-trait").innerText = bulletTrain.getTrait("example_trait") + "";
+            document.getElementById("js-button-clicks").innerText = flagsmith.getTrait("button_clicks");
+            document.getElementById("js-example-trait").innerText = flagsmith.getTrait("example_trait") + "";
         } else {
             document.getElementById("logged-out").classList.remove("hidden")
             document.getElementById("logged-in").classList.add("hidden")
         }
-        document.getElementById("js-data").innerText = JSON.stringify(bulletTrain.getAllFlags());
+        document.getElementById("js-data").innerText = JSON.stringify(flagsmith.getAllFlags());
     }
 });

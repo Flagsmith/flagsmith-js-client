@@ -5,7 +5,7 @@ const defaultAPI = 'https://api.bullet-train.io/api/v1/';
 const deepEqual = require('fast-deep-equal');
 
 const initError = function (caller) {
-    return  "Attempted to " + caller + " a user before calling bulletTrain.init. Call bulletTrain.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
+    return  "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
 }
 
 const BulletTrain = class {
@@ -309,7 +309,7 @@ const BulletTrain = class {
         }
 
         if (!traits || typeof traits !== 'object') {
-            console.error("Expected object for bulletTrain.setTraits");
+            console.error("Expected object for flagsmith.setTraits");
         }
 
         const body = Object.keys(traits).map((key) => (
