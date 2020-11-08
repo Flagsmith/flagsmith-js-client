@@ -92,7 +92,7 @@ However, you can avoid these extra calls to get flags if you call these function
 
 ## Developing the client
 
-To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``bullet-train-core.js`` will compile the library to ``bullet-train-client/index`` and ``react-native-bullet-train/index.js``. The examples in ``/examples`` use the locally compiled library.
+To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``flagsmith-core.js`` will compile the library to ``bullet-train-client/index`` and ``react-native-bullet-train/index.js``. The examples in ``/examples`` use the locally compiled library.
 
 
 ## Serverside Support with Next.js

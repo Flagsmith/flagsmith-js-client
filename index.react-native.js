@@ -1,2 +1,2 @@
-const bt = require('./bullet-train-core');
+const bt = require('./flagsmith-core');
 export default bt({});
