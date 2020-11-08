@@ -21,7 +21,7 @@ const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web
     output: {
         libraryTarget:'umd',
         filename: "index.js",
-        path: path.join(__dirname, '/bullet-train-client/'),
+        path: path.join(__dirname, '/flagsmith/'),
         globalObject: 'this',
     },
     entry: {
@@ -33,7 +33,7 @@ const isomorphicBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile 
     output: {
         libraryTarget:'umd',
         filename: "isomorphic-es6.js",
-        path: path.join(__dirname, '/bullet-train-client/'),
+        path: path.join(__dirname, '/flagsmith/'),
         globalObject: 'this',
     },
     entry: {

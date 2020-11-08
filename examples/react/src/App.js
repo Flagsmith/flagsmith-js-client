@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import flagsmith from "bullet-train-client";
+import flagsmith from "flagsmith";
 const environmentID = "uCDQzKWgejrutqSYYsKWen";
 
 //Define default flags

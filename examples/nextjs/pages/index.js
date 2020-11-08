@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import withConfig from '../common/providers/withConfig';
 
-import flagsmith from 'bullet-train-client/isomorphic';
+import flagsmith from 'flagsmith/isomorphic';
 const environmentID = "uCDQzKWgejrutqSYYsKWen";
 //Define default flags
 class HomePage extends Component {

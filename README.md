@@ -2,8 +2,8 @@
 
 # Flagsmith Client
 
-[![npm version](https://badge.fury.io/js/bullet-train-client.svg)](https://badge.fury.io/js/bullet-train-client)
-[![](https://data.jsdelivr.com/v1/package/npm/bullet-train-client/badge)](https://www.jsdelivr.com/package/npm/bullet-train-client)
+[![npm version](https://badge.fury.io/js/flagsmith.svg)](https://badge.fury.io/js/flagsmith)
+[![](https://data.jsdelivr.com/v1/package/npm/flagsmith/badge)](https://www.jsdelivr.com/package/npm/flagsmith)
 
 The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
 
@@ -17,7 +17,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Web:
 
-```npm i bullet-train-client --save```
+```npm i flagsmith --save```
 
 React Native:
 
@@ -26,7 +26,7 @@ React Native:
 **Retrieving feature flags for your project**
 
 ```javascript
-import flagsmith from "bullet-train-client or react-native-flagsmith"; //Add this line if you're using flagsmith via npm
+import flagsmith from "flagsmith or react-native-flagsmith"; //Add this line if you're using flagsmith via npm
 
 flagsmith.identify("flagsmith_sample_user");
 
@@ -92,13 +92,13 @@ However, you can avoid these extra calls to get flags if you call these function
 
 ## Developing the client
 
-To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``flagsmith-core.js`` will compile the library to ``bullet-train-client/index`` and ``react-native-bullet-train/index.js``. The examples in ``/examples`` use the locally compiled library.
+To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``flagsmith-core.js`` will compile the library to ``flagsmith/index`` and ``react-native-bullet-train/index.js``. The examples in ``/examples`` use the locally compiled library.
 
 
 ## Serverside Support with Next.js
-This library now supports server side rendering! In order to use this, use the following instead of the standard bullet-train-client:
+This library now supports server side rendering! In order to use this, use the following instead of the standard flagsmith:
 ```
-import flagsmith from 'bullet-train-client/isomorphic';
+import flagsmith from 'flagsmith/isomorphic';
 ```
 
 ## Contributing

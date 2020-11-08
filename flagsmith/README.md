@@ -18,7 +18,7 @@ These instructions will get you a copy of the project up and running on your loc
 **Retrieving feature flags for your project**
 
 ```javascript
-import bulletTrain from "bullet-train-client"; //Add this line if you're using bulletTrain via npm
+import bulletTrain from "flagsmith"; //Add this line if you're using bulletTrain via npm
 
 bulletTrain.identify("bullet_train_sample_user");
 
