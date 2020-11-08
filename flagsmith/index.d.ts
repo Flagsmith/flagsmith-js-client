@@ -1,4 +1,4 @@
-declare module 'bullet-train-client' {
+declare module 'flagsmith' {
     /**
      * Initialise the sdk against a particular environment
      */
@@ -134,7 +134,7 @@ declare module 'bullet-train-client' {
     }
 }
 
-declare module 'bullet-train-client/isomorphic' {
+declare module 'flagsmith/isomorphic' {
     /**
      * Initialise the sdk against a particular environment
      */
