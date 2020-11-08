@@ -3,7 +3,7 @@ declare module 'flagsmith' {
      * Initialise the sdk against a particular environment
      */
     export function init(config: {
-        environmentID: string // your Bullet Train environment id
+        environmentID: string // your Flagsmith environment id
         api?: string // the api you wish to use, important if self hosting
         AsyncStorage?: any // an AsyncStorage implementation
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined

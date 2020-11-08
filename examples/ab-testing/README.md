@@ -1,12 +1,12 @@
 <img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
 
-## Bullet Train A/B Testing
+## Flagsmith A/B Testing
 <img src="./example.png"/>
 This repository contains an example of an a/b test. This is accomplished by creating a feature and overriding the feature's value for a segment with a percentage split rule.
 
 An example of this can be ran at https://jsfiddle.net/vw0af7zq/.
 
-## How was this feature created in Bullet Train?
+## How was this feature created in Flagsmith?
 
 **Step 1: Create a remote config called hero**
 

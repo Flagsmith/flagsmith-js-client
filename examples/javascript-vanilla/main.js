@@ -30,7 +30,7 @@ document.getElementById("js-decrement").addEventListener("click", function (){
     increment(-1)
 });
 
-//Intialise Bullet Train
+//Intialise Flagsmith
 flagsmith.init({
     cacheFlags: true,
     enableLogs: true,

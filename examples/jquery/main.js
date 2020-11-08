@@ -30,7 +30,7 @@ $("#js-decrement").on("click", function (){
     increment(-1)
 });
 
-//Intialise Bullet Train
+//Intialise Flagsmith
 flagsmith.init({
     environmentID: environmentID,
     cacheFlags: true,

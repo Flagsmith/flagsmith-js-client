@@ -1,7 +1,7 @@
 var environmentID = 'QjgYur4LQTwe5HpvbvhpzK'
 
 $(document).ready(function () {
-    //Intialise Bullet Train
+    //Intialise Flagsmith
     $('.js-special').on('click', function () {
         flagsmith.identify('flagsmith_sample_user')
     });
