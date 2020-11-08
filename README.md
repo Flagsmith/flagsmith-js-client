@@ -21,12 +21,12 @@ Web:
 
 React Native:
 
-```npm i react-native-bullet-train --save```
+```npm i react-native-flagsmith --save```
 
 **Retrieving feature flags for your project**
 
 ```javascript
-import flagsmith from "bullet-train-client or react-native-bullet-train"; //Add this line if you're using flagsmith via npm
+import flagsmith from "bullet-train-client or react-native-flagsmith"; //Add this line if you're using flagsmith via npm
 
 flagsmith.identify("flagsmith_sample_user");
 

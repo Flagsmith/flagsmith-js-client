@@ -13,7 +13,7 @@ import {
   View,
   ScrollView,
 } from 'react-native';
-import flagsmith from "./react-native-bullet-train";
+import flagsmith from "./react-native-flagsmith";
 import AsyncStorage from '@react-native-community/async-storage';
 const environmentID = "uCDQzKWgejrutqSYYsKWen";
 

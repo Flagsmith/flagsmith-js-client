@@ -52,7 +52,7 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
         filename: "index.js",
         library: "bullet-train",
         libraryTarget: "umd",
-        path: path.join(__dirname, '/react-native-bullet-train/lib'),
+        path: path.join(__dirname, '/react-native-flagsmith/lib'),
     }
 });
 
@@ -67,7 +67,7 @@ const reactNativeExampleBundle = Object.assign({}, defaultConfig, { //Bundle 4: 
         filename: "index.js",
         library: "bullet-train",
         libraryTarget: "umd",
-        path: path.join(__dirname, '/examples/react-native/react-native-bullet-train'),
+        path: path.join(__dirname, '/examples/react-native/react-native-flagsmith'),
     }
 });
 
