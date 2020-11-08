@@ -1,4 +1,4 @@
-declare module 'react-native-bullet-train' {
+declare module 'react-native-flagsmith' {
     /**
      * Initialise the sdk against a particular environment
      */
@@ -103,13 +103,13 @@ declare module 'react-native-bullet-train' {
         incrementBy:number
     ): Promise<IFlags>
 
-    export interface IBulletTrainFeature {
+    export interface IFeature {
         enabled: boolean
         value?: string
     }
 
     export interface IFlags {
-        [key: string]: IBulletTrainFeature
+        [key: string]: IFeature
     }
 
     export interface ITraits {
@@ -117,7 +117,7 @@ declare module 'react-native-bullet-train' {
     }
 
     export interface IUserIdentity {
-        flags: IBulletTrainFeature
+        flags: IFeature
         traits: ITraits
     }
     export interface IRetrieveInfo {
