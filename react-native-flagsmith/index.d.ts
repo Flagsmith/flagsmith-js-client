@@ -1,9 +1,9 @@
-declare module 'react-native-bullet-train' {
+declare module 'react-native-flagsmith' {
     /**
      * Initialise the sdk against a particular environment
      */
     export function init(config: {
-        environmentID: string // your Bullet Train environment id
+        environmentID: string // your Flagsmith environment id
         api?: string // the api you wish to use, important if self hosting
         AsyncStorage?: any // an AsyncStorage implementation
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
@@ -26,12 +26,12 @@ declare module 'react-native-bullet-train' {
     export function getAllFlags(): IFlags
 
     /**
-     * Identify user, triggers a call to get flags if bulletTrain.init has been called
+     * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
     export function identify(userId:string): Promise<IFlags|undefined>
 
     /**
-     * Retrieves the current state of bulletTrain
+     * Retrieves the current state of flagsmith
      */
     export function getState(): IState
 
@@ -41,7 +41,7 @@ declare module 'react-native-bullet-train' {
     export function logout(): Promise<IFlags>
 
     /**
-     * Polls the bulletTrain API, specify interval in ms
+     * Polls the flagsmith API, specify interval in ms
      */
     export function startListening(interval?:number): void
 
@@ -51,12 +51,12 @@ declare module 'react-native-bullet-train' {
     export function stopListening(): void
 
     /**
-     * Get the whether a flag is enabled e.g. bulletTrain.hasFeature("powerUserFeature")
+     * Get the whether a flag is enabled e.g. flagsmith.hasFeature("powerUserFeature")
      */
     export function hasFeature(key: string): boolean
 
     /**
-     * Get the value of a particular remote config e.g. bulletTrain.getValue("font_size")
+     * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
     export function getValue(key: string): string|number|boolean
 
@@ -103,13 +103,13 @@ declare module 'react-native-bullet-train' {
         incrementBy:number
     ): Promise<IFlags>
 
-    export interface IBulletTrainFeature {
+    export interface IFeature {
         enabled: boolean
         value?: string
     }
 
     export interface IFlags {
-        [key: string]: IBulletTrainFeature
+        [key: string]: IFeature
     }
 
     export interface ITraits {
@@ -117,7 +117,7 @@ declare module 'react-native-bullet-train' {
     }
 
     export interface IUserIdentity {
-        flags: IBulletTrainFeature
+        flags: IFeature
         traits: ITraits
     }
     export interface IRetrieveInfo {

@@ -1,11 +1,11 @@
 {
-  "name": "bullet-train-client",
+  "name": "flagsmith",
   "description": "Feature flagging to support continuous development",
   "scripts": {
     "prepublish": "npm run build",
-    "deploy": "npm run build && cd ./bullet-train-client/ && npm publish && cd ../react-native-bullet-train && npm publish",
+    "deploy": "npm run build && cd ./flagsmith/ && npm publish && cd ../react-native-flagsmith && npm publish",
     "start": "node_modules/.bin/webpack --watch",
-    "build": "node_modules/.bin/webpack && babel ./bullet-train-client/isomorphic-es6.js --out-file bullet-train-client/isomorphic.js"
+    "build": "node_modules/.bin/webpack && babel ./flagsmith/isomorphic-es6.js --out-file flagsmith/isomorphic.js"
   },
   "repository": {
     "type": "git",

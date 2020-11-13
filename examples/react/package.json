@@ -1,13 +1,13 @@
 {
-  "name": "bullet-train-client-example",
-  "description": "Bullet Train client example",
+  "name": "flagsmith-example",
+  "description": "Flagsmith client example",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-scripts": "3.2.0",
-    "bullet-train-client": "file://../../bullet-train-client"
+    "flagsmith": "file://../../flagsmith"
   },
   "scripts": {
     "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",

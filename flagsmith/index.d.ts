@@ -1,4 +1,4 @@
-declare module 'bullet-train-client' {
+declare module 'flagsmith' {
     /**
      * Initialise the sdk against a particular environment
      */
@@ -26,12 +26,12 @@ declare module 'bullet-train-client' {
     export function getAllFlags(): IFlags
 
     /**
-     * Identify user, triggers a call to get flags if bulletTrain.init has been called
+     * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
     export function identify(userId:string): Promise<IFlags|undefined>
 
     /**
-     * Retrieves the current state of bulletTrain
+     * Retrieves the current state of flagsmith
      */
     export function getState(): IState
 
@@ -41,7 +41,7 @@ declare module 'bullet-train-client' {
     export function logout(): Promise<IFlags>
 
     /**
-     * Polls the bulletTrain API, specify interval in ms
+     * Polls the flagsmith API, specify interval in ms
      */
     export function startListening(interval?:number): void
 
@@ -51,12 +51,12 @@ declare module 'bullet-train-client' {
     export function stopListening(): void
 
     /**
-     * Get the whether a flag is enabled e.g. bulletTrain.hasFeature("powerUserFeature")
+     * Get the whether a flag is enabled e.g. flagsmith.hasFeature("powerUserFeature")
      */
     export function hasFeature(key: string): boolean
 
     /**
-     * Get the value of a particular remote config e.g. bulletTrain.getValue("font_size")
+     * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
     export function getValue(key: string): string|number|boolean
 
@@ -134,7 +134,7 @@ declare module 'bullet-train-client' {
     }
 }
 
-declare module 'bullet-train-client/isomorphic' {
+declare module 'flagsmith/isomorphic' {
     /**
      * Initialise the sdk against a particular environment
      */
@@ -162,12 +162,12 @@ declare module 'bullet-train-client/isomorphic' {
     export function getAllFlags(): IFlags
 
     /**
-     * Identify user, triggers a call to get flags if bulletTrain.init has been called
+     * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
     export function identify(userId:string): Promise<IFlags|undefined>
 
     /**
-     * Retrieves the current state of bulletTrain
+     * Retrieves the current state of flagsmith
      */
     export function getState(): IState
 
@@ -177,7 +177,7 @@ declare module 'bullet-train-client/isomorphic' {
     export function logout(): Promise<IFlags>
 
     /**
-     * Polls the bulletTrain API, specify interval in ms
+     * Polls the flagsmith API, specify interval in ms
      */
     export function startListening(interval?:number): void
 
@@ -187,12 +187,12 @@ declare module 'bullet-train-client/isomorphic' {
     export function stopListening(): void
 
     /**
-     * Get the whether a flag is enabled e.g. bulletTrain.hasFeature("powerUserFeature")
+     * Get the whether a flag is enabled e.g. flagsmith.hasFeature("powerUserFeature")
      */
     export function hasFeature(key: string): boolean
 
     /**
-     * Get the value of a particular remote config e.g. bulletTrain.getValue("font_size")
+     * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
     export function getValue(key: string): string|number|boolean
 

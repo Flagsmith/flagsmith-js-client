@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import withConfig from '../common/providers/withConfig';
 
-import bulletTrain from 'bullet-train-client/isomorphic';
+import flagsmith from 'flagsmith/isomorphic';
 const environmentID = "uCDQzKWgejrutqSYYsKWen";
 //Define default flags
 class HomePage extends Component {
@@ -14,34 +14,34 @@ class HomePage extends Component {
     }
 
     logout = () => {
-        bulletTrain.logout();
+        flagsmith.logout();
     };
 
     login = () => {
-        bulletTrain.identify("bullet_train_sample_user");
+        flagsmith.identify("flagsmith_sample_user");
     };
 
     submitTrait = () => {
-        bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10) + "");
+        flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10) + "");
     }
 
     increment = (value) => {
-        bulletTrain.incrementTrait("button_clicks", value)
+        flagsmith.incrementTrait("button_clicks", value)
     };
 
     render() {
-        const fontSize = parseInt(bulletTrain.getValue("font_size"));
-        const trait = bulletTrain.getTrait("example_trait") + "";
-        const buttonClicks = bulletTrain.getTrait("button_clicks");
+        const fontSize = parseInt(flagsmith.getValue("font_size"));
+        const trait = flagsmith.getTrait("example_trait") + "";
+        const buttonClicks = flagsmith.getTrait("button_clicks");
         const { submitTrait } = this;
         const { isLoading, logs } = this.state;
         return (
             <div>
                 <h2>{environmentID}</h2>
                 <p style={{ fontSize }}>
-                    {JSON.stringify(bulletTrain.flags)}
+                    {JSON.stringify(flagsmith.flags)}
                 </p>
-                {bulletTrain.identity ? (
+                {flagsmith.identity ? (
                     <div>
                         <div>
                             <div>

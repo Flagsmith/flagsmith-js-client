@@ -1,11 +1,11 @@
 <img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
 
-# Bullet Train Client
+# Flagsmith Client
 
-[![npm version](https://badge.fury.io/js/bullet-train-client.svg)](https://badge.fury.io/js/bullet-train-client)
-[![](https://data.jsdelivr.com/v1/package/npm/bullet-train-client/badge)](https://www.jsdelivr.com/package/npm/bullet-train-client)
+[![npm version](https://badge.fury.io/js/flagsmith.svg)](https://badge.fury.io/js/flagsmith)
+[![](https://data.jsdelivr.com/v1/package/npm/flagsmith/badge)](https://www.jsdelivr.com/package/npm/flagsmith)
 
-The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Bullet Train allows you to manage feature flags and remote config across multiple projects, environments and organisations.
+The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
 
 ## Getting Started
 
@@ -17,20 +17,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 Web:
 
-```npm i bullet-train-client --save```
+```npm i flagsmith --save```
 
 React Native:
 
-```npm i react-native-bullet-train --save```
+```npm i react-native-flagsmith --save```
 
 **Retrieving feature flags for your project**
 
 ```javascript
-import bulletTrain from "bullet-train-client or react-native-bullet-train"; //Add this line if you're using bulletTrain via npm
+import flagsmith from "flagsmith or react-native-flagsmith"; //Add this line if you're using flagsmith via npm
 
-bulletTrain.identify("bullet_train_sample_user");
+flagsmith.identify("flagsmith_sample_user");
 
-bulletTrain.init({
+flagsmith.init({
     environmentID:"<YOUR_ENVIRONMENT_KEY>",
     cacheFlags: true,
     onChange: (oldFlags,params)=>{ // callback function for when the flags are retrieved
@@ -38,12 +38,12 @@ bulletTrain.init({
         const {isFromServer} = params; //determines if the update came from the server or local cached storage
 
         //Check for a feature
-        if (bulletTrain.hasFeature("myCoolFeature")){
+        if (flagsmith.hasFeature("myCoolFeature")){
             myCoolFeature();
         }
 
         //Or, use the value of a feature
-        const bannerSize = bulletTrain.getValue("bannerSize");
+        const bannerSize = flagsmith.getValue("bannerSize");
 
         //Check whether value has changed
         const bannerSizeOld = oldFlags["bannerSize"] && oldFlags["bannerSize"].value;
@@ -62,7 +62,7 @@ bulletTrain.init({
 | ```onChange```     | Your callback function for when the flags are retrieved ``` (flags,{isFromServer:true/false, flagsChanged:true/false, traitsChanged:true/false})=>{...} ``` | **YES** | null
 | ```onError```     | Callback function on failure to retrieve flags. ``` (error)=>{...} ``` | | null
 | ```cacheFlags```     | Any time flags are retrieved they will be cached, flags and identities will then be retrieved from local storage before hitting the API ``` | | null
-| ```enableLogs```     | Enables logging for key bullet train events ``` | | null
+| ```enableLogs```     | Enables logging for key Flagsmith events ``` | | null
 | ```defaultFlags```     | Allows you define default features, these will all be overridden on first retrieval of features. | | null
 | ```preventFetch```     | Use this if you want to prevent fetching on init(), e.g. if you want to do some initialisation or call identify. | | false
 | ```api```     | Use this property to define where you're getting feature flags from, e.g. if you're self hosting. | | https://api.bullet-train.io/api/v1/
@@ -72,12 +72,12 @@ bulletTrain.init({
 | Property        | Description |
 | ------------- |:-------------:|
 | ```init```     | Initialise the sdk against a particular environment
-| ```hasFeature(key)```     | Get the boolean value of a particular *Feature Flag*  e.g. ```bulletTrain.hasFeature("powerUserFeature") // true```
-| ```getValue(key)```     | Get the value of a particular *Remote Config Value* e.g. ```bulletTrain.getValue("font_size") // 10```
-| ```getTrait(key)```     | Once used with an identified user you can get the value of any trait that is set for them e.g. ```bulletTrain.getTrait("accepted_cookie_policy")```
-| ```setTrait(key, value)```     | Once used with an identified user you can set the value of any trait relevant to them e.g. ```bulletTrain.setTrait("accepted_cookie_policy", true)```
-| ```setTraits(object)```     | Set multiple traits e.g. ```bulletTrain.setTraits({foo:"bar",numericProp:1,boolProp:true})```. Setting a value of null for a trait will remove that trait.
-| ```incrementTrait(key, value)```     | You can also increment/decrement a particular trait them e.g. ```bulletTrain.incrementTrait("click_count", 1)```
+| ```hasFeature(key)```     | Get the boolean value of a particular *Feature Flag*  e.g. ```flagsmith.hasFeature("powerUserFeature") // true```
+| ```getValue(key)```     | Get the value of a particular *Remote Config Value* e.g. ```flagsmith.getValue("font_size") // 10```
+| ```getTrait(key)```     | Once used with an identified user you can get the value of any trait that is set for them e.g. ```flagsmith.getTrait("accepted_cookie_policy")```
+| ```setTrait(key, value)```     | Once used with an identified user you can set the value of any trait relevant to them e.g. ```flagsmith.setTrait("accepted_cookie_policy", true)```
+| ```setTraits(object)```     | Set multiple traits e.g. ```flagsmith.setTraits({foo:"bar",numericProp:1,boolProp:true})```. Setting a value of null for a trait will remove that trait.
+| ```incrementTrait(key, value)```     | You can also increment/decrement a particular trait them e.g. ```flagsmith.incrementTrait("click_count", 1)```
 | ```startListening(ticks=1000)```     | Poll the api for changes every x milliseconds
 | ```stopListening()```     | Stop polling the api
 | ```getFlags()```     | Trigger a manual fetch of the environment features, if a user is identified it will fetch their features
@@ -88,17 +88,17 @@ bulletTrain.init({
 
 ``identify``, ``setTrait`` and ``setTraits`` all trigger calls to ``getFlags``, which in turn hits the get flags endpoint. This is due to identities and traits affecting flags that are returned.
  
-However, you can avoid these extra calls to get flags if you call these functions before  ``bulletTrain.init``. 
+However, you can avoid these extra calls to get flags if you call these functions before  ``flagsmith.init``. 
 
 ## Developing the client
 
-To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``bullet-train-core.js`` will compile the library to ``bullet-train-client/index`` and ``react-native-bullet-train/index.js``. The examples in ``/examples`` use the locally compiled library.
+To edit the client, clone this repository and ``npm install`` then run ``npm run start``, editing ``flagsmith-core.js`` will compile the library to ``flagsmith/index`` and ``react-native-flagsmith/index.js``. The examples in ``/examples`` use the locally compiled library.
 
 
 ## Serverside Support with Next.js
-This library now supports server side rendering! In order to use this, use the following instead of the standard bullet-train-client:
+This library now supports server side rendering! In order to use this, use the following instead of the standard flagsmith:
 ```
-import bulletTrain from 'bullet-train-client/isomorphic';
+import flagsmith from 'flagsmith/isomorphic';
 ```
 
 ## Contributing

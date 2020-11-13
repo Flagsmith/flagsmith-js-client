@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import bulletTrain from 'bullet-train-client';
+import flagsmith from 'bullet-train-client';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,7 @@ export class AppComponent {
 
   constructor() {
     const { environmentID, handleFlags, handleFlagsError } = this;
-    bulletTrain.init({
+    flagsmith.init({
       environmentID,
       onChange: handleFlags,
       onError: handleFlagsError,
@@ -32,11 +32,11 @@ export class AppComponent {
     this.logs = [{
       timestamp: new Date().toTimeString(),
       params: JSON.stringify(params),
-      data: JSON.stringify(bulletTrain.getAllFlags(), null, 2),
+      data: JSON.stringify(flagsmith.getAllFlags(), null, 2),
     }].concat(this.logs)
-    this.identity = bulletTrain.identity;
-    this.buttonClicks = bulletTrain.getTrait("button_clicks");
-    this.trait = bulletTrain.getTrait("example_trait") + "";
+    this.identity = flagsmith.identity;
+    this.buttonClicks = flagsmith.getTrait("button_clicks");
+    this.trait = flagsmith.getTrait("example_trait") + "";
 
   };
 
@@ -45,19 +45,19 @@ export class AppComponent {
   };
 
   logout = () => {
-    bulletTrain.logout();
+    flagsmith.logout();
   };
 
   login = () => {
-    bulletTrain.identify('bullet_train_sample_user');
+    flagsmith.identify('flagsmith_sample_user');
   };
 
   submitTrait = () => {
-    bulletTrain.setTrait('example_trait', 'Some value ' + Math.floor(Math.random() * 10) + '');
+    flagsmith.setTrait('example_trait', 'Some value ' + Math.floor(Math.random() * 10) + '');
   }
 
   increment = (value) => {
-    bulletTrain.incrementTrait('button_clicks', value)
+    flagsmith.incrementTrait('button_clicks', value)
   };
 
 }

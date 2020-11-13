@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import bulletTrain from "bullet-train-client";
+import flagsmith from "flagsmith";
 const environmentID = "uCDQzKWgejrutqSYYsKWen";
 
 //Define default flags
@@ -15,7 +15,7 @@ export default class App extends Component {
 
   componentWillMount() {
     const { handleFlags, handleFlagsError } = this;
-    bulletTrain.init({
+    flagsmith.init({
       environmentID,
       onChange: handleFlags,
       onError: handleFlagsError,
@@ -26,42 +26,49 @@ export default class App extends Component {
         font_size: 12,
       }
     });
-    // bulletTrain.startListening(2000)
+    // flagsmith.startListening(2000)
 
   }
 
   logout = () => {
-    bulletTrain.logout();
+    flagsmith.logout();
     this.forceUpdate();
   };
 
   login = () => {
-    bulletTrain.identify("bullet_train_sample_user");
+    flagsmith.identify("flagsmith_sample_user");
     this.forceUpdate();
   };
 
   submitTrait = () => {
-    bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10) + "");
+    flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10) + "");
   }
 
   increment = (value) => {
-    bulletTrain.incrementTrait("button_clicks", value)
+    flagsmith.incrementTrait("button_clicks", value)
   };
 
   render() {
 
-    const fontSize = parseInt(bulletTrain.getValue("font_size"));
-    const trait = bulletTrain.getTrait("example_trait") + "";
-    const buttonClicks = bulletTrain.getTrait("button_clicks");
+    const fontSize = parseInt(flagsmith.getValue("font_size"));
+    const trait = flagsmith.getTrait("example_trait") + "";
+    const buttonClicks = flagsmith.getTrait("button_clicks");
     const { submitTrait } = this;
     const { isLoading, logs } = this.state;
     return isLoading ? <div>Loading</div> : (
         <div>
           <h2>{environmentID}</h2>
+          <strong>flags</strong>
           <p style={{ fontSize }}>
-            {JSON.stringify(bulletTrain.flags)}
+            {JSON.stringify(flagsmith.flags)}
           </p>
-          {bulletTrain.identity ? (
+          <div>
+            <strong>
+              Traits
+            </strong>
+          </div>
+          {JSON.stringify(flagsmith.traits)}
+          {flagsmith.identity ? (
               <div>
                 <div>
                   <div>
@@ -100,14 +107,6 @@ export default class App extends Component {
                 <div>
                   <div>
                     <strong>
-                      Traits
-                    </strong>
-                  </div>
-                  {data}
-                </div>
-                <div>
-                  <div>
-                    <strong>
                       Params
                     </strong>
                   </div>
@@ -126,7 +125,7 @@ export default class App extends Component {
       logs: [{
         timestamp: new Date().toTimeString(),
         params: JSON.stringify(params),
-        data: JSON.stringify(bulletTrain.getAllFlags(), null, 2),
+        data: JSON.stringify(flagsmith.getAllFlags(), null, 2),
       }].concat(this.state.logs)
     });
   };

@@ -1,14 +1,13 @@
 {
-  "name": "react-native-bullet-train",
-  "version": "0.2.5",
+  "name": "flagsmith",
+  "version": "1.0.0",
   "description": "Feature flagging to support continuous development",
-  "main": "./lib/index.js",
+  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/SolidStateGroup/bullet-train-js-client"
   },
   "keywords": [
-    "react native",
     "feature flagger",
     "continuous deployment"
   ],
@@ -18,8 +17,5 @@
     "url": "https://github.com/SolidStateGroup/bullet-train-js-client/issues"
   },
   "homepage": "https://bullet-train.io",
-  "peerDependencies": {
-    "react-native": ">=0.20.0"
-  },
   "types": "./index.d.ts"
 }

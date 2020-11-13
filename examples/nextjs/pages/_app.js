@@ -3,7 +3,7 @@ import Head from 'next/head';
 import React from 'react';
 
 import { Provider } from 'react-redux';
-import bulletTrain from 'bullet-train-client/isomorphic';
+import flagsmith from 'flagsmith/isomorphic';
 import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
 import createStore from '../common/store';
@@ -17,7 +17,7 @@ class MyApp extends App {
 
         if (typeof window === "undefined") {
             var environmentID = 'uCDQzKWgejrutqSYYsKWen'
-            await bulletTrain.init({
+            await flagsmith.init({
                 environmentID: environmentID,
                 cacheFlags: true,
                 enableLogs: true,
@@ -30,7 +30,7 @@ class MyApp extends App {
             });
 
             await Promise.all([
-                ctx.store.dispatch(AppActions.startup({ serverLoaded:true, config: bulletTrain.getState() })),
+                ctx.store.dispatch(AppActions.startup({ serverLoaded:true, config: flagsmith.getState() })),
             ]);
         }
 
@@ -45,9 +45,9 @@ class MyApp extends App {
     {
         super(props);
         if ((typeof window !== "undefined") && !this.props.store.getState().clientLoaded) {
-            bulletTrain.setState(this.props.store.getState().config);
-            bulletTrain.onChange = ()=> {
-                this.props.store.dispatch(AppActions.startup({ serverLoaded:true, config:bulletTrain.getState() }));
+            flagsmith.setState(this.props.store.getState().config);
+            flagsmith.onChange = ()=> {
+                this.props.store.dispatch(AppActions.startup({ serverLoaded:true, config:flagsmith.getState() }));
             }
             this.props.store.dispatch(AppActions.startup({ clientLoaded:true })); // Post startup action with token and locale
         }

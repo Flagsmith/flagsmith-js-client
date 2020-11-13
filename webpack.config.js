@@ -21,7 +21,7 @@ const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web
     output: {
         libraryTarget:'umd',
         filename: "index.js",
-        path: path.join(__dirname, '/bullet-train-client/'),
+        path: path.join(__dirname, '/flagsmith/'),
         globalObject: 'this',
     },
     entry: {
@@ -33,7 +33,7 @@ const isomorphicBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile 
     output: {
         libraryTarget:'umd',
         filename: "isomorphic-es6.js",
-        path: path.join(__dirname, '/bullet-train-client/'),
+        path: path.join(__dirname, '/flagsmith/'),
         globalObject: 'this',
     },
     entry: {
@@ -50,9 +50,9 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
     },
     output: {
         filename: "index.js",
-        library: "bullet-train",
+        library: "flagsmith",
         libraryTarget: "umd",
-        path: path.join(__dirname, '/react-native-bullet-train/lib'),
+        path: path.join(__dirname, '/react-native-flagsmith/lib'),
     }
 });
 
@@ -65,9 +65,9 @@ const reactNativeExampleBundle = Object.assign({}, defaultConfig, { //Bundle 4: 
     },
     output: {
         filename: "index.js",
-        library: "bullet-train",
+        library: "flagsmith",
         libraryTarget: "umd",
-        path: path.join(__dirname, '/examples/react-native/react-native-bullet-train'),
+        path: path.join(__dirname, '/examples/react-native/react-native-flagsmith'),
     }
 });
 

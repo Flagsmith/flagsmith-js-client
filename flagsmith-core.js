@@ -1,14 +1,14 @@
 let fetch;
 let AsyncStorage;
-const BULLET_TRAIN_KEY = "BULLET_TRAIN_DB";
+const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const defaultAPI = 'https://api.bullet-train.io/api/v1/';
 const deepEqual = require('fast-deep-equal');
 
 const initError = function (caller) {
-    return  "Attempted to " + caller + " a user before calling bulletTrain.init. Call bulletTrain.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
+    return  "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
 }
 
-const BulletTrain = class {
+const Flagsmith = class {
 
     constructor(props) {
         if (props.fetch) {
@@ -155,7 +155,7 @@ const BulletTrain = class {
 
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
-                AsyncStorage.getItem(BULLET_TRAIN_KEY, (err, res) => {
+                AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
                     if (res) {
                         try {
                             var json = JSON.parse(res);
@@ -170,13 +170,20 @@ const BulletTrain = class {
                                 }
                                 this.oldFlags = this.flags;
                                 resolve();
-                                this.getFlags(Promise.resolve, Promise.reject);
-
+                                if (!preventFetch) {
+                                    this.getFlags(Promise.resolve, Promise.reject);
+                                }
                             } else {
-                                this.getFlags(resolve, reject);
+                                if (!preventFetch) {
+                                  this.getFlags(resolve, reject);
+                                }
                             }
                         } catch (e) {
                             this.log("Exception fetching cached logs", e);
+                        }
+                    } else {
+                        if (!preventFetch) {
+                            this.getFlags(resolve, reject)
                         }
                     }
                 });
@@ -223,7 +230,7 @@ const BulletTrain = class {
 
     log(...args) {
         if (this.enableLogs) {
-            console.log.apply(this, ["BULLET TRAIN:", new Date().valueOf() - this.timer, "ms", ...args]);
+            console.log.apply(this, ["FLAGSMITH:", new Date().valueOf() - this.timer, "ms", ...args]);
         }
     }
 
@@ -231,7 +238,7 @@ const BulletTrain = class {
         if (this.cacheFlags) {
             const state = JSON.stringify(this.getState());
             this.log("Setting storage", state);
-            AsyncStorage.setItem(BULLET_TRAIN_KEY, state);
+            AsyncStorage.setItem(FLAGSMITH_KEY, state);
         }
     }
 
@@ -309,7 +316,7 @@ const BulletTrain = class {
         }
 
         if (!traits || typeof traits !== 'object') {
-            console.error("Expected object for bulletTrain.setTraits");
+            console.error("Expected object for flagsmith.setTraits");
         }
 
         const body = Object.keys(traits).map((key) => (
@@ -354,7 +361,7 @@ const BulletTrain = class {
 };
 
 module.exports = function ({ fetch, AsyncStorage }) {
-    return new BulletTrain({ fetch, AsyncStorage });
+    return new Flagsmith({ fetch, AsyncStorage });
 };
 
 

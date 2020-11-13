@@ -1,23 +1,23 @@
 var environmentID = 'uCDQzKWgejrutqSYYsKWen'
 
 function identify() {
-    bulletTrain.identify("bullet_train_sample_user")
+    flagsmith.identify("flagsmith_sample_user")
 }
 
 function toggleTrait () {
-    bulletTrain.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
+    flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
 }
 
 function login () {
-    bulletTrain.identify("bullet_train_sample_user");
+    flagsmith.identify("flagsmith_sample_user");
 };
 
 function logout () {
-    bulletTrain.logout();
+    flagsmith.logout();
 };
 
 function increment (value) {
-    bulletTrain.incrementTrait("button_clicks", value)
+    flagsmith.incrementTrait("button_clicks", value)
 };
 
 $("#js-login").on("click", login);
@@ -30,8 +30,8 @@ $("#js-decrement").on("click", function (){
     increment(-1)
 });
 
-//Intialise Bullet Train
-bulletTrain.init({
+//Intialise Flagsmith
+flagsmith.init({
     environmentID: environmentID,
     cacheFlags: true,
     enableLogs: true,
@@ -42,18 +42,18 @@ bulletTrain.init({
         $("#loaded").removeClass("hidden")
         $("#loading").addClass("hidden")
 
-        if (bulletTrain.identity) {
+        if (flagsmith.identity) {
             $("#logged-in").removeClass("hidden")
             $("#logged-out").addClass("hidden")
-            $("#js-button-clicks").text(bulletTrain.getTrait("button_clicks"));
-            $("#js-example-trait").text(bulletTrain.getTrait("example_trait") + "");
-            if (bulletTrain.getSegments()) {
-                $("#js-segments").text(Object.keys(bulletTrain.getSegments() ).join(", "));
+            $("#js-button-clicks").text(flagsmith.getTrait("button_clicks"));
+            $("#js-example-trait").text(flagsmith.getTrait("example_trait") + "");
+            if (flagsmith.getSegments()) {
+                $("#js-segments").text(Object.keys(flagsmith.getSegments() ).join(", "));
             }
         } else {
             $("#logged-out").removeClass("hidden")
             $("#logged-in").addClass("hidden")
         }
-        $("#js-data").text(JSON.stringify(bulletTrain.getAllFlags(), null, 2));
+        $("#js-data").text(JSON.stringify(flagsmith.getAllFlags(), null, 2));
     }
 });
