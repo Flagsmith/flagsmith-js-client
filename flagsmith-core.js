@@ -1,11 +1,12 @@
 let fetch;
 let AsyncStorage;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
+const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
 const defaultAPI = 'https://api.bullet-train.io/api/v1/';
 const deepEqual = require('fast-deep-equal');
 
 const initError = function (caller) {
-    return  "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
+    return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
 }
 
 const Flagsmith = class {
@@ -59,6 +60,7 @@ const Flagsmith = class {
             traits = traits || [];
             features.forEach(feature => {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
+                    id: feature.feature.id,
                     enabled: feature.enabled,
                     value: feature.feature_state_value
                 };
@@ -84,11 +86,10 @@ const Flagsmith = class {
             if (onChange) {
                 onChange(this.oldFlags, {
                     isFromServer: true,
-                    flagsChanged:!flagsEqual,
+                    flagsChanged: !flagsEqual,
                     traitsChanged: !traitsEqual
                 });
             }
-
         };
 
         if (identity) {
@@ -120,26 +121,40 @@ const Flagsmith = class {
         }
     };
 
+    analyticsFlags = () => {
+        const { api, evaluationEvent } = this;
+        if (evaluationEvent) {
+            return Promise.all([
+                this.getJSON(api + 'analytics/', 'POST', JSON.stringify(evaluationEvent)),
+            ]).then(() => {
+                this.evaluationEvent = {};
+                this.updateEventStorage();
+            }).catch();
+        }
+    };
+
     init({
-             environmentID,
-             api = defaultAPI,
-             onChange,
-             cacheFlags,
-             onError,
-             defaultFlags,
-             preventFetch,
-             enableLogs,
-             AsyncStorage: _AsyncStorage,
-             state
-         }) {
+        environmentID,
+        api = defaultAPI,
+        onChange,
+        cacheFlags,
+        onError,
+        defaultFlags,
+        preventFetch,
+        enableLogs,
+        sendFlagEvaluationEvents,
+        AsyncStorage: _AsyncStorage,
+        state
+    }) {
 
         return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
             this.api = api;
-            this.interval = null;
+            this.interval = [];
             this.onChange = onChange;
             this.onError = onError;
             this.enableLogs = enableLogs;
+            this.sendFlagEvaluationEvents = sendFlagEvaluationEvents ? sendFlagEvaluationEvents : false;
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
             this.timer = this.enableLogs ? new Date().valueOf() : null;
@@ -150,7 +165,7 @@ const Flagsmith = class {
             this.setState(state)
             if (!environmentID) {
                 reject('Please specify a environment id')
-                throw('Please specify a environment id');
+                throw ('Please specify a environment id');
             }
 
             //If the user specified default flags emit a changed event immediately
@@ -175,7 +190,7 @@ const Flagsmith = class {
                                 }
                             } else {
                                 if (!preventFetch) {
-                                  this.getFlags(resolve, reject);
+                                    this.getFlags(resolve, reject);
                                 }
                             }
                         } catch (e) {
@@ -199,7 +214,7 @@ const Flagsmith = class {
 
     identify(userId) {
         this.identity = userId;
-        if (this.initialised && !this.interval) {
+        if (this.initialised && !this.interval.length) {
             return this.getFlags();
         }
         return Promise.resolve();
@@ -225,6 +240,7 @@ const Flagsmith = class {
             this.identity = state.identity || this.identity;
             this.segments = state.segments || this.segments;
             this.traits = state.traits || this.traits;
+            this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
         }
     }
 
@@ -242,20 +258,31 @@ const Flagsmith = class {
         }
     }
 
+    updateEventStorage() {
+        if (this.sendFlagEvaluationEvents) {
+            const state = JSON.stringify(this.getState());
+            this.log("Setting event storage", state.evaluationEvent);
+            AsyncStorage.setItem(FLAGSMITH_EVENT, state.evaluationEvent);
+        }
+    }
+
     logout() {
         this.identity = null;
         this.segments = null;
         this.traits = null;
-        if (this.initialised && !this.interval) {
+        if (this.initialised && !this.interval.length) {
             this.getFlags();
         }
     }
 
     startListening(ticks = 1000) {
-        if (this.interval) {
+        if (this.interval.length) {
             return;
         }
-        this.interval = setInterval(this.getFlags, ticks);
+        this.interval.push(setInterval(this.getFlags, ticks))
+        if (this.sendFlagEvaluationEvents) {
+            this.interval.push(setInterval(this.analyticsFlags, ticks))
+        }
     }
 
     getSegments() {
@@ -264,8 +291,22 @@ const Flagsmith = class {
     }
 
     stopListening() {
-        clearInterval(this.interval);
+        this.interval.forEach(interval => {
+            clearInterval(interval);
+        });
     }
+
+
+    evaluateFlag = (flag) => {
+        if (sendFlagEvaluationEvents && flag) {
+            if (!this.evaluationEvent.hasOwnProperty(flag.id)) {
+                this.evaluationEvent[flag.id] = 0;
+            }
+            this.evaluationEvent[flag.id] += 1;
+        }
+        updateEventStorage();
+    }
+
 
     getValue = (key) => {
         const flag = this.flags && this.flags[key];
@@ -273,6 +314,8 @@ const Flagsmith = class {
         if (flag) {
             res = flag.value;
         }
+        evaluateFlag(this.flags[key]);
+
         //todo record check for value
 
         return res;
@@ -353,6 +396,8 @@ const Flagsmith = class {
         if (flag && flag.enabled) {
             res = true;
         }
+        evaluateFlag(this.flags[key]);
+
         //todo record check for feature
 
         return res;

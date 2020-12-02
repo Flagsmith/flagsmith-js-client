@@ -9,10 +9,11 @@ declare module 'flagsmith' {
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
         preventFetch?: boolean // whether to prevent fetching flags on init
         enableLogs?: boolean // whether to enable logs
-        onChange?: (flags:IFlags, params:IRetrieveInfo)=> void // triggered when the flags are retrieved
+        onChange?: (flags: IFlags, params: IRetrieveInfo) => void // triggered when the flags are retrieved
         state?: IState // set a predefined state, useful for isomorphic applications
-        onError?: (res:{message:string}) => void // triggered if there was an api error
+        onError?: (res: { message: string }) => void // triggered if there was an api error
         defaultFlags?: IFlags //
+        sendFlagEvaluationEvents?: boolean //
     }): void
 
     /**
@@ -28,7 +29,7 @@ declare module 'flagsmith' {
     /**
      * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
-    export function identify(userId:string): Promise<IFlags|undefined>
+    export function identify(userId: string): Promise<IFlags | undefined>
 
     /**
      * Retrieves the current state of flagsmith
@@ -43,7 +44,7 @@ declare module 'flagsmith' {
     /**
      * Polls the flagsmith API, specify interval in ms
      */
-    export function startListening(interval?:number): void
+    export function startListening(interval?: number): void
 
     /**
      * Stops polling
@@ -58,12 +59,12 @@ declare module 'flagsmith' {
     /**
      * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
-    export function getValue(key: string): string|number|boolean
+    export function getValue(key: string): string | number | boolean
 
     /**
      * Get the value of a particular trait for the identified user
      */
-    export function getTrait(key: string): string|number|boolean
+    export function getTrait(key: string): string | number | boolean
 
     /**
      * Trigger a manual fetch of the environment features for a given user id
@@ -85,22 +86,22 @@ declare module 'flagsmith' {
      */
     export function setTrait(
         key: string,
-        value: string|number|boolean
+        value: string | number | boolean
     ): Promise<IFlags>
 
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
     export function setTraits(
-        traits: Record<string, string|number|boolean>,
+        traits: Record<string, string | number | boolean>,
     ): Promise<IFlags>
 
     /**
      * Increments the value of a numeric trait by a given amount (can be negative number)
      */
     export function incrementTrait(
-        key:string,
-        incrementBy:number
+        key: string,
+        incrementBy: number
     ): Promise<IFlags>
 
     export interface IFeature {
