@@ -157,6 +157,7 @@ const Flagsmith = class {
             this.sendFlagEvaluationEvents = sendFlagEvaluationEvents ? sendFlagEvaluationEvents : false;
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
+            this.evaluationEvent = {};
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             if (_AsyncStorage) {
                 AsyncStorage = _AsyncStorage;
@@ -296,17 +297,15 @@ const Flagsmith = class {
         });
     }
 
-
     evaluateFlag = (flag) => {
-        if (sendFlagEvaluationEvents && flag) {
-            if (!this.evaluationEvent.hasOwnProperty(flag.id)) {
+        if (this.sendFlagEvaluationEvents && flag) {
+            if (this.evaluationEvent[flag.id] !== undefined) {
                 this.evaluationEvent[flag.id] = 0;
             }
             this.evaluationEvent[flag.id] += 1;
         }
-        updateEventStorage();
+        this.updateEventStorage();
     }
-
 
     getValue = (key) => {
         const flag = this.flags && this.flags[key];
@@ -408,5 +407,3 @@ const Flagsmith = class {
 module.exports = function ({ fetch, AsyncStorage }) {
     return new Flagsmith({ fetch, AsyncStorage });
 };
-
-

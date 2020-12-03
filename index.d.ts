@@ -105,6 +105,7 @@ declare module 'flagsmith' {
     ): Promise<IFlags>
 
     export interface IFeature {
+        id: integer
         enabled: boolean
         value?: string
     }

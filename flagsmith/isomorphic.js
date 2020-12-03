@@ -540,11 +540,11 @@
     const S = /[^\^_`a-zA-Z\-0-9!#$%&'*+.|~]/,
           O = /[^\t\x20-\x7e\x80-\xff]/;
 
-    function P(e) {
+    function E(e) {
       if (e = `${e}`, S.test(e) || "" === e) throw new TypeError(`${e} is not a legal HTTP header name`);
     }
 
-    function E(e) {
+    function P(e) {
       if (e = `${e}`, O.test(e)) throw new TypeError(`${e} is not a legal HTTP header value`);
     }
 
@@ -592,7 +592,7 @@
       }
 
       get(e) {
-        P(e = `${e}`);
+        E(e = `${e}`);
         const t = T(this[x], e);
         return void 0 === t ? null : this[x][t].join(", ");
       }
@@ -611,23 +611,23 @@
       }
 
       set(e, t) {
-        t = `${t}`, P(e = `${e}`), E(t);
+        t = `${t}`, E(e = `${e}`), P(t);
         const r = T(this[x], e);
         this[x][void 0 !== r ? r : e] = [t];
       }
 
       append(e, t) {
-        t = `${t}`, P(e = `${e}`), E(t);
+        t = `${t}`, E(e = `${e}`), P(t);
         const r = T(this[x], e);
         void 0 !== r ? this[x][r].push(t) : this[x][e] = [t];
       }
 
       has(e) {
-        return P(e = `${e}`), void 0 !== T(this[x], e);
+        return E(e = `${e}`), void 0 !== T(this[x], e);
       }
 
       delete(e) {
-        P(e = `${e}`);
+        E(e = `${e}`);
         const t = T(this[x], e);
         void 0 !== t && delete this[x][t];
       }
@@ -1095,14 +1095,14 @@
           _ = j && "object" == typeof e && e && !e.nodeType && e,
           S = _ && _.exports === j,
           O = S && v.process,
-          P = function () {
+          E = function () {
         try {
           var e = _ && _.require && _.require("util").types;
 
           return e || O && O.binding && O.binding("util");
         } catch (e) {}
       }(),
-          E = P && P.isTypedArray;
+          P = E && E.isTypedArray;
 
       function T(e, t, r) {
         switch (r.length) {
@@ -1223,16 +1223,16 @@
       }
 
       function ue(e, t, r) {
-        (void 0 === r || Ee(e[t], r)) && (void 0 !== r || t in e) || fe(e, t, r);
+        (void 0 === r || Pe(e[t], r)) && (void 0 !== r || t in e) || fe(e, t, r);
       }
 
       function ce(e, t, r) {
         var n = e[t];
-        $.call(e, t) && Ee(n, r) && (void 0 !== r || t in e) || fe(e, t, r);
+        $.call(e, t) && Pe(n, r) && (void 0 !== r || t in e) || fe(e, t, r);
       }
 
       function le(e, t) {
-        for (var r = e.length; r--;) if (Ee(e[r][0], t)) return r;
+        for (var r = e.length; r--;) if (Pe(e[r][0], t)) return r;
 
         return -1;
       }
@@ -1450,7 +1450,7 @@
       }
 
       function me(e, t) {
-        return Pe(function (e, t, r) {
+        return Ee(function (e, t, r) {
           return t = X(void 0 === t ? e.length - 1 : t, 0), function () {
             for (var n = arguments, o = -1, i = X(n.length - t, 0), s = Array(i); ++o < i;) s[o] = n[t + o];
 
@@ -1492,7 +1492,7 @@
         if (("constructor" !== t || "function" != typeof e[t]) && "__proto__" != t) return e[t];
       }
 
-      var Pe = function (e) {
+      var Ee = function (e) {
         var t = 0,
             r = 0;
         return function () {
@@ -1517,7 +1517,7 @@
         var r;
       } : Ue);
 
-      function Ee(e, t) {
+      function Pe(e, t) {
         return e === t || e != e && t != t;
       }
 
@@ -1555,11 +1555,11 @@
         return null != e && "object" == typeof e;
       }
 
-      var Ie = E ? function (e) {
+      var Ie = P ? function (e) {
         return function (t) {
           return e(t);
         };
-      }(E) : function (e) {
+      }(P) : function (e) {
         return Le(e) && Fe(e.length) && !!b[de(e)];
       };
 
@@ -1579,7 +1579,7 @@
         for (o = ze.length > 3 && "function" == typeof o ? (n--, o) : void 0, i && function (e, t, r) {
           if (!Ce(r)) return !1;
           var n = typeof t;
-          return !!("number" == n ? Ae(r) && _e(t, r.length) : "string" == n && (t in r)) && Ee(r[t], e);
+          return !!("number" == n ? Ae(r) && _e(t, r.length) : "string" == n && (t in r)) && Pe(r[t], e);
         }(t[0], t[1], i) && (o = n < 3 ? void 0 : o, n = 1), e = Object(e); ++r < n;) {
           var s = t[r];
           s && ze(e, s, r, o);
@@ -1609,15 +1609,17 @@
       }), e.webpackPolyfill = 1), e;
     };
   }, function (e, t, r) {
-    function n(e) {
-      return (n = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
+    var n, o;
+
+    function i(e) {
+      return (i = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
         return typeof e;
       } : function (e) {
         return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
       })(e);
     }
 
-    function o(e, t) {
+    function s(e, t) {
       var r = Object.keys(e);
 
       if (Object.getOwnPropertySymbols) {
@@ -1630,11 +1632,14 @@
       return r;
     }
 
-    function i(e, t) {
-      for (var r, n = 0; n < t.length; n++) (r = t[n]).enumerable = r.enumerable || !1, r.configurable = !0, "value" in r && (r.writable = !0), Object.defineProperty(e, r.key, r);
+    function a(e, t) {
+      for (var r = 0; r < t.length; r++) {
+        var n = t[r];
+        n.enumerable = n.enumerable || !1, n.configurable = !0, "value" in n && (n.writable = !0), Object.defineProperty(e, n.key, n);
+      }
     }
 
-    function s(e, t, r) {
+    function u(e, t, r) {
       return t in e ? Object.defineProperty(e, t, {
         value: r,
         enumerable: !0,
@@ -1643,9 +1648,7 @@
       }) : e[t] = r, e;
     }
 
-    var a,
-        u,
-        c = "https://api.bullet-train.io/api/v1/",
+    var c = "https://api.bullet-train.io/api/v1/",
         l = r(12),
         f = function (e) {
       return "Attempted to " + e + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true.";
@@ -1653,18 +1656,18 @@
         h = function () {
       function e(t) {
         var r = this;
-        (function (e, t) {
+        !function (e, t) {
           if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
-        })(this, e), s(this, "getJSON", function (e, t, n) {
-          var o = {
+        }(this, e), u(this, "getJSON", function (e, t, o) {
+          var i = {
             method: t || "GET",
-            body: n,
+            body: o,
             headers: {
               "x-environment-key": r.environmentID
             }
           };
-          return "GET" !== t && (o.headers["Content-Type"] = "application/json; charset=utf-8"), a(e, o).then(function (e) {
-            return 200 <= e.status && 300 > e.status ? e : e.text().then(function (e) {
+          return "GET" !== t && (i.headers["Content-Type"] = "application/json; charset=utf-8"), n(e, i).then(function (e) {
+            return e.status >= 200 && e.status < 300 ? e : e.text().then(function (e) {
               var t = e;
 
               try {
@@ -1676,32 +1679,35 @@
           }).then(function (e) {
             return e.json();
           });
-        }), s(this, "getFlags", function (e, t) {
+        }), u(this, "getFlags", function (e, t) {
           var n = r.onChange,
-              i = r.onError,
-              a = r.identity,
-              u = r.api,
+              o = r.onError,
+              i = r.identity,
+              a = r.api,
               c = (r.disableCache, !1),
               f = function (e, t) {
-            var i = e.flags,
-                a = e.traits,
-                u = {},
+            var o = e.flags,
+                i = e.traits,
+                a = {},
                 c = {};
 
-            if (a = a || [], (i = i || []).forEach(function (e) {
-              u[e.feature.name.toLowerCase().replace(/ /g, "_")] = {
+            if (i = i || [], (o = o || []).forEach(function (e) {
+              a[e.feature.name.toLowerCase().replace(/ /g, "_")] = {
                 id: e.feature.id,
                 enabled: e.enabled,
                 value: e.feature_state_value
               };
-            }), a.forEach(function (e) {
+            }), i.forEach(function (e) {
               c[e.trait_key.toLowerCase().replace(/ /g, "_")] = e.trait_value;
             }), r.oldFlags = function (e) {
-              for (var t, r = 1; r < arguments.length; r++) t = null == arguments[r] ? {} : arguments[r], r % 2 ? o(t, !0).forEach(function (r) {
-                s(e, r, t[r]);
-              }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : o(t).forEach(function (r) {
-                Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
-              });
+              for (var t = 1; t < arguments.length; t++) {
+                var r = null != arguments[t] ? arguments[t] : {};
+                t % 2 ? s(r, !0).forEach(function (t) {
+                  u(e, t, r[t]);
+                }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(r)) : s(r).forEach(function (t) {
+                  Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(r, t));
+                });
+              }
 
               return e;
             }({}, r.flags), t) {
@@ -1711,80 +1717,85 @@
               }), r.segments = f;
             }
 
-            var h = l(r.flags, u),
+            var h = l(r.flags, a),
                 p = l(r.traits, c);
-            r.flags = u, r.traits = c, r.updateStorage(), n && n(r.oldFlags, {
+            r.flags = a, r.traits = c, r.updateStorage(), n && n(r.oldFlags, {
               isFromServer: !0,
               flagsChanged: !h,
               traitsChanged: !p
             });
           };
 
-          return a ? Promise.all([r.getJSON(u + "identities/?identifier=" + encodeURIComponent(a))]).then(function (e) {
+          return i ? Promise.all([r.getJSON(a + "identities/?identifier=" + encodeURIComponent(i))]).then(function (e) {
             f(e[0], e[1]);
           }).catch(function (e) {
             var t = e.message;
-            i && i({
+            o && o({
               message: t
             });
-          }) : Promise.all([r.getJSON(u + "flags/")]).then(function (t) {
+          }) : Promise.all([r.getJSON(a + "flags/")]).then(function (t) {
             f({
               flags: t[0]
             }, null), e && !c && (c = !0, e());
           }).catch(function (e) {
-            t && !c && (c = !0, t(e)), i && i(e);
+            t && !c && (c = !0, t(e)), o && o(e);
           });
-        }), s(this, "analyticsFlags", function () {
+        }), u(this, "analyticsFlags", function () {
           var e = r.api,
               t = r.evaluationEvent;
           if (t) return Promise.all([r.getJSON(e + "analytics/", "POST", JSON.stringify(t))]).then(function () {
             r.evaluationEvent = {}, r.updateEventStorage();
           }).catch();
-        }), s(this, "evaluateFlag", function (e) {
-          sendFlagEvaluationEvents && e && (!r.evaluationEvent.hasOwnProperty(e.id) && (r.evaluationEvent[e.id] = 0), r.evaluationEvent[e.id] += 1), updateEventStorage();
-        }), s(this, "getValue", function (e) {
+        }), u(this, "evaluateFlag", function (e) {
+          r.sendFlagEvaluationEvents && e && (e.id in r.evaluationEvent || (r.evaluationEvent[e.id] = 0), r.evaluationEvent[e.id] += 1), r.updateEventStorage();
+        }), u(this, "getValue", function (e) {
           var t = r.flags && r.flags[e],
               n = null;
-          return t && (n = t.value), evaluateFlag(r.flags[e]), n;
-        }), s(this, "getTrait", function (e) {
+          return t && (n = t.value), r.evaluateFlag(r.flags[e]), n;
+        }), u(this, "getTrait", function (e) {
           return r.traits && r.traits[e];
-        }), s(this, "setTrait", function (e, t) {
+        }), u(this, "setTrait", function (e, t) {
           var n = r.getJSON,
-              o = r.identity,
-              i = r.api;
-          if (i) return n("".concat(i, "traits/"), "POST", JSON.stringify({
-            identity: {
-              identifier: o
-            },
-            trait_key: e,
-            trait_value: t
-          })).then(function () {
-            r.initialised && r.getFlags();
-          });
-          console.error(f("setTrait"));
-        }), s(this, "setTraits", function (e) {
-          var t = r.getJSON,
               o = r.identity,
               i = r.api;
 
           if (i) {
-            e && "object" === n(e) || console.error("Expected object for flagsmith.setTraits");
+            var s = {
+              identity: {
+                identifier: o
+              },
+              trait_key: e,
+              trait_value: t
+            };
+            return n("".concat(i, "traits/"), "POST", JSON.stringify(s)).then(function () {
+              r.initialised && r.getFlags();
+            });
+          }
+
+          console.error(f("setTrait"));
+        }), u(this, "setTraits", function (e) {
+          var t = r.getJSON,
+              n = r.identity,
+              o = r.api;
+
+          if (o) {
+            e && "object" === i(e) || console.error("Expected object for flagsmith.setTraits");
             var s = Object.keys(e).map(function (t) {
               return {
                 identity: {
-                  identifier: o
+                  identifier: n
                 },
                 trait_key: t,
                 trait_value: e[t]
               };
             });
-            return t("".concat(i, "traits/bulk/"), "PUT", JSON.stringify(s)).then(function () {
+            return t("".concat(o, "traits/bulk/"), "PUT", JSON.stringify(s)).then(function () {
               r.initialised && r.getFlags();
             });
           }
 
           console.error(f("setTraits"));
-        }), s(this, "incrementTrait", function (e, t) {
+        }), u(this, "incrementTrait", function (e, t) {
           var n = r.getJSON,
               o = r.identity,
               i = r.api;
@@ -1793,25 +1804,24 @@
             increment_by: t,
             identifier: o
           })).then(r.getFlags);
-        }), s(this, "hasFeature", function (e) {
+        }), u(this, "hasFeature", function (e) {
           var t = r.flags && r.flags[e],
               n = !1;
-          return t && t.enabled && (n = !0), evaluateFlag(r.flags[e]), n;
-        }), a = t.fetch ? t.fetch : global.fetch, u = t.AsyncStorage;
+          return t && t.enabled && (n = !0), r.evaluateFlag(r.flags[e]), n;
+        }), n = t.fetch ? t.fetch : global.fetch, o = t.AsyncStorage;
       }
 
-      return function (e, t, r) {
-        t && i(e.prototype, t), r && i(e, r);
-      }(e, [{
+      var t, r, h;
+      return t = e, (r = [{
         key: "init",
         value: function (e) {
           var t = this,
               r = e.environmentID,
               n = e.api,
-              o = void 0 === n ? c : n,
-              i = e.onChange,
-              s = e.cacheFlags,
-              a = e.onError,
+              i = void 0 === n ? c : n,
+              s = e.onChange,
+              a = e.cacheFlags,
+              u = e.onError,
               l = e.defaultFlags,
               f = e.preventFetch,
               h = e.enableLogs,
@@ -1819,17 +1829,17 @@
               d = e.AsyncStorage,
               y = e.state;
           return new Promise(function (e, n) {
-            if (t.environmentID = r, t.api = o, t.interval = [], t.onChange = i, t.onError = a, t.enableLogs = h, t.sendFlagEvaluationEvents = !!p && p, t.flags = Object.assign({}, l) || {}, t.initialised = !0, t.timer = t.enableLogs ? new Date().valueOf() : null, d && (u = d), t.cacheFlags = void 0 !== u && s, t.setState(y), !r) throw n("Please specify a environment id"), "Please specify a environment id";
-            s ? u.getItem("BULLET_TRAIN_DB", function (r, o) {
+            if (t.environmentID = r, t.api = i, t.interval = [], t.onChange = s, t.onError = u, t.enableLogs = h, t.sendFlagEvaluationEvents = p || !1, t.flags = Object.assign({}, l) || {}, t.initialised = !0, t.evaluationEvent = {}, t.timer = t.enableLogs ? new Date().valueOf() : null, d && (o = d), t.cacheFlags = void 0 !== o && a, t.setState(y), !r) throw n("Please specify a environment id"), "Please specify a environment id";
+            a ? o.getItem("BULLET_TRAIN_DB", function (r, o) {
               if (o) try {
                 var i = JSON.parse(o);
                 i && i.api === t.api && i.environmentID === t.environmentID && (t.setState(i), t.log("Retrieved flags from cache", i)), t.flags ? (t.onChange && t.onChange(null, {
                   isFromServer: !1
-                }), t.oldFlags = t.flags, e(), !f && t.getFlags(Promise.resolve, Promise.reject)) : !f && t.getFlags(e, n);
+                }), t.oldFlags = t.flags, e(), f || t.getFlags(Promise.resolve, Promise.reject)) : f || t.getFlags(e, n);
               } catch (e) {
                 t.log("Exception fetching cached logs", e);
               } else f || t.getFlags(e, n);
-            }) : !f && t.getFlags(e, n);
+            }) : f || t.getFlags(e, n);
           });
         }
       }, {
@@ -1863,7 +1873,7 @@
         key: "log",
         value: function () {
           if (this.enableLogs) {
-            for (var e = arguments.length, t = Array(e), r = 0; r < e; r++) t[r] = arguments[r];
+            for (var e = arguments.length, t = new Array(e), r = 0; r < e; r++) t[r] = arguments[r];
 
             console.log.apply(this, ["FLAGSMITH:", new Date().valueOf() - this.timer, "ms"].concat(t));
           }
@@ -1873,7 +1883,7 @@
         value: function () {
           if (this.cacheFlags) {
             var e = JSON.stringify(this.getState());
-            this.log("Setting storage", e), u.setItem("BULLET_TRAIN_DB", e);
+            this.log("Setting storage", e), o.setItem("BULLET_TRAIN_DB", e);
           }
         }
       }, {
@@ -1881,7 +1891,7 @@
         value: function () {
           if (this.sendFlagEvaluationEvents) {
             var e = JSON.stringify(this.getState());
-            this.log("Setting event storage", e.evaluationEvent), u.setItem("BULLET_TRAIN_EVENT", e.evaluationEvent);
+            this.log("Setting event storage", e.evaluationEvent), o.setItem("BULLET_TRAIN_EVENT", e.evaluationEvent);
           }
         }
       }, {
@@ -1892,7 +1902,7 @@
       }, {
         key: "startListening",
         value: function () {
-          var e = 0 < arguments.length && void 0 !== arguments[0] ? arguments[0] : 1e3;
+          var e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 1e3;
           this.interval.length || (this.interval.push(setInterval(this.getFlags, e)), this.sendFlagEvaluationEvents && this.interval.push(setInterval(this.analyticsFlags, e)));
         }
       }, {
@@ -1905,7 +1915,7 @@
             clearInterval(e);
           });
         }
-      }]), e;
+      }]) && a(t.prototype, r), h && a(t, h), e;
     }();
 
     e.exports = function (e) {
