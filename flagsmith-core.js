@@ -125,7 +125,7 @@ const Flagsmith = class {
         const { api, evaluationEvent } = this;
         if (evaluationEvent) {
             return Promise.all([
-                this.getJSON(api + 'analytics/', 'POST', JSON.stringify(evaluationEvent)),
+                this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(evaluationEvent)),
             ]).then(() => {
                 this.evaluationEvent = {};
                 this.updateEventStorage();
@@ -157,6 +157,7 @@ const Flagsmith = class {
             this.sendFlagEvaluationEvents = sendFlagEvaluationEvents ? sendFlagEvaluationEvents : false;
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
+            this.ticks = 10000;
             this.evaluationEvent = {};
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             if (_AsyncStorage) {
@@ -167,6 +168,20 @@ const Flagsmith = class {
             if (!environmentID) {
                 reject('Please specify a environment id')
                 throw ('Please specify a environment id');
+            }
+
+            if (this.sendFlagEvaluationEvents) {
+                this.interval.push(setInterval(this.analyticsFlags, this.ticks))
+                AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
+                    if (res) {
+                        var json = JSON.parse(res);
+                        if (json) {
+                            this.evaluationEvent = json;
+                            this.log("Retrieved events from cache", res);
+                            this.setState();
+                        }
+                    }
+                });
             }
 
             //If the user specified default flags emit a changed event immediately
@@ -229,6 +244,7 @@ const Flagsmith = class {
             identity: this.identity,
             segments: this.segments,
             traits: this.traits,
+            evaluationEvent: this.evaluationEvent,
         }
     }
 
@@ -261,9 +277,9 @@ const Flagsmith = class {
 
     updateEventStorage() {
         if (this.sendFlagEvaluationEvents) {
-            const state = JSON.stringify(this.getState());
-            this.log("Setting event storage", state.evaluationEvent);
-            AsyncStorage.setItem(FLAGSMITH_EVENT, state.evaluationEvent);
+            const events = JSON.stringify(this.getState().evaluationEvent);
+            this.log("Setting event storage", events);
+            AsyncStorage.setItem(FLAGSMITH_EVENT, events);
         }
     }
 
@@ -281,9 +297,6 @@ const Flagsmith = class {
             return;
         }
         this.interval.push(setInterval(this.getFlags, ticks))
-        if (this.sendFlagEvaluationEvents) {
-            this.interval.push(setInterval(this.analyticsFlags, ticks))
-        }
     }
 
     getSegments() {
@@ -299,7 +312,7 @@ const Flagsmith = class {
 
     evaluateFlag = (flag) => {
         if (this.sendFlagEvaluationEvents && flag) {
-            if (this.evaluationEvent[flag.id] !== undefined) {
+            if (this.evaluationEvent[flag.id] === undefined) {
                 this.evaluationEvent[flag.id] = 0;
             }
             this.evaluationEvent[flag.id] += 1;
