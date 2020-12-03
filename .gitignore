@@ -39,9 +39,3 @@ buck-out/
 \.buckd/
 android/app/libs
 android/keystores/debug.keystore
-
-flagsmith/index.js
-flagsmith/index.js.map
-flagsmith/isomorphic.js
-flagsmith/isomorphic.js.map
-react-native-flagsmith/lib

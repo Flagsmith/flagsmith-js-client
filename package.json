@@ -1,6 +1,7 @@
 {
   "name": "flagsmith",
   "description": "Feature flagging to support continuous development",
+  "main": "./flagsmith/index.js",
   "scripts": {
     "prepublish": "npm run build",
     "deploy": "npm run build && cd ./flagsmith/ && npm publish && cd ../react-native-flagsmith && npm publish",

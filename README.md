@@ -66,7 +66,6 @@ flagsmith.init({
 | ```defaultFlags```     | Allows you define default features, these will all be overridden on first retrieval of features. | | null
 | ```preventFetch```     | Use this if you want to prevent fetching on init(), e.g. if you want to do some initialisation or call identify. | | false
 | ```api```     | Use this property to define where you're getting feature flags from, e.g. if you're self hosting. | | https://api.bullet-train.io/api/v1/
-| ```sendFlagEvaluationEvents```     | Enable send evaluations flag. | | false
 
 **Available Functions**
 
