@@ -314,7 +314,7 @@ const Flagsmith = class {
         if (flag) {
             res = flag.value;
         }
-        evaluateFlag(this.flags[key]);
+        this.evaluateFlag(this.flags[key]);
 
         //todo record check for value
 
@@ -396,7 +396,7 @@ const Flagsmith = class {
         if (flag && flag.enabled) {
             res = true;
         }
-        evaluateFlag(this.flags[key]);
+        this.evaluateFlag(this.flags[key]);
 
         //todo record check for feature
 
