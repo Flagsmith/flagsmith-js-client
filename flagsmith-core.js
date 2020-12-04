@@ -150,7 +150,8 @@ const Flagsmith = class {
         return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
             this.api = api;
-            this.interval = [];
+            this.getFlagInterval = null;
+            this.analyticsInterval = null;
             this.onChange = onChange;
             this.onError = onError;
             this.enableLogs = enableLogs;
@@ -171,7 +172,11 @@ const Flagsmith = class {
             }
 
             if (this.sendFlagEvaluationEvents) {
-                this.interval.push(setInterval(this.analyticsFlags, this.ticks))
+                if (this.analyticsInterval) {
+                    clearInterval(this.analyticsInterval);
+                }
+
+                this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
                 AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
                     if (res) {
                         var json = JSON.parse(res);
@@ -233,7 +238,7 @@ const Flagsmith = class {
 
     identify(userId) {
         this.identity = userId;
-        if (this.initialised && !this.interval.length) {
+        if (this.initialised && !this.getFlagInterval) {
             return this.getFlags();
         }
         return Promise.resolve();
@@ -290,16 +295,16 @@ const Flagsmith = class {
         this.identity = null;
         this.segments = null;
         this.traits = null;
-        if (this.initialised && !this.interval.length) {
+        if (this.initialised && !this.getFlagInterval) {
             this.getFlags();
         }
     }
 
     startListening(ticks = 1000) {
-        if (this.interval.length) {
+        if (this.getFlagInterval) {
             return;
         }
-        this.interval.push(setInterval(this.getFlags, ticks))
+        this.getFlagInterval = setInterval(this.getFlags, ticks);
     }
 
     getSegments() {
@@ -308,9 +313,7 @@ const Flagsmith = class {
     }
 
     stopListening() {
-        this.interval.forEach(interval => {
-            clearInterval(interval);
-        });
+        clearInterval(this.getFlagInterval);
     }
 
     evaluateFlag = (flag) => {

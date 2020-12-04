@@ -77,12 +77,12 @@
             i = void 0;
 
         try {
-          for (var s, a = e[Symbol.iterator](); !(r = (s = a.next()).done) && (n.push(s.value), !t || n.length !== t); r = !0);
+          for (var a, s = e[Symbol.iterator](); !(r = (a = s.next()).done) && (n.push(a.value), !t || n.length !== t); r = !0);
         } catch (e) {
           o = !0, i = e;
         } finally {
           try {
-            !r && a.return && a.return();
+            !r && s.return && s.return();
           } finally {
             if (o) throw i;
           }
@@ -93,13 +93,13 @@
       throw new TypeError("Invalid attempt to destructure non-iterable instance");
     },
         i = n(9),
-        s = (r = i) && r.__esModule ? r : {
+        a = (r = i) && r.__esModule ? r : {
       default: r
     };
 
-    var a = {
+    var s = {
       getItem: function (e, t) {
-        return a.multiGet([e]).then(function (e) {
+        return s.multiGet([e]).then(function (e) {
           return e[0][1];
         }).then(function (e) {
           return t && t(null, e), e;
@@ -108,7 +108,7 @@
         });
       },
       setItem: function (e, t, n) {
-        return a.multiSet([[e, t]]).then(function (e) {
+        return s.multiSet([[e, t]]).then(function (e) {
           return n && n(null, e), e;
         }).catch(function (e) {
           return n && n(e, null), e;
@@ -122,7 +122,7 @@
         });
       },
       removeItem: function (e, t) {
-        return a.multiRemove([e]).then(function () {
+        return s.multiRemove([e]).then(function () {
           t && t(null);
         }).catch(function (e) {
           t && t(e, null);
@@ -134,7 +134,7 @@
         });
       },
       mergeItem: function (e, t) {
-        return a.multiMerge([[e, t]]);
+        return s.multiMerge([[e, t]]);
       },
       multiGet: function (e) {
         return new Promise(function (t) {
@@ -166,9 +166,9 @@
             var t = o(e, 2),
                 n = t[0],
                 i = t[1],
-                a = localStorage.getItem(n);
-            if (a) try {
-              localStorage.setItem(n, JSON.stringify((0, s.default)(JSON.parse(a), JSON.parse(i))));
+                s = localStorage.getItem(n);
+            if (s) try {
+              localStorage.setItem(n, JSON.stringify((0, a.default)(JSON.parse(s), JSON.parse(i))));
             } catch (e) {
               r.push(e);
             }
@@ -186,7 +186,7 @@
         console.warn("AsyncStorage.flushGetRequests: Not supported on `web`");
       }
     };
-    t.default = a;
+    t.default = s;
   }, function (e, t, n) {
     "use strict";
 
@@ -195,11 +195,11 @@
         o = n.n(r),
         i = n(7).default;
     "undefined" == typeof window && (i = n(8).default);
-    var s = n(11)({
+    var a = n(11)({
       AsyncStorage: o.a,
       fetch: i
     });
-    "undefined" != typeof window && (window.flagsmith = s), t.default = s;
+    "undefined" != typeof window && (window.flagsmith = a), t.default = a;
   }, function (e, t, n) {
     "use strict";
 
@@ -207,8 +207,8 @@
       return t = t || {}, new Promise(function (n, r) {
         var o = new XMLHttpRequest(),
             i = [],
-            s = [],
-            a = {},
+            a = [],
+            s = {},
             u = function () {
           return {
             ok: 2 == (o.status / 100 | 0),
@@ -230,13 +230,13 @@
                 return i;
               },
               entries: function () {
-                return s;
+                return a;
               },
               get: function (e) {
-                return a[e.toLowerCase()];
+                return s[e.toLowerCase()];
               },
               has: function (e) {
-                return e.toLowerCase() in a;
+                return e.toLowerCase() in s;
               }
             }
           };
@@ -244,7 +244,7 @@
 
         for (var c in o.open(t.method || "get", e, !0), o.onload = function () {
           o.getAllResponseHeaders().replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm, function (e, t, n) {
-            i.push(t = t.toLowerCase()), s.push([t, n]), a[t] = a[t] ? a[t] + "," + n : n;
+            i.push(t = t.toLowerCase()), a.push([t, n]), s[t] = s[t] ? s[t] + "," + n : n;
           }), n(u());
         }, o.onerror = r, o.withCredentials = "include" == t.credentials, t.headers) o.setRequestHeader(c, t.headers[c]);
 
@@ -266,8 +266,8 @@
     var r = n(0),
         o = n(3),
         i = n(2),
-        s = n(4),
-        a = n(1);
+        a = n(4),
+        s = n(1);
     const u = r.Readable,
           c = Symbol("buffer"),
           l = Symbol("type");
@@ -330,11 +330,11 @@
         let r, o;
         r = void 0 === t ? 0 : t < 0 ? Math.max(e + t, 0) : Math.min(t, e), o = void 0 === n ? e : n < 0 ? Math.max(e + n, 0) : Math.min(n, e);
         const i = Math.max(o - r, 0),
-              s = this[c].slice(r, r + i),
-              a = new f([], {
+              a = this[c].slice(r, r + i),
+              s = new f([], {
           type: arguments[2]
         });
-        return a[c] = s, a;
+        return s[c] = a, s;
       }
 
     }
@@ -373,13 +373,13 @@
           n = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {},
           o = n.size;
       let i = void 0 === o ? 0 : o;
-      var s = n.timeout;
-      let a = void 0 === s ? 0 : s;
+      var a = n.timeout;
+      let s = void 0 === a ? 0 : a;
       null == e ? e = null : v(e) ? e = Buffer.from(e.toString()) : m(e) || Buffer.isBuffer(e) || ("[object ArrayBuffer]" === Object.prototype.toString.call(e) ? e = Buffer.from(e) : ArrayBuffer.isView(e) ? e = Buffer.from(e.buffer, e.byteOffset, e.byteLength) : e instanceof r || (e = Buffer.from(String(e)))), this[d] = {
         body: e,
         disturbed: !1,
         error: null
-      }, this.size = i, this.timeout = a, e instanceof r && e.on("error", function (e) {
+      }, this.size = i, this.timeout = s, e instanceof r && e.on("error", function (e) {
         const n = "AbortError" === e.name ? e : new h(`Invalid response body while trying to fetch ${t.url}: ${e.message}`, "system", e);
         t[d].error = n;
       });
@@ -396,25 +396,25 @@
       let n = [],
           o = 0,
           i = !1;
-      return new g.Promise(function (r, s) {
-        let a;
-        e.timeout && (a = setTimeout(function () {
-          i = !0, s(new h(`Response timeout while trying to fetch ${e.url} (over ${e.timeout}ms)`, "body-timeout"));
+      return new g.Promise(function (r, a) {
+        let s;
+        e.timeout && (s = setTimeout(function () {
+          i = !0, a(new h(`Response timeout while trying to fetch ${e.url} (over ${e.timeout}ms)`, "body-timeout"));
         }, e.timeout)), t.on("error", function (t) {
-          "AbortError" === t.name ? (i = !0, s(t)) : s(new h(`Invalid response body while trying to fetch ${e.url}: ${t.message}`, "system", t));
+          "AbortError" === t.name ? (i = !0, a(t)) : a(new h(`Invalid response body while trying to fetch ${e.url}: ${t.message}`, "system", t));
         }), t.on("data", function (t) {
           if (!i && null !== t) {
-            if (e.size && o + t.length > e.size) return i = !0, void s(new h(`content size at ${e.url} over limit: ${e.size}`, "max-size"));
+            if (e.size && o + t.length > e.size) return i = !0, void a(new h(`content size at ${e.url} over limit: ${e.size}`, "max-size"));
             o += t.length, n.push(t);
           }
         }), t.on("end", function () {
           if (!i) {
-            clearTimeout(a);
+            clearTimeout(s);
 
             try {
               r(Buffer.concat(n, o));
             } catch (t) {
-              s(new h(`Could not create Buffer from response body for ${e.url}: ${t.message}`, "system", t));
+              a(new h(`Could not create Buffer from response body for ${e.url}: ${t.message}`, "system", t));
             }
           }
         });
@@ -605,8 +605,8 @@
         for (; r < n.length;) {
           var o = n[r];
           const i = o[0],
-                s = o[1];
-          e.call(t, s, i, this), n = k(this), r++;
+                a = o[1];
+          e.call(t, a, i, this), n = k(this), r++;
         }
       }
 
@@ -637,15 +637,15 @@
       }
 
       keys() {
-        return F(this, "key");
+        return I(this, "key");
       }
 
       values() {
-        return F(this, "value");
+        return I(this, "value");
       }
 
       [Symbol.iterator]() {
-        return F(this, "key+value");
+        return I(this, "key+value");
       }
 
     }
@@ -695,21 +695,21 @@
         enumerable: !0
       }
     });
-    const B = Symbol("internal");
+    const F = Symbol("internal");
 
-    function F(e, t) {
-      const n = Object.create(L);
-      return n[B] = {
+    function I(e, t) {
+      const n = Object.create(B);
+      return n[F] = {
         target: e,
         kind: t,
         index: 0
       }, n;
     }
 
-    const L = Object.setPrototypeOf({
+    const B = Object.setPrototypeOf({
       next() {
-        if (!this || Object.getPrototypeOf(this) !== L) throw new TypeError("Value of `this` is not a HeadersIterator");
-        var e = this[B];
+        if (!this || Object.getPrototypeOf(this) !== B) throw new TypeError("Value of `this` is not a HeadersIterator");
+        var e = this[F];
         const t = e.target,
               n = e.kind,
               r = e.index,
@@ -717,7 +717,7 @@
         return r >= o.length ? {
           value: void 0,
           done: !0
-        } : (this[B].index = r + 1, {
+        } : (this[F].index = r + 1, {
           value: o[r],
           done: !1
         });
@@ -725,7 +725,7 @@
 
     }, Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]())));
 
-    function C(e) {
+    function L(e) {
       const t = Object.assign({
         __proto__: null
       }, e[x]),
@@ -733,13 +733,13 @@
       return void 0 !== n && (t[n] = t[n][0]), t;
     }
 
-    Object.defineProperty(L, Symbol.toStringTag, {
+    Object.defineProperty(B, Symbol.toStringTag, {
       value: "HeadersIterator",
       writable: !1,
       enumerable: !1,
       configurable: !0
     });
-    const I = Symbol("Response internals"),
+    const C = Symbol("Response internals"),
           $ = o.STATUS_CODES;
 
     class z {
@@ -755,7 +755,7 @@
           t && r.append("Content-Type", t);
         }
 
-        this[I] = {
+        this[C] = {
           url: t.url,
           status: n,
           statusText: t.statusText || $[n],
@@ -765,27 +765,27 @@
       }
 
       get url() {
-        return this[I].url || "";
+        return this[C].url || "";
       }
 
       get status() {
-        return this[I].status;
+        return this[C].status;
       }
 
       get ok() {
-        return this[I].status >= 200 && this[I].status < 300;
+        return this[C].status >= 200 && this[C].status < 300;
       }
 
       get redirected() {
-        return this[I].counter > 0;
+        return this[C].counter > 0;
       }
 
       get statusText() {
-        return this[I].statusText;
+        return this[C].statusText;
       }
 
       get headers() {
-        return this[I].headers;
+        return this[C].headers;
       }
 
       clone() {
@@ -857,17 +857,17 @@
           e && i.append("Content-Type", e);
         }
 
-        let s = q(e) ? e.signal : null;
-        if ("signal" in n && (s = n.signal), null != s && !function (e) {
+        let a = q(e) ? e.signal : null;
+        if ("signal" in n && (a = n.signal), null != a && !function (e) {
           const t = e && "object" == typeof e && Object.getPrototypeOf(e);
           return !(!t || "AbortSignal" !== t.constructor.name);
-        }(s)) throw new TypeError("Expected signal to be an instanceof AbortSignal");
+        }(a)) throw new TypeError("Expected signal to be an instanceof AbortSignal");
         this[R] = {
           method: r,
           redirect: n.redirect || e.redirect || "follow",
           headers: i,
           parsedURL: t,
-          signal: s
+          signal: a
         }, this.follow = void 0 !== n.follow ? n.follow : void 0 !== e.follow ? e.follow : 20, this.compress = void 0 !== n.compress ? n.compress : void 0 === e.compress || e.compress, this.counter = n.counter || e.counter || 0, this.agent = n.agent || e.agent;
       }
 
@@ -951,11 +951,11 @@
           let i = e.agent;
           return "function" == typeof i && (i = i(t)), n.has("Connection") || i || n.set("Connection", "close"), Object.assign({}, t, {
             method: e.method,
-            headers: C(n),
+            headers: L(n),
             agent: i
           });
         }(u),
-              l = ("https:" === c.protocol ? s : o).request,
+              l = ("https:" === c.protocol ? a : o).request,
               f = u.signal;
 
         let p = null;
@@ -1042,20 +1042,20 @@
             timeout: u.timeout,
             counter: u.counter
           },
-                s = t.get("Content-Encoding");
-          if (!u.compress || "HEAD" === u.method || null === s || 204 === e.statusCode || 304 === e.statusCode) return p = new z(r, o), void n(p);
+                a = t.get("Content-Encoding");
+          if (!u.compress || "HEAD" === u.method || null === a || 204 === e.statusCode || 304 === e.statusCode) return p = new z(r, o), void n(p);
           const c = {
-            flush: a.Z_SYNC_FLUSH,
-            finishFlush: a.Z_SYNC_FLUSH
+            flush: s.Z_SYNC_FLUSH,
+            finishFlush: s.Z_SYNC_FLUSH
           };
-          if ("gzip" == s || "x-gzip" == s) return r = r.pipe(a.createGunzip(c)), p = new z(r, o), void n(p);
+          if ("gzip" == a || "x-gzip" == a) return r = r.pipe(s.createGunzip(c)), p = new z(r, o), void n(p);
 
-          if ("deflate" != s && "x-deflate" != s) {
-            if ("br" == s && "function" == typeof a.createBrotliDecompress) return r = r.pipe(a.createBrotliDecompress()), p = new z(r, o), void n(p);
+          if ("deflate" != a && "x-deflate" != a) {
+            if ("br" == a && "function" == typeof s.createBrotliDecompress) return r = r.pipe(s.createBrotliDecompress()), p = new z(r, o), void n(p);
             p = new z(r, o), n(p);
           } else {
             e.pipe(new H()).once("data", function (e) {
-              r = 8 == (15 & e[0]) ? r.pipe(a.createInflate()) : r.pipe(a.createInflateRaw()), p = new z(r, o), n(p);
+              r = 8 == (15 & e[0]) ? r.pipe(s.createInflate()) : r.pipe(s.createInflateRaw()), p = new z(r, o), n(p);
             });
           }
         }), function (e, t) {
@@ -1074,8 +1074,8 @@
           r = "__lodash_hash_undefined__",
           o = 800,
           i = 16,
-          s = 9007199254740991,
-          a = "[object Arguments]",
+          a = 9007199254740991,
+          s = "[object Arguments]",
           u = "[object AsyncFunction]",
           c = "[object Function]",
           l = "[object GeneratorFunction]",
@@ -1086,7 +1086,7 @@
           y = /^\[object .+?Constructor\]$/,
           g = /^(?:0|[1-9]\d*)$/,
           b = {};
-      b["[object Float32Array]"] = b["[object Float64Array]"] = b["[object Int8Array]"] = b["[object Int16Array]"] = b["[object Int32Array]"] = b["[object Uint8Array]"] = b["[object Uint8ClampedArray]"] = b["[object Uint16Array]"] = b["[object Uint32Array]"] = !0, b[a] = b["[object Array]"] = b["[object ArrayBuffer]"] = b["[object Boolean]"] = b["[object DataView]"] = b["[object Date]"] = b["[object Error]"] = b[c] = b["[object Map]"] = b["[object Number]"] = b[h] = b["[object RegExp]"] = b["[object Set]"] = b["[object String]"] = b["[object WeakMap]"] = !1;
+      b["[object Float32Array]"] = b["[object Float64Array]"] = b["[object Int8Array]"] = b["[object Int16Array]"] = b["[object Int32Array]"] = b["[object Uint8Array]"] = b["[object Uint8ClampedArray]"] = b["[object Uint16Array]"] = b["[object Uint32Array]"] = !0, b[s] = b["[object Array]"] = b["[object ArrayBuffer]"] = b["[object Boolean]"] = b["[object DataView]"] = b["[object Date]"] = b["[object Error]"] = b[c] = b["[object Map]"] = b["[object Number]"] = b[h] = b["[object RegExp]"] = b["[object Set]"] = b["[object String]"] = b["[object WeakMap]"] = !1;
 
       var v = "object" == typeof global && global && global.Object === Object && global,
           m = "object" == typeof self && self && self.Object === Object && self,
@@ -1125,16 +1125,16 @@
       var x,
           A,
           k,
-          B = Array.prototype,
-          F = Function.prototype,
-          L = Object.prototype,
-          C = w["__core-js_shared__"],
-          I = F.toString,
-          $ = L.hasOwnProperty,
-          z = (x = /[^.]+$/.exec(C && C.keys && C.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
-          R = L.toString,
-          N = I.call(Object),
-          U = RegExp("^" + I.call($).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
+          F = Array.prototype,
+          I = Function.prototype,
+          B = Object.prototype,
+          L = w["__core-js_shared__"],
+          C = I.toString,
+          $ = B.hasOwnProperty,
+          z = (x = /[^.]+$/.exec(L && L.keys && L.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
+          R = B.toString,
+          N = C.call(Object),
+          U = RegExp("^" + C.call($).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
           D = S ? w.Buffer : void 0,
           q = w.Symbol,
           J = w.Uint8Array,
@@ -1143,8 +1143,8 @@
         return A(k(e));
       }),
           G = Object.create,
-          V = L.propertyIsEnumerable,
-          K = B.splice,
+          V = B.propertyIsEnumerable,
+          K = F.splice,
           Z = q ? q.toStringTag : void 0,
           Y = function () {
         try {
@@ -1161,7 +1161,7 @@
         function e() {}
 
         return function (t) {
-          if (!Le(t)) return {};
+          if (!Be(t)) return {};
           if (G) return G(t);
           e.prototype = t;
           var n = new e();
@@ -1199,27 +1199,27 @@
         }
       }
 
-      function se(e) {
+      function ae(e) {
         var t = this.__data__ = new oe(e);
         this.size = t.size;
       }
 
-      function ae(e, t) {
+      function se(e, t) {
         var n = xe(e),
             r = !n && Te(e),
             o = !n && !r && ke(e),
-            i = !n && !r && !o && Ie(e),
-            s = n || r || o || i,
-            a = s ? function (e, t) {
+            i = !n && !r && !o && Ce(e),
+            a = n || r || o || i,
+            s = a ? function (e, t) {
           for (var n = -1, r = Array(e); ++n < e;) r[n] = t(n);
 
           return r;
         }(e.length, String) : [],
-            u = a.length;
+            u = s.length;
 
-        for (var c in e) !t && !$.call(e, c) || s && ("length" == c || o && ("offset" == c || "parent" == c) || i && ("buffer" == c || "byteLength" == c || "byteOffset" == c) || _e(c, u)) || a.push(c);
+        for (var c in e) !t && !$.call(e, c) || a && ("length" == c || o && ("offset" == c || "parent" == c) || i && ("buffer" == c || "byteLength" == c || "byteOffset" == c) || _e(c, u)) || s.push(c);
 
-        return a;
+        return s;
       }
 
       function ue(e, t, n) {
@@ -1299,17 +1299,17 @@
         var n = we(this, e),
             r = n.size;
         return n.set(e, t), this.size += n.size == r ? 0 : 1, this;
-      }, se.prototype.clear = function () {
+      }, ae.prototype.clear = function () {
         this.__data__ = new oe(), this.size = 0;
-      }, se.prototype.delete = function (e) {
+      }, ae.prototype.delete = function (e) {
         var t = this.__data__,
             n = t.delete(e);
         return this.size = t.size, n;
-      }, se.prototype.get = function (e) {
+      }, ae.prototype.get = function (e) {
         return this.__data__.get(e);
-      }, se.prototype.has = function (e) {
+      }, ae.prototype.has = function (e) {
         return this.__data__.has(e);
-      }, se.prototype.set = function (e, t) {
+      }, ae.prototype.set = function (e, t) {
         var r = this.__data__;
 
         if (r instanceof oe) {
@@ -1323,9 +1323,9 @@
 
       var he,
           pe = function (e, t, n) {
-        for (var r = -1, o = Object(e), i = n(e), s = i.length; s--;) {
-          var a = i[he ? s : ++r];
-          if (!1 === t(o[a], a, o)) break;
+        for (var r = -1, o = Object(e), i = n(e), a = i.length; a--;) {
+          var s = i[he ? a : ++r];
+          if (!1 === t(o[s], s, o)) break;
         }
 
         return e;
@@ -1350,16 +1350,16 @@
       }
 
       function ye(e) {
-        return Ce(e) && de(e) == a;
+        return Le(e) && de(e) == s;
       }
 
       function ge(e) {
-        return !(!Le(e) || function (e) {
+        return !(!Be(e) || function (e) {
           return !!z && z in e;
-        }(e)) && (Be(e) ? U : y).test(function (e) {
+        }(e)) && (Fe(e) ? U : y).test(function (e) {
           if (null != e) {
             try {
-              return I.call(e);
+              return C.call(e);
             } catch (e) {}
 
             try {
@@ -1372,7 +1372,7 @@
       }
 
       function be(e) {
-        if (!Le(e)) return function (e) {
+        if (!Be(e)) return function (e) {
           var t = [];
           if (null != e) for (var n in Object(e)) t.push(n);
           return t;
@@ -1386,20 +1386,20 @@
       }
 
       function ve(e, t, n, r, o) {
-        e !== t && pe(t, function (i, s) {
-          if (o || (o = new se()), Le(i)) !function (e, t, n, r, o, i, s) {
-            var a = Oe(e, n),
+        e !== t && pe(t, function (i, a) {
+          if (o || (o = new ae()), Be(i)) !function (e, t, n, r, o, i, a) {
+            var s = Oe(e, n),
                 u = Oe(t, n),
-                c = s.get(u);
+                c = a.get(u);
             if (c) return void ue(e, n, c);
-            var l = i ? i(a, u, n + "", e, t, s) : void 0,
+            var l = i ? i(s, u, n + "", e, t, a) : void 0,
                 f = void 0 === l;
 
             if (f) {
               var p = xe(u),
                   d = !p && ke(u),
-                  y = !p && !d && Ie(u);
-              l = u, p || d || y ? xe(a) ? l = a : Ce(w = a) && Ae(w) ? l = function (e, t) {
+                  y = !p && !d && Ce(u);
+              l = u, p || d || y ? xe(s) ? l = s : Le(w = s) && Ae(w) ? l = function (e, t) {
                 var n = -1,
                     r = e.length;
                 t || (t = Array(r));
@@ -1407,44 +1407,44 @@
                 for (; ++n < r;) t[n] = e[n];
 
                 return t;
-              }(a) : d ? (f = !1, l = function (e, t) {
+              }(s) : d ? (f = !1, l = function (e, t) {
                 if (t) return e.slice();
                 var n = e.length,
                     r = M ? M(n) : new e.constructor(n);
                 return e.copy(r), r;
               }(u, !0)) : y ? (f = !1, g = u, b = !0 ? (v = g.buffer, m = new v.constructor(v.byteLength), new J(m).set(new J(v)), m) : g.buffer, l = new g.constructor(b, g.byteOffset, g.length)) : l = [] : function (e) {
-                if (!Ce(e) || de(e) != h) return !1;
+                if (!Le(e) || de(e) != h) return !1;
                 var t = H(e);
                 if (null === t) return !0;
                 var n = $.call(t, "constructor") && t.constructor;
-                return "function" == typeof n && n instanceof n && I.call(n) == N;
-              }(u) || Te(u) ? (l = a, Te(a) ? l = function (e) {
+                return "function" == typeof n && n instanceof n && C.call(n) == N;
+              }(u) || Te(u) ? (l = s, Te(s) ? l = function (e) {
                 return function (e, t, n, r) {
                   var o = !n;
                   n || (n = {});
                   var i = -1,
-                      s = t.length;
+                      a = t.length;
 
-                  for (; ++i < s;) {
-                    var a = t[i],
-                        u = r ? r(n[a], e[a], a, n, e) : void 0;
-                    void 0 === u && (u = e[a]), o ? fe(n, a, u) : ce(n, a, u);
+                  for (; ++i < a;) {
+                    var s = t[i],
+                        u = r ? r(n[s], e[s], s, n, e) : void 0;
+                    void 0 === u && (u = e[s]), o ? fe(n, s, u) : ce(n, s, u);
                   }
 
                   return n;
                 }(e, $e(e));
-              }(a) : Le(a) && !Be(a) || (l = function (e) {
+              }(s) : Be(s) && !Fe(s) || (l = function (e) {
                 return "function" != typeof e.constructor || Se(e) ? {} : ne(H(e));
               }(u))) : f = !1;
             }
 
             var g, b, v, m;
             var w;
-            f && (s.set(u, l), o(l, u, r, i, s), s.delete(u));
+            f && (a.set(u, l), o(l, u, r, i, a), a.delete(u));
             ue(e, n, l);
-          }(e, t, s, n, ve, r, o);else {
-            var a = r ? r(Oe(e, s), i, s + "", e, t, o) : void 0;
-            void 0 === a && (a = i), ue(e, s, a);
+          }(e, t, a, n, ve, r, o);else {
+            var s = r ? r(Oe(e, a), i, a + "", e, t, o) : void 0;
+            void 0 === s && (s = i), ue(e, a, s);
           }
         }, $e);
       }
@@ -1452,13 +1452,13 @@
       function me(e, t) {
         return Ee(function (e, t, n) {
           return t = X(void 0 === t ? e.length - 1 : t, 0), function () {
-            for (var r = arguments, o = -1, i = X(r.length - t, 0), s = Array(i); ++o < i;) s[o] = r[t + o];
+            for (var r = arguments, o = -1, i = X(r.length - t, 0), a = Array(i); ++o < i;) a[o] = r[t + o];
 
             o = -1;
 
-            for (var a = Array(t + 1); ++o < t;) a[o] = r[o];
+            for (var s = Array(t + 1); ++o < t;) s[o] = r[o];
 
-            return a[t] = n(s), T(e, this, a);
+            return s[t] = n(a), T(e, this, s);
           };
         }(e, t, Ne), e + "");
       }
@@ -1480,12 +1480,12 @@
 
       function _e(e, t) {
         var n = typeof e;
-        return !!(t = null == t ? s : t) && ("number" == n || "symbol" != n && g.test(e)) && e > -1 && e % 1 == 0 && e < t;
+        return !!(t = null == t ? a : t) && ("number" == n || "symbol" != n && g.test(e)) && e > -1 && e % 1 == 0 && e < t;
       }
 
       function Se(e) {
         var t = e && e.constructor;
-        return e === ("function" == typeof t && t.prototype || L);
+        return e === ("function" == typeof t && t.prototype || B);
       }
 
       function Oe(e, t) {
@@ -1497,9 +1497,9 @@
             n = 0;
         return function () {
           var r = Q(),
-              s = i - (r - n);
+              a = i - (r - n);
 
-          if (n = r, s > 0) {
+          if (n = r, a > 0) {
             if (++t >= o) return arguments[0];
           } else t = 0;
 
@@ -1524,47 +1524,47 @@
       var Te = ye(function () {
         return arguments;
       }()) ? ye : function (e) {
-        return Ce(e) && $.call(e, "callee") && !V.call(e, "callee");
+        return Le(e) && $.call(e, "callee") && !V.call(e, "callee");
       },
           xe = Array.isArray;
 
       function Ae(e) {
-        return null != e && Fe(e.length) && !Be(e);
+        return null != e && Ie(e.length) && !Fe(e);
       }
 
       var ke = W || function () {
         return !1;
       };
 
-      function Be(e) {
-        if (!Le(e)) return !1;
+      function Fe(e) {
+        if (!Be(e)) return !1;
         var t = de(e);
         return t == c || t == l || t == u || t == p;
       }
 
-      function Fe(e) {
-        return "number" == typeof e && e > -1 && e % 1 == 0 && e <= s;
+      function Ie(e) {
+        return "number" == typeof e && e > -1 && e % 1 == 0 && e <= a;
       }
 
-      function Le(e) {
+      function Be(e) {
         var t = typeof e;
         return null != e && ("object" == t || "function" == t);
       }
 
-      function Ce(e) {
+      function Le(e) {
         return null != e && "object" == typeof e;
       }
 
-      var Ie = P ? function (e) {
+      var Ce = P ? function (e) {
         return function (t) {
           return e(t);
         };
       }(P) : function (e) {
-        return Ce(e) && Fe(e.length) && !!b[de(e)];
+        return Le(e) && Ie(e.length) && !!b[de(e)];
       };
 
       function $e(e) {
-        return Ae(e) ? ae(e, !0) : be(e);
+        return Ae(e) ? se(e, !0) : be(e);
       }
 
       var ze,
@@ -1577,12 +1577,12 @@
             i = r > 2 ? t[2] : void 0;
 
         for (o = ze.length > 3 && "function" == typeof o ? (r--, o) : void 0, i && function (e, t, n) {
-          if (!Le(n)) return !1;
+          if (!Be(n)) return !1;
           var r = typeof t;
           return !!("number" == r ? Ae(n) && _e(t, n.length) : "string" == r && (t in n)) && Pe(n[t], e);
         }(t[0], t[1], i) && (o = r < 3 ? void 0 : o, r = 1), e = Object(e); ++n < r;) {
-          var s = t[n];
-          s && ze(e, s, n, o);
+          var a = t[n];
+          a && ze(e, a, n, o);
         }
 
         return e;
@@ -1632,7 +1632,7 @@
 
     function i(e) {
       for (var t, n = 1; n < arguments.length; n++) t = null == arguments[n] ? {} : arguments[n], n % 2 ? o(t, !0).forEach(function (n) {
-        a(e, n, t[n]);
+        s(e, n, t[n]);
       }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : o(t).forEach(function (n) {
         Object.defineProperty(e, n, Object.getOwnPropertyDescriptor(t, n));
       });
@@ -1640,11 +1640,11 @@
       return e;
     }
 
-    function s(e, t) {
+    function a(e, t) {
       for (var n, r = 0; r < t.length; r++) (n = t[r]).enumerable = n.enumerable || !1, n.configurable = !0, "value" in n && (n.writable = !0), Object.defineProperty(e, n.key, n);
     }
 
-    function a(e, t, n) {
+    function s(e, t, n) {
       return t in e ? Object.defineProperty(e, t, {
         value: n,
         enumerable: !0,
@@ -1665,7 +1665,7 @@
         var n = this;
         (function (e, t) {
           if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
-        })(this, e), a(this, "getJSON", function (e, t, r) {
+        })(this, e), s(this, "getJSON", function (e, t, r) {
           var o = {
             method: t || "GET",
             body: r,
@@ -1684,25 +1684,25 @@
               return e.ok ? n : Promise.reject(n);
             });
           });
-        }), a(this, "getFlags", function (e, t) {
+        }), s(this, "getFlags", function (e, t) {
           var r = n.onChange,
               o = n.onError,
-              s = n.identity,
-              a = n.api,
+              a = n.identity,
+              s = n.api,
               u = (n.disableCache, !1),
               c = function (e, t) {
             var o = e.flags,
-                s = e.traits,
-                a = {},
+                a = e.traits,
+                s = {},
                 u = {};
 
-            if (s = s || [], (o = o || []).forEach(function (e) {
-              a[e.feature.name.toLowerCase().replace(/ /g, "_")] = {
+            if (a = a || [], (o = o || []).forEach(function (e) {
+              s[e.feature.name.toLowerCase().replace(/ /g, "_")] = {
                 id: e.feature.id,
                 enabled: e.enabled,
                 value: e.feature_state_value
               };
-            }), s.forEach(function (e) {
+            }), a.forEach(function (e) {
               u[e.trait_key.toLowerCase().replace(/ /g, "_")] = e.trait_value;
             }), n.oldFlags = i({}, n.flags), t) {
               var c = {};
@@ -1711,30 +1711,30 @@
               }), n.segments = c;
             }
 
-            var l = f(n.flags, a),
+            var l = f(n.flags, s),
                 h = f(n.traits, u);
-            n.flags = a, n.traits = u, n.updateStorage(), r && r(n.oldFlags, {
+            n.flags = s, n.traits = u, n.updateStorage(), r && r(n.oldFlags, {
               isFromServer: !0,
               flagsChanged: !l,
               traitsChanged: !h
             });
           };
 
-          return s ? Promise.all([n.getJSON(a + "identities/?identifier=" + encodeURIComponent(s))]).then(function (e) {
+          return a ? Promise.all([n.getJSON(s + "identities/?identifier=" + encodeURIComponent(a))]).then(function (e) {
             c(e[0], e[1]);
           }).catch(function (e) {
             var t = e.message;
             o && o({
               message: t
             });
-          }) : Promise.all([n.getJSON(a + "flags/")]).then(function (t) {
+          }) : Promise.all([n.getJSON(s + "flags/")]).then(function (t) {
             c({
               flags: t[0]
             }, null), e && !u && (u = !0, e());
           }).catch(function (e) {
             t && !u && (u = !0, t(e)), o && o(e);
           });
-        }), a(this, "analyticsFlags", function () {
+        }), s(this, "analyticsFlags", function () {
           var e = n.api;
           if (0 !== Object.getOwnPropertyNames(n.evaluationEvent).length) return n.getJSON(e + "analytics/flags/", "POST", JSON.stringify(n.evaluationEvent)).then(function () {
             state = n.getState(), n.setState(i({}, state, {
@@ -1743,15 +1743,15 @@
           }).catch(function (e) {
             n.log("Exception fetching evaluationEvent", e);
           });
-        }), a(this, "evaluateFlag", function (e) {
+        }), s(this, "evaluateFlag", function (e) {
           n.sendFlagEvaluationEvents && e && (void 0 === n.evaluationEvent[e.id] && (n.evaluationEvent[e.id] = 0), n.evaluationEvent[e.id] += 1), n.updateEventStorage();
-        }), a(this, "getValue", function (e) {
+        }), s(this, "getValue", function (e) {
           var t = n.flags && n.flags[e],
               r = null;
           return t && (r = t.value), n.evaluateFlag(n.flags[e]), r;
-        }), a(this, "getTrait", function (e) {
+        }), s(this, "getTrait", function (e) {
           return n.traits && n.traits[e];
-        }), a(this, "setTrait", function (e, t) {
+        }), s(this, "setTrait", function (e, t) {
           var r = n.getJSON,
               o = n.identity,
               i = n.api;
@@ -1765,14 +1765,14 @@
             n.initialised && n.getFlags();
           });
           console.error(h("setTrait"));
-        }), a(this, "setTraits", function (e) {
+        }), s(this, "setTraits", function (e) {
           var t = n.getJSON,
               o = n.identity,
               i = n.api;
 
           if (i) {
             e && "object" === r(e) || console.error("Expected object for flagsmith.setTraits");
-            var s = Object.keys(e).map(function (t) {
+            var a = Object.keys(e).map(function (t) {
               return {
                 identity: {
                   identifier: o
@@ -1781,13 +1781,13 @@
                 trait_value: e[t]
               };
             });
-            return t("".concat(i, "traits/bulk/"), "PUT", JSON.stringify(s)).then(function () {
+            return t("".concat(i, "traits/bulk/"), "PUT", JSON.stringify(a)).then(function () {
               n.initialised && n.getFlags();
             });
           }
 
           console.error(h("setTraits"));
-        }), a(this, "incrementTrait", function (e, t) {
+        }), s(this, "incrementTrait", function (e, t) {
           var r = n.getJSON,
               o = n.identity,
               i = n.api;
@@ -1796,7 +1796,7 @@
             increment_by: t,
             identifier: o
           })).then(n.getFlags);
-        }), a(this, "hasFeature", function (e) {
+        }), s(this, "hasFeature", function (e) {
           var t = n.flags && n.flags[e],
               r = !1;
           return t && t.enabled && (r = !0), n.evaluateFlag(n.flags[e]), r;
@@ -1804,7 +1804,7 @@
       }
 
       return function (e, t, n) {
-        t && s(e.prototype, t), n && s(e, n);
+        t && a(e.prototype, t), n && a(e, n);
       }(e, [{
         key: "init",
         value: function (e) {
@@ -1812,8 +1812,8 @@
               n = e.environmentID,
               r = e.api,
               o = void 0 === r ? l : r,
-              s = e.onChange,
-              a = e.cacheFlags,
+              a = e.onChange,
+              s = e.cacheFlags,
               u = e.onError,
               f = e.defaultFlags,
               h = e.preventFetch,
@@ -1822,15 +1822,15 @@
               y = e.AsyncStorage,
               g = e.state;
           return new Promise(function (e, r) {
-            if (t.environmentID = n, t.api = o, t.interval = [], t.onChange = s, t.onError = u, t.enableLogs = p, t.sendFlagEvaluationEvents = !!d && d, t.flags = Object.assign({}, f) || {}, t.initialised = !0, t.ticks = 1e4, t.evaluationEvent = {}, t.timer = t.enableLogs ? new Date().valueOf() : null, y && (c = y), t.cacheFlags = void 0 !== c && a, t.setState(g), !n) throw r("Please specify a environment id"), "Please specify a environment id";
-            t.sendFlagEvaluationEvents && (t.interval.push(setInterval(t.analyticsFlags, t.ticks)), c.getItem("BULLET_TRAIN_EVENT", function (e, n) {
+            if (t.environmentID = n, t.api = o, t.getFlagInterval = null, t.analyticsInterval = null, t.onChange = a, t.onError = u, t.enableLogs = p, t.sendFlagEvaluationEvents = !!d && d, t.flags = Object.assign({}, f) || {}, t.initialised = !0, t.ticks = 1e4, t.evaluationEvent = {}, t.timer = t.enableLogs ? new Date().valueOf() : null, y && (c = y), t.cacheFlags = void 0 !== c && s, t.setState(g), !n) throw r("Please specify a environment id"), "Please specify a environment id";
+            t.sendFlagEvaluationEvents && (t.analyticsInterval && clearInterval(t.analyticsInterval), t.analyticsInterval = setInterval(t.analyticsFlags, t.ticks), c.getItem("BULLET_TRAIN_EVENT", function (e, n) {
               if (n) {
                 var r = JSON.parse(n);
                 r && (g = t.getState(), t.log("Retrieved events from cache", n), t.setState(i({}, g, {
                   evaluationEvent: r
                 })));
               }
-            })), a ? c.getItem("BULLET_TRAIN_DB", function (n, o) {
+            })), s ? c.getItem("BULLET_TRAIN_DB", function (n, o) {
               if (o) try {
                 var i = JSON.parse(o);
                 i && i.api === t.api && i.environmentID === t.environmentID && (t.setState(i), t.log("Retrieved flags from cache", i)), t.flags ? (t.onChange && t.onChange(null, {
@@ -1850,7 +1850,7 @@
       }, {
         key: "identify",
         value: function (e) {
-          return this.identity = e, this.initialised && !this.interval.length ? this.getFlags() : Promise.resolve();
+          return this.identity = e, this.initialised && !this.getFlagInterval ? this.getFlags() : Promise.resolve();
         }
       }, {
         key: "getState",
@@ -1898,13 +1898,13 @@
       }, {
         key: "logout",
         value: function () {
-          this.identity = null, this.segments = null, this.traits = null, this.initialised && !this.interval.length && this.getFlags();
+          this.identity = null, this.segments = null, this.traits = null, this.initialised && !this.getFlagInterval && this.getFlags();
         }
       }, {
         key: "startListening",
         value: function () {
           var e = 0 < arguments.length && void 0 !== arguments[0] ? arguments[0] : 1e3;
-          this.interval.length || this.interval.push(setInterval(this.getFlags, e));
+          this.getFlagInterval || (this.getFlagInterval = setInterval(this.getFlags, e));
         }
       }, {
         key: "getSegments",
@@ -1912,9 +1912,7 @@
       }, {
         key: "stopListening",
         value: function () {
-          this.interval.forEach(function (e) {
-            clearInterval(e);
-          });
+          clearInterval(this.getFlagInterval);
         }
       }]), e;
     }();
@@ -1953,8 +1951,8 @@
         for (o = r; 0 != o--;) if (!Object.prototype.hasOwnProperty.call(n, i[o])) return !1;
 
         for (o = r; 0 != o--;) {
-          var s = i[o];
-          if (!e(t[s], n[s])) return !1;
+          var a = i[o];
+          if (!e(t[a], n[a])) return !1;
         }
 
         return !0;
