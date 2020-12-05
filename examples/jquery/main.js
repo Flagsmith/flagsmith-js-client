@@ -1,4 +1,4 @@
-var environmentID = 'uCDQzKWgejrutqSYYsKWen'
+var environmentID = 'QjgYur4LQTwe5HpvbvhpzK'
 
 function identify() {
     flagsmith.identify("flagsmith_sample_user")
@@ -15,12 +15,20 @@ function login () {
 function logout () {
     flagsmith.logout();
 };
+function evaluateConfig () {
+    alert(flagsmith.getValue("font_size"));
+};
+function evaluateFlag () {
+    alert(flagsmith.hasFeature("flag")? "true":"false");
+};
 
 function increment (value) {
     flagsmith.incrementTrait("button_clicks", value)
 };
 
 $("#js-login").on("click", login);
+$("#js-evaluate-config").on("click", evaluateConfig);
+$("#js-evaluate-flag").on("click", evaluateFlag);
 $("#js-logout").on("click", logout);
 $("#js-toggle-trait").on("click", toggleTrait);
 $("#js-increment").on("click", function (){
@@ -35,6 +43,7 @@ flagsmith.init({
     environmentID: environmentID,
     cacheFlags: true,
     enableLogs: true,
+    enableAnalytics:true,
     defaultFlags: {
         font_size: 10
     },

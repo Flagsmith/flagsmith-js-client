@@ -16,7 +16,7 @@ class MyApp extends App {
         }
 
         if (typeof window === "undefined") {
-            var environmentID = 'uCDQzKWgejrutqSYYsKWen'
+            var environmentID = 'QjgYur4LQTwe5HpvbvhpzK'
             await flagsmith.init({
                 environmentID: environmentID,
                 cacheFlags: true,

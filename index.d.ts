@@ -13,7 +13,7 @@ declare module 'flagsmith' {
         state?: IState // set a predefined state, useful for isomorphic applications
         onError?: (res: { message: string }) => void // triggered if there was an api error
         defaultFlags?: IFlags //
-        sendFlagEvaluationEvents?: boolean //
+        enableAnalytics?: boolean //
     }): void
 
     /**

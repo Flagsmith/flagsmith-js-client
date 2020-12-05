@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import withConfig from '../common/providers/withConfig';
 
 import flagsmith from 'flagsmith/isomorphic';
-const environmentID = "uCDQzKWgejrutqSYYsKWen";
+const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
 //Define default flags
 class HomePage extends Component {
     constructor(props, context) {

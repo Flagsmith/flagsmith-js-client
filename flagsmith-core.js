@@ -142,7 +142,7 @@ const Flagsmith = class {
         defaultFlags,
         preventFetch,
         enableLogs,
-        sendFlagEvaluationEvents,
+        enableAnalytics,
         AsyncStorage: _AsyncStorage,
         state
     }) {
@@ -155,11 +155,12 @@ const Flagsmith = class {
             this.onChange = onChange;
             this.onError = onError;
             this.enableLogs = enableLogs;
-            this.sendFlagEvaluationEvents = sendFlagEvaluationEvents ? sendFlagEvaluationEvents : false;
+            this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
             this.ticks = 10000;
-            this.evaluationEvent = {};
+
+
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             if (_AsyncStorage) {
                 AsyncStorage = _AsyncStorage;
@@ -171,12 +172,26 @@ const Flagsmith = class {
                 throw ('Please specify a environment id');
             }
 
-            if (this.sendFlagEvaluationEvents) {
+            AsyncStorage.getItem(FLAGSMITH_EVENT)
+                .then((res)=>{
+                    if (res){
+                        try {
+                            this.evaluationEvent = JSON.parse(res)
+
+                        } catch (e){
+                            this.evaluationEvent = {};
+                        }
+                    } else {
+                        this.evaluationEvent = {};
+                    }
+                    this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
+                })
+
+            if (this.enableAnalytics) {
                 if (this.analyticsInterval) {
                     clearInterval(this.analyticsInterval);
                 }
 
-                this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
                 AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
                     if (res) {
                         var json = JSON.parse(res);
@@ -284,7 +299,7 @@ const Flagsmith = class {
     }
 
     updateEventStorage() {
-        if (this.sendFlagEvaluationEvents) {
+        if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
             this.log("Setting event storage", events);
             AsyncStorage.setItem(FLAGSMITH_EVENT, events);
@@ -316,12 +331,12 @@ const Flagsmith = class {
         clearInterval(this.getFlagInterval);
     }
 
-    evaluateFlag = (flag) => {
-        if (this.sendFlagEvaluationEvents && flag) {
-            if (this.evaluationEvent[flag.id] === undefined) {
-                this.evaluationEvent[flag.id] = 0;
+    evaluateFlag = (key) => {
+        if (this.enableAnalytics) {
+            if (this.evaluationEvent[key] === undefined) {
+                this.evaluationEvent[key] = 0;
             }
-            this.evaluationEvent[flag.id] += 1;
+            this.evaluationEvent[key] += 1;
         }
         this.updateEventStorage();
     }
@@ -332,7 +347,7 @@ const Flagsmith = class {
         if (flag) {
             res = flag.value;
         }
-        this.evaluateFlag(this.flags[key]);
+        this.evaluateFlag(key);
 
         //todo record check for value
 
@@ -414,7 +429,7 @@ const Flagsmith = class {
         if (flag && flag.enabled) {
             res = true;
         }
-        this.evaluateFlag(this.flags[key]);
+        this.evaluateFlag(key);
 
         //todo record check for feature
 

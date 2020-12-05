@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import flagsmith from "./react-native-flagsmith";
 import AsyncStorage from '@react-native-community/async-storage';
-const environmentID = "uCDQzKWgejrutqSYYsKWen";
+const environmentID = "QjgYur4LQTwe5HpvbvhpzK";
 
 export default class App extends Component<Props> {
   constructor(props, context) {

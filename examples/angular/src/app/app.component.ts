@@ -9,7 +9,7 @@ import flagsmith from 'bullet-train-client';
 export class AppComponent {
   logs = [];
   loading = true;
-  environmentID = 'uCDQzKWgejrutqSYYsKWen';
+  environmentID = 'QjgYur4LQTwe5HpvbvhpzK';
   identity = null;
   buttonClicks = null;
   trait = null;
