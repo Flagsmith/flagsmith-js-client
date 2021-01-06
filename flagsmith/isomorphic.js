@@ -637,15 +637,15 @@
       }
 
       keys() {
-        return B(this, "key");
+        return F(this, "key");
       }
 
       values() {
-        return B(this, "value");
+        return F(this, "value");
       }
 
       [Symbol.iterator]() {
-        return B(this, "key+value");
+        return F(this, "key+value");
       }
 
     }
@@ -697,8 +697,8 @@
     });
     const k = Symbol("internal");
 
-    function B(e, t) {
-      const n = Object.create(F);
+    function F(e, t) {
+      const n = Object.create(B);
       return n[k] = {
         target: e,
         kind: t,
@@ -706,9 +706,9 @@
       }, n;
     }
 
-    const F = Object.setPrototypeOf({
+    const B = Object.setPrototypeOf({
       next() {
-        if (!this || Object.getPrototypeOf(this) !== F) throw new TypeError("Value of `this` is not a HeadersIterator");
+        if (!this || Object.getPrototypeOf(this) !== B) throw new TypeError("Value of `this` is not a HeadersIterator");
         var e = this[k];
         const t = e.target,
               n = e.kind,
@@ -733,7 +733,7 @@
       return void 0 !== n && (t[n] = t[n][0]), t;
     }
 
-    Object.defineProperty(F, Symbol.toStringTag, {
+    Object.defineProperty(B, Symbol.toStringTag, {
       value: "HeadersIterator",
       writable: !1,
       enumerable: !1,
@@ -1127,13 +1127,13 @@
           A,
           I,
           k = Array.prototype,
-          B = Function.prototype,
-          F = Object.prototype,
+          F = Function.prototype,
+          B = Object.prototype,
           L = w["__core-js_shared__"],
-          C = B.toString,
-          $ = F.hasOwnProperty,
+          C = F.toString,
+          $ = B.hasOwnProperty,
           z = (x = /[^.]+$/.exec(L && L.keys && L.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
-          R = F.toString,
+          R = B.toString,
           N = C.call(Object),
           U = RegExp("^" + C.call($).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
           D = S ? w.Buffer : void 0,
@@ -1144,7 +1144,7 @@
         return A(I(e));
       }),
           G = Object.create,
-          V = F.propertyIsEnumerable,
+          V = B.propertyIsEnumerable,
           K = k.splice,
           Z = q ? q.toStringTag : void 0,
           Y = function () {
@@ -1163,7 +1163,7 @@
         function e() {}
 
         return function (t) {
-          if (!Fe(t)) return {};
+          if (!Be(t)) return {};
           if (G) return G(t);
           e.prototype = t;
           var n = new e();
@@ -1356,7 +1356,7 @@
       }
 
       function ge(e) {
-        return !(!Fe(e) || function (e) {
+        return !(!Be(e) || function (e) {
           return !!z && z in e;
         }(e)) && (ke(e) ? U : y).test(function (e) {
           if (null != e) {
@@ -1374,7 +1374,7 @@
       }
 
       function be(e) {
-        if (!Fe(e)) return function (e) {
+        if (!Be(e)) return function (e) {
           var t = [];
           if (null != e) for (var n in Object(e)) t.push(n);
           return t;
@@ -1389,7 +1389,7 @@
 
       function ve(e, t, n, r, o) {
         e !== t && pe(t, function (i, a) {
-          if (o || (o = new ae()), Fe(i)) !function (e, t, n, r, o, i, a) {
+          if (o || (o = new ae()), Be(i)) !function (e, t, n, r, o, i, a) {
             var s = Oe(e, n),
                 u = Oe(t, n),
                 c = a.get(u);
@@ -1435,7 +1435,7 @@
 
                   return n;
                 }(e, $e(e));
-              }(s) : Fe(s) && !ke(s) || (l = function (e) {
+              }(s) : Be(s) && !ke(s) || (l = function (e) {
                 return "function" != typeof e.constructor || Se(e) ? {} : ne(H(e));
               }(u))) : f = !1;
             }
@@ -1487,7 +1487,7 @@
 
       function Se(e) {
         var t = e && e.constructor;
-        return e === ("function" == typeof t && t.prototype || F);
+        return e === ("function" == typeof t && t.prototype || B);
       }
 
       function Oe(e, t) {
@@ -1531,7 +1531,7 @@
           xe = Array.isArray;
 
       function Ae(e) {
-        return null != e && Be(e.length) && !ke(e);
+        return null != e && Fe(e.length) && !ke(e);
       }
 
       var Ie = W || function () {
@@ -1539,16 +1539,16 @@
       };
 
       function ke(e) {
-        if (!Fe(e)) return !1;
+        if (!Be(e)) return !1;
         var t = de(e);
         return t == c || t == l || t == u || t == p;
       }
 
-      function Be(e) {
+      function Fe(e) {
         return "number" == typeof e && e > -1 && e % 1 == 0 && e <= a;
       }
 
-      function Fe(e) {
+      function Be(e) {
         var t = typeof e;
         return null != e && ("object" == t || "function" == t);
       }
@@ -1562,7 +1562,7 @@
           return e(t);
         };
       }(T) : function (e) {
-        return Le(e) && Be(e.length) && !!b[de(e)];
+        return Le(e) && Fe(e.length) && !!b[de(e)];
       };
 
       function $e(e) {
@@ -1579,7 +1579,7 @@
             i = r > 2 ? t[2] : void 0;
 
         for (o = ze.length > 3 && "function" == typeof o ? (r--, o) : void 0, i && function (e, t, n) {
-          if (!Fe(n)) return !1;
+          if (!Be(n)) return !1;
           var r = typeof t;
           return !!("number" == r ? Ae(n) && je(t, n.length) : "string" == r && (t in n)) && Te(n[t], e);
         }(t[0], t[1], i) && (o = r < 3 ? void 0 : o, r = 1), e = Object(e); ++n < r;) {
@@ -1913,16 +1913,16 @@
         key: "startListening",
         value: function () {
           var e = 0 < arguments.length && void 0 !== arguments[0] ? arguments[0] : 1e3;
-          this.getFlagInterval || (this.getFlagInterval = setInterval(this.getFlags, e));
+          this.getFlagInterval && clearInterval(this.getFlagInterval), this.getFlagInterval = setInterval(this.getFlags, e);
+        }
+      }, {
+        key: "stopListening",
+        value: function () {
+          clearInterval(this.getFlagInterval), this.getFlagInterval = null;
         }
       }, {
         key: "getSegments",
         value: function () {}
-      }, {
-        key: "stopListening",
-        value: function () {
-          clearInterval(this.getFlagInterval);
-        }
       }]), e;
     }();
 
