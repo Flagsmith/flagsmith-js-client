@@ -343,7 +343,7 @@ const Flagsmith = class {
     }
 
     getValue = (key) => {
-        const flag = this.flags && this.flags[key];
+        const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = null;
         if (flag) {
             res = flag.value;
@@ -356,7 +356,7 @@ const Flagsmith = class {
     }
 
     getTrait = (key) => {
-        const trait = this.traits && this.traits[key];
+        const trait = this.traits && this.traits[key.toLowerCase().replace(/ /g, '_')];
         return trait;
     }
 
@@ -425,7 +425,7 @@ const Flagsmith = class {
     };
 
     hasFeature = (key) => {
-        const flag = this.flags && this.flags[key];
+        const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = false;
         if (flag && flag.enabled) {
             res = true;
