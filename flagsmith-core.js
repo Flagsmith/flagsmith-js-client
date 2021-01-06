@@ -317,18 +317,19 @@ const Flagsmith = class {
 
     startListening(ticks = 1000) {
         if (this.getFlagInterval) {
-            return;
+            clearInterval(this.getFlagInterval);
         }
         this.getFlagInterval = setInterval(this.getFlags, ticks);
+    }
+
+    stopListening() {
+        clearInterval(this.getFlagInterval);
+        this.getFlagInterval = null;
     }
 
     getSegments() {
         // noop for now
         // return this.segments;
-    }
-
-    stopListening() {
-        clearInterval(this.getFlagInterval);
     }
 
     evaluateFlag = (key) => {
