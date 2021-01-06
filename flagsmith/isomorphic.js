@@ -437,11 +437,11 @@
       return o instanceof r && "function" != typeof o.getBoundary && (t = new y(), n = new y(), o.pipe(t), o.pipe(n), e[d].body = t, o = n), o;
     }
 
-    function j(e) {
+    function _(e) {
       return null === e ? null : "string" == typeof e ? "text/plain;charset=UTF-8" : v(e) ? "application/x-www-form-urlencoded;charset=UTF-8" : m(e) ? e.type || null : Buffer.isBuffer(e) ? null : "[object ArrayBuffer]" === Object.prototype.toString.call(e) ? null : ArrayBuffer.isView(e) ? null : "function" == typeof e.getBoundary ? `multipart/form-data;boundary=${e.getBoundary()}` : e instanceof r ? null : "text/plain;charset=UTF-8";
     }
 
-    function _(e) {
+    function j(e) {
       const t = e.body;
       return null === t ? 0 : m(t) ? t.size : Buffer.isBuffer(t) ? t.length : t && "function" == typeof t.getLengthSync && (t._lengthRetrievers && 0 == t._lengthRetrievers.length || t.hasKnownLength && t.hasKnownLength()) ? t.getLengthSync() : null;
     }
@@ -544,11 +544,11 @@
       if (e = `${e}`, S.test(e) || "" === e) throw new TypeError(`${e} is not a legal HTTP header name`);
     }
 
-    function P(e) {
+    function T(e) {
       if (e = `${e}`, O.test(e)) throw new TypeError(`${e} is not a legal HTTP header value`);
     }
 
-    function T(e, t) {
+    function P(e, t) {
       t = t.toLowerCase();
 
       for (const n in e) if (n.toLowerCase() === t) return n;
@@ -593,42 +593,42 @@
 
       get(e) {
         E(e = `${e}`);
-        const t = T(this[x], e);
+        const t = P(this[x], e);
         return void 0 === t ? null : this[x][t].join(", ");
       }
 
       forEach(e) {
         let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : void 0,
-            n = k(this),
+            n = I(this),
             r = 0;
 
         for (; r < n.length;) {
           var o = n[r];
           const i = o[0],
                 a = o[1];
-          e.call(t, a, i, this), n = k(this), r++;
+          e.call(t, a, i, this), n = I(this), r++;
         }
       }
 
       set(e, t) {
-        t = `${t}`, E(e = `${e}`), P(t);
-        const n = T(this[x], e);
+        t = `${t}`, E(e = `${e}`), T(t);
+        const n = P(this[x], e);
         this[x][void 0 !== n ? n : e] = [t];
       }
 
       append(e, t) {
-        t = `${t}`, E(e = `${e}`), P(t);
-        const n = T(this[x], e);
+        t = `${t}`, E(e = `${e}`), T(t);
+        const n = P(this[x], e);
         void 0 !== n ? this[x][n].push(t) : this[x][e] = [t];
       }
 
       has(e) {
-        return E(e = `${e}`), void 0 !== T(this[x], e);
+        return E(e = `${e}`), void 0 !== P(this[x], e);
       }
 
       delete(e) {
         E(e = `${e}`);
-        const t = T(this[x], e);
+        const t = P(this[x], e);
         void 0 !== t && delete this[x][t];
       }
 
@@ -637,20 +637,20 @@
       }
 
       keys() {
-        return I(this, "key");
+        return B(this, "key");
       }
 
       values() {
-        return I(this, "value");
+        return B(this, "value");
       }
 
       [Symbol.iterator]() {
-        return I(this, "key+value");
+        return B(this, "key+value");
       }
 
     }
 
-    function k(e) {
+    function I(e) {
       let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : "key+value";
       return Object.keys(e[x]).sort().map("key" === t ? function (e) {
         return e.toLowerCase();
@@ -695,29 +695,29 @@
         enumerable: !0
       }
     });
-    const F = Symbol("internal");
+    const k = Symbol("internal");
 
-    function I(e, t) {
-      const n = Object.create(B);
-      return n[F] = {
+    function B(e, t) {
+      const n = Object.create(F);
+      return n[k] = {
         target: e,
         kind: t,
         index: 0
       }, n;
     }
 
-    const B = Object.setPrototypeOf({
+    const F = Object.setPrototypeOf({
       next() {
-        if (!this || Object.getPrototypeOf(this) !== B) throw new TypeError("Value of `this` is not a HeadersIterator");
-        var e = this[F];
+        if (!this || Object.getPrototypeOf(this) !== F) throw new TypeError("Value of `this` is not a HeadersIterator");
+        var e = this[k];
         const t = e.target,
               n = e.kind,
               r = e.index,
-              o = k(t, n);
+              o = I(t, n);
         return r >= o.length ? {
           value: void 0,
           done: !0
-        } : (this[F].index = r + 1, {
+        } : (this[k].index = r + 1, {
           value: o[r],
           done: !1
         });
@@ -729,11 +729,11 @@
       const t = Object.assign({
         __proto__: null
       }, e[x]),
-            n = T(e[x], "Host");
+            n = P(e[x], "Host");
       return void 0 !== n && (t[n] = t[n][0]), t;
     }
 
-    Object.defineProperty(B, Symbol.toStringTag, {
+    Object.defineProperty(F, Symbol.toStringTag, {
       value: "HeadersIterator",
       writable: !1,
       enumerable: !1,
@@ -751,7 +751,8 @@
               r = new A(t.headers);
 
         if (null != e && !r.has("Content-Type")) {
-          const t = j(e);
+          const t = _(e);
+
           t && r.append("Content-Type", t);
         }
 
@@ -853,7 +854,8 @@
         const i = new A(n.headers || e.headers || {});
 
         if (null != o && !i.has("Content-Type")) {
-          const e = j(o);
+          const e = _(o);
+
           e && i.append("Content-Type", e);
         }
 
@@ -942,8 +944,7 @@
           let o = null;
 
           if (null == e.body && /^(POST|PUT)$/i.test(e.method) && (o = "0"), null != e.body) {
-            const t = _(e);
-
+            const t = j(e);
             "number" == typeof t && (o = String(t));
           }
 
@@ -1025,7 +1026,7 @@
                   signal: u.signal,
                   timeout: u.timeout
                 };
-                return 303 !== e.statusCode && u.body && null === _(u) ? (i(new h("Cannot follow redirect with body being a readable stream", "unsupported-redirect")), void v()) : (303 !== e.statusCode && (301 !== e.statusCode && 302 !== e.statusCode || "POST" !== u.method) || (r.method = "GET", r.body = void 0, r.headers.delete("content-length")), n(V(new J(o, r))), void v());
+                return 303 !== e.statusCode && u.body && null === j(u) ? (i(new h("Cannot follow redirect with body being a readable stream", "unsupported-redirect")), void v()) : (303 !== e.statusCode && (301 !== e.statusCode && 302 !== e.statusCode || "POST" !== u.method) || (r.method = "GET", r.body = void 0, r.headers.delete("content-length")), n(V(new J(o, r))), void v());
             }
           }
 
@@ -1091,20 +1092,20 @@
       var v = "object" == typeof global && global && global.Object === Object && global,
           m = "object" == typeof self && self && self.Object === Object && self,
           w = v || m || Function("return this")(),
-          j = t && !t.nodeType && t,
-          _ = j && "object" == typeof e && e && !e.nodeType && e,
-          S = _ && _.exports === j,
+          _ = t && !t.nodeType && t,
+          j = _ && "object" == typeof e && e && !e.nodeType && e,
+          S = j && j.exports === _,
           O = S && v.process,
           E = function () {
         try {
-          var e = _ && _.require && _.require("util").types;
+          var e = j && j.require && j.require("util").types;
 
           return e || O && O.binding && O.binding("util");
         } catch (e) {}
       }(),
-          P = E && E.isTypedArray;
+          T = E && E.isTypedArray;
 
-      function T(e, t, n) {
+      function P(e, t, n) {
         switch (n.length) {
           case 0:
             return e.call(t);
@@ -1124,44 +1125,45 @@
 
       var x,
           A,
-          k,
-          F = Array.prototype,
-          I = Function.prototype,
-          B = Object.prototype,
+          I,
+          k = Array.prototype,
+          B = Function.prototype,
+          F = Object.prototype,
           L = w["__core-js_shared__"],
-          C = I.toString,
-          $ = B.hasOwnProperty,
+          C = B.toString,
+          $ = F.hasOwnProperty,
           z = (x = /[^.]+$/.exec(L && L.keys && L.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
-          R = B.toString,
+          R = F.toString,
           N = C.call(Object),
           U = RegExp("^" + C.call($).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
           D = S ? w.Buffer : void 0,
           q = w.Symbol,
           J = w.Uint8Array,
           M = D ? D.allocUnsafe : void 0,
-          H = (A = Object.getPrototypeOf, k = Object, function (e) {
-        return A(k(e));
+          H = (A = Object.getPrototypeOf, I = Object, function (e) {
+        return A(I(e));
       }),
           G = Object.create,
-          V = B.propertyIsEnumerable,
-          K = F.splice,
+          V = F.propertyIsEnumerable,
+          K = k.splice,
           Z = q ? q.toStringTag : void 0,
           Y = function () {
         try {
-          var e = je(Object, "defineProperty");
+          var e = _e(Object, "defineProperty");
+
           return e({}, "", {}), e;
         } catch (e) {}
       }(),
           W = D ? D.isBuffer : void 0,
           X = Math.max,
           Q = Date.now,
-          ee = je(w, "Map"),
-          te = je(Object, "create"),
+          ee = _e(w, "Map"),
+          te = _e(Object, "create"),
           ne = function () {
         function e() {}
 
         return function (t) {
-          if (!Be(t)) return {};
+          if (!Fe(t)) return {};
           if (G) return G(t);
           e.prototype = t;
           var n = new e();
@@ -1206,8 +1208,8 @@
 
       function se(e, t) {
         var n = xe(e),
-            r = !n && Te(e),
-            o = !n && !r && ke(e),
+            r = !n && Pe(e),
+            o = !n && !r && Ie(e),
             i = !n && !r && !o && Ce(e),
             a = n || r || o || i,
             s = a ? function (e, t) {
@@ -1217,22 +1219,22 @@
         }(e.length, String) : [],
             u = s.length;
 
-        for (var c in e) !t && !$.call(e, c) || a && ("length" == c || o && ("offset" == c || "parent" == c) || i && ("buffer" == c || "byteLength" == c || "byteOffset" == c) || _e(c, u)) || s.push(c);
+        for (var c in e) !t && !$.call(e, c) || a && ("length" == c || o && ("offset" == c || "parent" == c) || i && ("buffer" == c || "byteLength" == c || "byteOffset" == c) || je(c, u)) || s.push(c);
 
         return s;
       }
 
       function ue(e, t, n) {
-        (void 0 === n || Pe(e[t], n)) && (void 0 !== n || t in e) || fe(e, t, n);
+        (void 0 === n || Te(e[t], n)) && (void 0 !== n || t in e) || fe(e, t, n);
       }
 
       function ce(e, t, n) {
         var r = e[t];
-        $.call(e, t) && Pe(r, n) && (void 0 !== n || t in e) || fe(e, t, n);
+        $.call(e, t) && Te(r, n) && (void 0 !== n || t in e) || fe(e, t, n);
       }
 
       function le(e, t) {
-        for (var n = e.length; n--;) if (Pe(e[n][0], t)) return n;
+        for (var n = e.length; n--;) if (Te(e[n][0], t)) return n;
 
         return -1;
       }
@@ -1354,9 +1356,9 @@
       }
 
       function ge(e) {
-        return !(!Be(e) || function (e) {
+        return !(!Fe(e) || function (e) {
           return !!z && z in e;
-        }(e)) && (Fe(e) ? U : y).test(function (e) {
+        }(e)) && (ke(e) ? U : y).test(function (e) {
           if (null != e) {
             try {
               return C.call(e);
@@ -1372,7 +1374,7 @@
       }
 
       function be(e) {
-        if (!Be(e)) return function (e) {
+        if (!Fe(e)) return function (e) {
           var t = [];
           if (null != e) for (var n in Object(e)) t.push(n);
           return t;
@@ -1387,7 +1389,7 @@
 
       function ve(e, t, n, r, o) {
         e !== t && pe(t, function (i, a) {
-          if (o || (o = new ae()), Be(i)) !function (e, t, n, r, o, i, a) {
+          if (o || (o = new ae()), Fe(i)) !function (e, t, n, r, o, i, a) {
             var s = Oe(e, n),
                 u = Oe(t, n),
                 c = a.get(u);
@@ -1397,7 +1399,7 @@
 
             if (f) {
               var p = xe(u),
-                  d = !p && ke(u),
+                  d = !p && Ie(u),
                   y = !p && !d && Ce(u);
               l = u, p || d || y ? xe(s) ? l = s : Le(w = s) && Ae(w) ? l = function (e, t) {
                 var n = -1,
@@ -1418,7 +1420,7 @@
                 if (null === t) return !0;
                 var n = $.call(t, "constructor") && t.constructor;
                 return "function" == typeof n && n instanceof n && C.call(n) == N;
-              }(u) || Te(u) ? (l = s, Te(s) ? l = function (e) {
+              }(u) || Pe(u) ? (l = s, Pe(s) ? l = function (e) {
                 return function (e, t, n, r) {
                   var o = !n;
                   n || (n = {});
@@ -1433,7 +1435,7 @@
 
                   return n;
                 }(e, $e(e));
-              }(s) : Be(s) && !Fe(s) || (l = function (e) {
+              }(s) : Fe(s) && !ke(s) || (l = function (e) {
                 return "function" != typeof e.constructor || Se(e) ? {} : ne(H(e));
               }(u))) : f = !1;
             }
@@ -1458,7 +1460,7 @@
 
             for (var s = Array(t + 1); ++o < t;) s[o] = r[o];
 
-            return s[t] = n(a), T(e, this, s);
+            return s[t] = n(a), P(e, this, s);
           };
         }(e, t, Ne), e + "");
       }
@@ -1470,7 +1472,7 @@
         return ("string" == (r = typeof (n = t)) || "number" == r || "symbol" == r || "boolean" == r ? "__proto__" !== n : null === n) ? o["string" == typeof t ? "string" : "hash"] : o.map;
       }
 
-      function je(e, t) {
+      function _e(e, t) {
         var n = function (e, t) {
           return null == e ? void 0 : e[t];
         }(e, t);
@@ -1478,14 +1480,14 @@
         return ge(n) ? n : void 0;
       }
 
-      function _e(e, t) {
+      function je(e, t) {
         var n = typeof e;
         return !!(t = null == t ? a : t) && ("number" == n || "symbol" != n && g.test(e)) && e > -1 && e % 1 == 0 && e < t;
       }
 
       function Se(e) {
         var t = e && e.constructor;
-        return e === ("function" == typeof t && t.prototype || B);
+        return e === ("function" == typeof t && t.prototype || F);
       }
 
       function Oe(e, t) {
@@ -1517,11 +1519,11 @@
         var n;
       } : Ne);
 
-      function Pe(e, t) {
+      function Te(e, t) {
         return e === t || e != e && t != t;
       }
 
-      var Te = ye(function () {
+      var Pe = ye(function () {
         return arguments;
       }()) ? ye : function (e) {
         return Le(e) && $.call(e, "callee") && !V.call(e, "callee");
@@ -1529,24 +1531,24 @@
           xe = Array.isArray;
 
       function Ae(e) {
-        return null != e && Ie(e.length) && !Fe(e);
+        return null != e && Be(e.length) && !ke(e);
       }
 
-      var ke = W || function () {
+      var Ie = W || function () {
         return !1;
       };
 
-      function Fe(e) {
-        if (!Be(e)) return !1;
+      function ke(e) {
+        if (!Fe(e)) return !1;
         var t = de(e);
         return t == c || t == l || t == u || t == p;
       }
 
-      function Ie(e) {
+      function Be(e) {
         return "number" == typeof e && e > -1 && e % 1 == 0 && e <= a;
       }
 
-      function Be(e) {
+      function Fe(e) {
         var t = typeof e;
         return null != e && ("object" == t || "function" == t);
       }
@@ -1555,12 +1557,12 @@
         return null != e && "object" == typeof e;
       }
 
-      var Ce = P ? function (e) {
+      var Ce = T ? function (e) {
         return function (t) {
           return e(t);
         };
-      }(P) : function (e) {
-        return Le(e) && Ie(e.length) && !!b[de(e)];
+      }(T) : function (e) {
+        return Le(e) && Be(e.length) && !!b[de(e)];
       };
 
       function $e(e) {
@@ -1577,9 +1579,9 @@
             i = r > 2 ? t[2] : void 0;
 
         for (o = ze.length > 3 && "function" == typeof o ? (r--, o) : void 0, i && function (e, t, n) {
-          if (!Be(n)) return !1;
+          if (!Fe(n)) return !1;
           var r = typeof t;
-          return !!("number" == r ? Ae(n) && _e(t, n.length) : "string" == r && (t in n)) && Pe(n[t], e);
+          return !!("number" == r ? Ae(n) && je(t, n.length) : "string" == r && (t in n)) && Te(n[t], e);
         }(t[0], t[1], i) && (o = r < 3 ? void 0 : o, r = 1), e = Object(e); ++n < r;) {
           var a = t[n];
           a && ze(e, a, n, o);
@@ -1744,11 +1746,11 @@
             n.log("Exception fetching evaluationEvent", e);
           });
         }), s(this, "evaluateFlag", function (e) {
-          n.sendFlagEvaluationEvents && e && (void 0 === n.evaluationEvent[e.id] && (n.evaluationEvent[e.id] = 0), n.evaluationEvent[e.id] += 1), n.updateEventStorage();
+          n.enableAnalytics && (void 0 === n.evaluationEvent[e] && (n.evaluationEvent[e] = 0), n.evaluationEvent[e] += 1), n.updateEventStorage();
         }), s(this, "getValue", function (e) {
           var t = n.flags && n.flags[e],
               r = null;
-          return t && (r = t.value), n.evaluateFlag(n.flags[e]), r;
+          return t && (r = t.value), n.evaluateFlag(e), r;
         }), s(this, "getTrait", function (e) {
           return n.traits && n.traits[e];
         }), s(this, "setTrait", function (e, t) {
@@ -1799,7 +1801,7 @@
         }), s(this, "hasFeature", function (e) {
           var t = n.flags && n.flags[e],
               r = !1;
-          return t && t.enabled && (r = !0), n.evaluateFlag(n.flags[e]), r;
+          return t && t.enabled && (r = !0), n.evaluateFlag(e), r;
         }), u = t.fetch ? t.fetch : global.fetch, c = t.AsyncStorage;
       }
 
@@ -1818,12 +1820,19 @@
               f = e.defaultFlags,
               h = e.preventFetch,
               p = e.enableLogs,
-              d = e.sendFlagEvaluationEvents,
+              d = e.enableAnalytics,
               y = e.AsyncStorage,
               g = e.state;
           return new Promise(function (e, r) {
-            if (t.environmentID = n, t.api = o, t.getFlagInterval = null, t.analyticsInterval = null, t.onChange = a, t.onError = u, t.enableLogs = p, t.sendFlagEvaluationEvents = !!d && d, t.flags = Object.assign({}, f) || {}, t.initialised = !0, t.ticks = 1e4, t.evaluationEvent = {}, t.timer = t.enableLogs ? new Date().valueOf() : null, y && (c = y), t.cacheFlags = void 0 !== c && s, t.setState(g), !n) throw r("Please specify a environment id"), "Please specify a environment id";
-            t.sendFlagEvaluationEvents && (t.analyticsInterval && clearInterval(t.analyticsInterval), t.analyticsInterval = setInterval(t.analyticsFlags, t.ticks), c.getItem("BULLET_TRAIN_EVENT", function (e, n) {
+            if (t.environmentID = n, t.api = o, t.getFlagInterval = null, t.analyticsInterval = null, t.onChange = a, t.onError = u, t.enableLogs = p, t.enableAnalytics = !!d && d, t.flags = Object.assign({}, f) || {}, t.initialised = !0, t.ticks = 1e4, t.timer = t.enableLogs ? new Date().valueOf() : null, y && (c = y), t.cacheFlags = void 0 !== c && s, t.setState(g), !n) throw r("Please specify a environment id"), "Please specify a environment id";
+            c.getItem("BULLET_TRAIN_EVENT").then(function (e) {
+              if (e) try {
+                t.evaluationEvent = JSON.parse(e);
+              } catch (e) {
+                t.evaluationEvent = {};
+              } else t.evaluationEvent = {};
+              t.analyticsInterval = setInterval(t.analyticsFlags, t.ticks);
+            }), t.enableAnalytics && (t.analyticsInterval && clearInterval(t.analyticsInterval), c.getItem("BULLET_TRAIN_EVENT", function (e, n) {
               if (n) {
                 var r = JSON.parse(n);
                 r && (g = t.getState(), t.log("Retrieved events from cache", n), t.setState(i({}, g, {
@@ -1890,7 +1899,7 @@
       }, {
         key: "updateEventStorage",
         value: function () {
-          if (this.sendFlagEvaluationEvents) {
+          if (this.enableAnalytics) {
             var e = JSON.stringify(this.getState().evaluationEvent);
             this.log("Setting event storage", e), c.setItem("BULLET_TRAIN_EVENT", e);
           }
