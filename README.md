@@ -81,8 +81,8 @@ flagsmith.init({
 | ```incrementTrait(key, value)```     | You can also increment/decrement a particular trait them e.g. ```flagsmith.incrementTrait("click_count", 1)```
 | ```startListening(ticks=1000)```     | Poll the api for changes every x milliseconds
 | ```stopListening()```     | Stop polling the api
-| ```getFlags()```     | Trigger a manual fetch of the environment features, if a user is identified it will fetch their features
-| ```identify(userId)```     | Identify as a user, this will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```
+| ```getFlags()```     | Trigger a manual fetch of the environment features, if a user is identified it will fetch their features. Resolves a promise when the flags are updated.
+| ```identify(userId)```     | Identify as a user, this will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```, resolves a promise when the flags are updated.
 | ```logout()```     | Stop identifying as a user, this will trigger a call to ```getFlags()```
 
 ## Notes on initialisation
