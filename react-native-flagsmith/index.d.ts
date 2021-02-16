@@ -124,3 +124,9 @@ declare module 'react-native-flagsmith' {
     // @ts-ignore
     export default new IFlagsmith()
 }
+
+// @ts-ignore
+declare module 'flagsmith/isomorphic' {
+    // @ts-ignore
+    export default new IFlagsmith()
+}
