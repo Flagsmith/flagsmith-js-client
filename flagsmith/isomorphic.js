@@ -259,7 +259,7 @@
     }), n.d(t, "Request", function () {
       return J;
     }), n.d(t, "Response", function () {
-      return z;
+      return $;
     }), n.d(t, "FetchError", function () {
       return h;
     });
@@ -504,7 +504,7 @@
                 i = "utf-8";
             n && (r = /charset=([^;]*)/i.exec(n));
             o = e.slice(0, 1024).toString(), !r && o && (r = /<meta.+?charset=(['"])(.+?)\1/i.exec(o));
-            !r && o && (r = /<meta[\s]+?http-equiv=(['"])content-type\1[\s]+?content=(['"])(.+?)\2/i.exec(o)) && (r = /charset=(.*)/i.exec(r.pop()));
+            !r && o && ((r = /<meta[\s]+?http-equiv=(['"])content-type\1[\s]+?content=(['"])(.+?)\2/i.exec(o)) || (r = /<meta[\s]+?content=(['"])(.+?)\1[\s]+?http-equiv=(['"])content-type\3/i.exec(o)) && r.pop(), r && (r = /charset=(.*)/i.exec(r.pop())));
             !r && o && (r = /<\?xml.+?encoding=(['"])(.+?)\1/i.exec(o));
             r && ("gb2312" !== (i = r.pop()) && "gbk" !== i || (i = "gb18030"));
             return p(e, "UTF-8", i).toString();
@@ -740,9 +740,9 @@
       configurable: !0
     });
     const C = Symbol("Response internals"),
-          $ = o.STATUS_CODES;
+          z = o.STATUS_CODES;
 
-    class z {
+    class $ {
       constructor() {
         let e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : null,
             t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};
@@ -759,7 +759,7 @@
         this[C] = {
           url: t.url,
           status: n,
-          statusText: t.statusText || $[n],
+          statusText: t.statusText || z[n],
           headers: r,
           counter: t.counter
         };
@@ -790,7 +790,7 @@
       }
 
       clone() {
-        return new z(w(this), {
+        return new $(w(this), {
           url: this.url,
           status: this.status,
           statusText: this.statusText,
@@ -802,7 +802,7 @@
 
     }
 
-    g.mixIn(z.prototype), Object.defineProperties(z.prototype, {
+    g.mixIn($.prototype), Object.defineProperties($.prototype, {
       url: {
         enumerable: !0
       },
@@ -824,7 +824,7 @@
       clone: {
         enumerable: !0
       }
-    }), Object.defineProperty(z.prototype, Symbol.toStringTag, {
+    }), Object.defineProperty($.prototype, Symbol.toStringTag, {
       value: "Response",
       writable: !1,
       enumerable: !1,
@@ -1002,7 +1002,7 @@
 
             switch (u.redirect) {
               case "error":
-                return i(new h(`redirect mode is set to error: ${u.url}`, "no-redirect")), void v();
+                return i(new h(`uri requested responds with a redirect, redirect mode is set to error: ${u.url}`, "no-redirect")), void v();
 
               case "manual":
                 if (null !== o) try {
@@ -1024,7 +1024,8 @@
                   method: u.method,
                   body: u.body,
                   signal: u.signal,
-                  timeout: u.timeout
+                  timeout: u.timeout,
+                  size: u.size
                 };
                 return 303 !== e.statusCode && u.body && null === j(u) ? (i(new h("Cannot follow redirect with body being a readable stream", "unsupported-redirect")), void v()) : (303 !== e.statusCode && (301 !== e.statusCode && 302 !== e.statusCode || "POST" !== u.method) || (r.method = "GET", r.body = void 0, r.headers.delete("content-length")), n(V(new J(o, r))), void v());
             }
@@ -1044,19 +1045,19 @@
             counter: u.counter
           },
                 a = t.get("Content-Encoding");
-          if (!u.compress || "HEAD" === u.method || null === a || 204 === e.statusCode || 304 === e.statusCode) return p = new z(r, o), void n(p);
+          if (!u.compress || "HEAD" === u.method || null === a || 204 === e.statusCode || 304 === e.statusCode) return p = new $(r, o), void n(p);
           const c = {
             flush: s.Z_SYNC_FLUSH,
             finishFlush: s.Z_SYNC_FLUSH
           };
-          if ("gzip" == a || "x-gzip" == a) return r = r.pipe(s.createGunzip(c)), p = new z(r, o), void n(p);
+          if ("gzip" == a || "x-gzip" == a) return r = r.pipe(s.createGunzip(c)), p = new $(r, o), void n(p);
 
           if ("deflate" != a && "x-deflate" != a) {
-            if ("br" == a && "function" == typeof s.createBrotliDecompress) return r = r.pipe(s.createBrotliDecompress()), p = new z(r, o), void n(p);
-            p = new z(r, o), n(p);
+            if ("br" == a && "function" == typeof s.createBrotliDecompress) return r = r.pipe(s.createBrotliDecompress()), p = new $(r, o), void n(p);
+            p = new $(r, o), n(p);
           } else {
             e.pipe(new H()).once("data", function (e) {
-              r = 8 == (15 & e[0]) ? r.pipe(s.createInflate()) : r.pipe(s.createInflateRaw()), p = new z(r, o), n(p);
+              r = 8 == (15 & e[0]) ? r.pipe(s.createInflate()) : r.pipe(s.createInflateRaw()), p = new $(r, o), n(p);
             });
           }
         }), function (e, t) {
@@ -1131,11 +1132,11 @@
           F = Object.prototype,
           B = w["__core-js_shared__"],
           C = L.toString,
-          $ = F.hasOwnProperty,
-          z = (x = /[^.]+$/.exec(B && B.keys && B.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
+          z = F.hasOwnProperty,
+          $ = (x = /[^.]+$/.exec(B && B.keys && B.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
           R = F.toString,
           N = C.call(Object),
-          U = RegExp("^" + C.call($).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
+          U = RegExp("^" + C.call(z).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
           D = S ? w.Buffer : void 0,
           q = w.Symbol,
           J = w.Uint8Array,
@@ -1219,7 +1220,7 @@
         }(e.length, String) : [],
             u = s.length;
 
-        for (var c in e) !t && !$.call(e, c) || a && ("length" == c || o && ("offset" == c || "parent" == c) || i && ("buffer" == c || "byteLength" == c || "byteOffset" == c) || je(c, u)) || s.push(c);
+        for (var c in e) !t && !z.call(e, c) || a && ("length" == c || o && ("offset" == c || "parent" == c) || i && ("buffer" == c || "byteLength" == c || "byteOffset" == c) || je(c, u)) || s.push(c);
 
         return s;
       }
@@ -1230,7 +1231,7 @@
 
       function ce(e, t, n) {
         var r = e[t];
-        $.call(e, t) && Te(r, n) && (void 0 !== n || t in e) || fe(e, t, n);
+        z.call(e, t) && Te(r, n) && (void 0 !== n || t in e) || fe(e, t, n);
       }
 
       function le(e, t) {
@@ -1261,10 +1262,10 @@
           return n === r ? void 0 : n;
         }
 
-        return $.call(t, e) ? t[e] : void 0;
+        return z.call(t, e) ? t[e] : void 0;
       }, re.prototype.has = function (e) {
         var t = this.__data__;
-        return te ? void 0 !== t[e] : $.call(t, e);
+        return te ? void 0 !== t[e] : z.call(t, e);
       }, re.prototype.set = function (e, t) {
         var n = this.__data__;
         return this.size += this.has(e) ? 0 : 1, n[e] = te && void 0 === t ? r : t, this;
@@ -1335,7 +1336,7 @@
 
       function de(e) {
         return null == e ? void 0 === e ? d : f : Z && Z in Object(e) ? function (e) {
-          var t = $.call(e, Z),
+          var t = z.call(e, Z),
               n = e[Z];
 
           try {
@@ -1357,7 +1358,7 @@
 
       function ge(e) {
         return !(!Fe(e) || function (e) {
-          return !!z && z in e;
+          return !!$ && $ in e;
         }(e)) && (ke(e) ? U : y).test(function (e) {
           if (null != e) {
             try {
@@ -1382,7 +1383,7 @@
         var t = Se(e),
             n = [];
 
-        for (var r in e) ("constructor" != r || !t && $.call(e, r)) && n.push(r);
+        for (var r in e) ("constructor" != r || !t && z.call(e, r)) && n.push(r);
 
         return n;
       }
@@ -1418,7 +1419,7 @@
                 if (!Be(e) || de(e) != h) return !1;
                 var t = H(e);
                 if (null === t) return !0;
-                var n = $.call(t, "constructor") && t.constructor;
+                var n = z.call(t, "constructor") && t.constructor;
                 return "function" == typeof n && n instanceof n && C.call(n) == N;
               }(u) || Pe(u) ? (l = s, Pe(s) ? l = function (e) {
                 return function (e, t, n, r) {
@@ -1434,7 +1435,7 @@
                   }
 
                   return n;
-                }(e, $e(e));
+                }(e, ze(e));
               }(s) : Fe(s) && !ke(s) || (l = function (e) {
                 return "function" != typeof e.constructor || Se(e) ? {} : ne(H(e));
               }(u))) : f = !1;
@@ -1448,7 +1449,7 @@
             var s = r ? r(Oe(e, a), i, a + "", e, t, o) : void 0;
             void 0 === s && (s = i), ue(e, a, s);
           }
-        }, $e);
+        }, ze);
       }
 
       function me(e, t) {
@@ -1526,7 +1527,7 @@
       var Pe = ye(function () {
         return arguments;
       }()) ? ye : function (e) {
-        return Be(e) && $.call(e, "callee") && !V.call(e, "callee");
+        return Be(e) && z.call(e, "callee") && !V.call(e, "callee");
       },
           xe = Array.isArray;
 
@@ -1565,12 +1566,12 @@
         return Be(e) && Le(e.length) && !!b[de(e)];
       };
 
-      function $e(e) {
+      function ze(e) {
         return Ae(e) ? se(e, !0) : be(e);
       }
 
-      var ze,
-          Re = (ze = function (e, t, n) {
+      var $e,
+          Re = ($e = function (e, t, n) {
         ve(e, t, n);
       }, me(function (e, t) {
         var n = -1,
@@ -1578,13 +1579,13 @@
             o = r > 1 ? t[r - 1] : void 0,
             i = r > 2 ? t[2] : void 0;
 
-        for (o = ze.length > 3 && "function" == typeof o ? (r--, o) : void 0, i && function (e, t, n) {
+        for (o = $e.length > 3 && "function" == typeof o ? (r--, o) : void 0, i && function (e, t, n) {
           if (!Fe(n)) return !1;
           var r = typeof t;
           return !!("number" == r ? Ae(n) && je(t, n.length) : "string" == r && (t in n)) && Te(n[t], e);
         }(t[0], t[1], i) && (o = r < 3 ? void 0 : o, r = 1), e = Object(e); ++n < r;) {
           var a = t[n];
-          a && ze(e, a, n, o);
+          a && $e(e, a, n, o);
         }
 
         return e;
