@@ -311,8 +311,9 @@ const Flagsmith = class {
         this.segments = null;
         this.traits = null;
         if (this.initialised && !this.getFlagInterval) {
-            this.getFlags();
+            return this.getFlags();
         }
+        return Promise.resolve();
     }
 
     startListening(ticks = 1000) {
