@@ -48,6 +48,7 @@ const Flagsmith = class {
         const { onChange, onError, identity, api, disableCache } = this;
         let resolved = false;
         const handleResponse = ({ flags: features, traits }, segments) => {
+            this.withTraits = false;
             // Handle server response
             let flags = {};
             let userTraits = {};
@@ -89,6 +90,14 @@ const Flagsmith = class {
 
         if (identity) {
             return Promise.all([
+                this.withTraits?
+                    this.getJSON(api + 'identities/', "POST", JSON.stringify({
+                        "identifier": identity,
+                        traits: Object.keys(this.withTraits).map((k)=>({
+                            "trait_key":k,
+                            "trait_value": this.withTraits[k]
+                        }))
+                    })):
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
@@ -251,8 +260,11 @@ const Flagsmith = class {
         return this.flags;
     }
 
-    identify(userId) {
+    identify(userId, traits) {
         this.identity = userId;
+        if(traits) {
+            this.withTraits = traits;
+        }
         if (this.initialised && !this.getFlagInterval) {
             return this.getFlags();
         }

@@ -12,6 +12,10 @@ function login () {
     flagsmith.identify("flagsmith_sample_user");
 };
 
+function loginWithTraits () {
+    flagsmith.identify("flagsmith_sample_user", {button_clicks:99});
+};
+
 function logout () {
     flagsmith.logout();
 };
@@ -21,6 +25,7 @@ function increment (value) {
 };
 
 document.getElementById("js-login").addEventListener("click", login);
+document.getElementById("js-login-with-traits").addEventListener("click", loginWithTraits);
 document.getElementById("js-logout").addEventListener("click", logout);
 document.getElementById("js-toggle-trait").addEventListener("click", toggleTrait);
 document.getElementById("js-increment").addEventListener("click", function (){

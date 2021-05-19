@@ -67,16 +67,16 @@ flagsmith.init({
 | Property        | Description |
 | ------------- |:-------------:|
 | ```init```     | Initialise the sdk against a particular environment
-| ```hasFeature(key)```     | Get the value of a particular feature e.g. ```flagsmith.hasFeature("powerUserFeature") // true```
-| ```getValue(key)```     | Get the value of a particular feature e.g. ```flagsmith.getValue("font_size") // 10```
-| ```getTrait(key)```     | Once used with an identified user you can get the value of any trait that is set for them e.g. ```flagsmith.getTrait("accepted_cookie_policy")```
-| ```setTrait(key, value)```     | Once used with an identified user you can set the value of any trait relevant to them e.g. ```flagsmith.setTrait("accepted_cookie_policy", true)```
-| ```setTraits(object)```     | Set multiple traits e.g. ```flagsmith.setTraits({foo:"bar",numericProp:1,boolProp:true})```. Setting a value of null for a trait will remove that trait.
-| ```incrementTrait(key, value)```     | You can also increment/decrement a particular trait them e.g. ```flagsmith.incrementTrait("click_count", 1)```
-| ```startListening(ticks=1000)```     | Poll the api for changes every x milliseconds
+| ```hasFeature(key:string)```     | Get the value of a particular feature e.g. ```flagsmith.hasFeature("powerUserFeature") // true```
+| ```getValue(key:string)```     | Get the value of a particular feature e.g. ```flagsmith.getValue("font_size") // 10```
+| ```getTrait(key:string)```     | Once used with an identified user you can get the value of any trait that is set for them e.g. ```flagsmith.getTrait("accepted_cookie_policy")```
+| <code>setTrait(key:string, value:string&#124;number&#124;boolean)</code> | Once used with an identified user you can set the value of any trait relevant to them e.g. ```flagsmith.setTrait("accepted_cookie_policy", true)```
+| <code>setTraits(values:Record<string, string&#124;number&#124;boolean>)</code>     | Set multiple traits e.g. ```flagsmith.setTraits({foo:"bar",numericProp:1,boolProp:true})```. Setting a value of null for a trait will remove that trait.
+| ```incrementTrait(key:string, value:number)```     | You can also increment/decrement a particular trait them e.g. ```flagsmith.incrementTrait("click_count", 1)```
+| ```startListening(ticks=1000:number)```     | Poll the api for changes every x milliseconds
 | ```stopListening()```     | Stop polling the api
 | ```getFlags()```     | Trigger a manual fetch of the environment features, if a user is identified it will fetch their features. Resolves a promise when the flags are updated.
-| ```identify(userId)```     | Identify as a user, this will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```, resolves a promise when the flags are updated.
+| <code>identify(userId:string, traits?:Record<string, string&#124;numberr&#124;boolean>)</code>     | Identify as a user, optionally with traits e.g. ```{foo:"bar",numericProp:1,boolProp:true}```. This will create a user for your environment in the dashboard if they don't exist, it will also trigger a call to ```getFlags()```, resolves a promise when the flags are updated.
 | ```logout()```     | Stop identifying as a user, this will trigger a call to ```getFlags()```
 
 ## Notes on initialisation
