@@ -38,12 +38,14 @@ declare class IFlagsmith {
         AsyncStorage?: any // an AsyncStorage implementation
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
         preventFetch?: boolean // whether to prevent fetching flags on init
+        enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
         enableLogs?: boolean // whether to enable logs
         onChange?: (flags:IFlags, params:IRetrieveInfo)=> void // triggered when the flags are retrieved
         state?: IState // set a predefined state, useful for isomorphic applications
         onError?: (res:{message:string}) => void // triggered if there was an api error
         defaultFlags?: IFlags //
     }) => Promise<void>
+
 
     /**
      * Trigger a manual fetch of the environment features
