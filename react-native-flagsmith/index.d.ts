@@ -46,7 +46,6 @@ declare class IFlagsmith {
         defaultFlags?: IFlags //
     }) => Promise<void>
 
-
     /**
      * Trigger a manual fetch of the environment features
      */
@@ -60,7 +59,7 @@ declare class IFlagsmith {
     /**
      * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
-    identify:(userId:string) => Promise<IFlags|undefined>
+    identify:(userId:string, traits?: Record<string, string|number|boolean>,) => Promise<IFlags|undefined>
 
     /**
      * Retrieves the current state of flagsmith
@@ -122,7 +121,7 @@ declare class IFlagsmith {
 
 }
 
-declare module 'react-native-flagsmith' {
+declare module 'flagsmith' {
     // @ts-ignore
     export default new IFlagsmith()
 }

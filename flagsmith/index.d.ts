@@ -59,7 +59,7 @@ declare class IFlagsmith {
     /**
      * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
-    identify:(userId:string, traits: Record<string, string|number|boolean>,) => Promise<IFlags|undefined>
+    identify:(userId:string, traits?: Record<string, string|number|boolean>,) => Promise<IFlags|undefined>
 
     /**
      * Retrieves the current state of flagsmith

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import flagsmith from 'bullet-train-client';
+import flagsmith from 'flagsmith';
 
 @Component({
   selector: 'app-root',
