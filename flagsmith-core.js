@@ -254,6 +254,7 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             }
         })
+        .catch(error => onError(error));
     }
 
     getAllFlags() {
