@@ -124,6 +124,7 @@ declare class IFlagsmith {
 declare module 'flagsmith' {
     // @ts-ignore
     export default new IFlagsmith()
+    export function createFlagsmithInstance (): IFlagsmith
 }
 
 // @ts-ignore
