@@ -29,7 +29,7 @@ const Flagsmith = class {
                 'x-environment-key': environmentID
             }
         };
-        if (method !== "GET")
+        if (method && method !== "GET")
             options.headers['Content-Type'] = 'application/json; charset=utf-8'
         return fetch(url, options)
             .then(res => {
