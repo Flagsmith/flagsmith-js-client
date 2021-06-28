@@ -1,6 +1,7 @@
-<img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
+<img width="100%" src="https://raw.githubusercontent.com/Flagsmith/flagsmith/main/static-files/hero.png"/>
 
 ## Flagsmith with next.js and redux
+
 This repository contains integration with next.js and Redux with SSR support.
 Basic flow: 
 
@@ -12,6 +13,7 @@ Basic flow:
 - _app.js (CLIENT) initialises Flagsmith on the client with the server state setState and registers an onChange function which triggers a redux action.
 
 ## Installation 
+
 ```
 npm i
 ```
