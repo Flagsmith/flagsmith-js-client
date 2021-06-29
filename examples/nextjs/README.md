@@ -1,9 +1,9 @@
 <img width="100%" src="https://raw.githubusercontent.com/Flagsmith/flagsmith/main/static-files/hero.png"/>
 
-## Flagsmith with next.js and redux
+# Flagsmith with next.js and redux
 
 This repository contains integration with next.js and Redux with SSR support.
-Basic flow: 
+Basic flow:
 
 - _app.js (SERVER) awaits for Flagsmith to initialise and callback with flags
 - _app.js (SERVER) triggers an action with the Flagsmith state
@@ -12,19 +12,20 @@ Basic flow:
 
 - _app.js (CLIENT) initialises Flagsmith on the client with the server state setState and registers an onChange function which triggers a redux action.
 
-## Installation 
+## Installation
 
-```
+```bash
 npm i
 ```
-## Running in development mode 
 
-```
+## Running in development mode
+
+```bash
 npm run dev
 ```
 
-## Running in production mode 
+## Running in production mode
 
-```
+```bash
 npm run start
 ```
