@@ -2,7 +2,7 @@ let fetch;
 let AsyncStorage;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
-const defaultAPI = 'https://api.bullet-train.io/api/v1/';
+const defaultAPI = 'https://api.flagsmith.com/api/v1/';
 const deepEqual = require('fast-deep-equal');
 
 const initError = function (caller) {
