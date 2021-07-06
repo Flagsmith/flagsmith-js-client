@@ -1658,7 +1658,7 @@
 
     var u,
         c,
-        l = "https://api.bullet-train.io/api/v1/",
+        l = "https://api.flagsmith.com/api/v1/",
         f = r(12),
         h = function (e) {
       return "Attempted to " + e + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true.";
@@ -1676,7 +1676,7 @@
               "x-environment-key": r.environmentID
             }
           };
-          return "GET" !== t && (o.headers["Content-Type"] = "application/json; charset=utf-8"), u(e, o).then(function (e) {
+          return t && "GET" !== t && (o.headers["Content-Type"] = "application/json; charset=utf-8"), u(e, o).then(function (e) {
             return e.text().then(function (t) {
               var r = t;
 
@@ -1859,6 +1859,8 @@
                 t.log("Exception fetching cached logs", e);
               } else h || t.getFlags(e, n);
             }) : !h && t.getFlags(e, n);
+          }).catch(function (e) {
+            return u(e);
           });
         }
       }, {
@@ -1917,7 +1919,7 @@
       }, {
         key: "logout",
         value: function () {
-          this.identity = null, this.segments = null, this.traits = null, this.initialised && !this.getFlagInterval && this.getFlags();
+          return this.identity = null, this.segments = null, this.traits = null, this.initialised && !this.getFlagInterval ? this.getFlags() : Promise.resolve();
         }
       }, {
         key: "startListening",
