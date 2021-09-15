@@ -1854,7 +1854,7 @@
                 var i = JSON.parse(o);
                 i && i.api === t.api && i.environmentID === t.environmentID && (t.setState(i), t.log("Retrieved flags from cache", i)), t.flags ? (t.onChange && t.onChange(null, {
                   isFromServer: !1
-                }), t.oldFlags = t.flags, e(), !h && t.getFlags(Promise.resolve, Promise.reject)) : !h && t.getFlags(e, n);
+                }), t.oldFlags = t.flags, e(), !h && t.getFlags(Promise.resolve, Promise.reject)) : h ? e() : t.getFlags(e, n);
               } catch (e) {
                 t.log("Exception fetching cached logs", e);
               } else h || t.getFlags(e, n);
