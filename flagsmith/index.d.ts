@@ -40,7 +40,7 @@ declare class IFlagsmith {
         preventFetch?: boolean // whether to prevent fetching flags on init
         enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
         enableLogs?: boolean // whether to enable logs
-        onChange?: (flags:IFlags, params:IRetrieveInfo)=> void // triggered when the flags are retrieved
+        onChange?: (previousFlags:IFlags, params:IRetrieveInfo)=> void // triggered when the flags are retrieved
         state?: IState // set a predefined state, useful for isomorphic applications
         onError?: (res:{message:string}) => void // triggered if there was an api error
         defaultFlags?: IFlags //
@@ -49,7 +49,7 @@ declare class IFlagsmith {
     /**
      * Trigger a manual fetch of the environment features
      */
-    getFlags:()=> Promise<IFlags>
+    getFlags:()=> Promise<null>
 
     /**
      * Returns the current flags
@@ -59,7 +59,7 @@ declare class IFlagsmith {
     /**
      * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
-    identify:(userId:string, traits?: Record<string, string|number|boolean>,) => Promise<IFlags|undefined>
+    identify:(userId:string, traits?: Record<string, string|number|boolean>,) => Promise<null>
 
     /**
      * Retrieves the current state of flagsmith
@@ -69,7 +69,7 @@ declare class IFlagsmith {
     /**
      * Clears the identity, triggers a call to getFlags
      */
-    logout:()=> Promise<IFlags>
+    logout:()=> Promise<null>
 
     /**
      * Polls the flagsmith API, specify interval in ms
@@ -102,14 +102,14 @@ declare class IFlagsmith {
     setTrait:(
         key: string,
         value: string|number|boolean
-    )=> Promise<IFlags>
+    )=> Promise<null>
 
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
     setTraits:(
         traits: Record<string, string|number|boolean>,
-    )=> Promise<IFlags>
+    )=> Promise<null>
 
     /**
      * Increments the value of a numeric trait by a given amount (can be negative number)
@@ -117,7 +117,7 @@ declare class IFlagsmith {
     incrementTrait:(
         key:string,
         incrementBy:number
-    )=> Promise<IFlags>
+    )=> Promise<null>
 
 }
 
