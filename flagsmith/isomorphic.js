@@ -1857,7 +1857,7 @@
                 }), t.oldFlags = t.flags, e(), !h && t.getFlags(Promise.resolve, Promise.reject)) : h ? e() : t.getFlags(e, n);
               } catch (e) {
                 t.log("Exception fetching cached logs", e);
-              } else h || t.getFlags(e, n);
+              } else h ? e() : t.getFlags(e, n);
             }) : !h && t.getFlags(e, n);
           }).catch(function (e) {
             return u(e);

@@ -249,6 +249,8 @@ const Flagsmith = class {
                     } else {
                         if (!preventFetch) {
                             this.getFlags(resolve, reject)
+                        } else {
+                            resolve();
                         }
                     }
                 });
