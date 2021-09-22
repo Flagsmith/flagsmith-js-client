@@ -35,6 +35,7 @@ declare class IFlagsmith {
     init:(config: {
         environmentID: string // your Bullet Train environment id
         api?: string // the api you wish to use, important if self hosting
+        headers?: object // pass custom headers for flagsmith api calls
         AsyncStorage?: any // an AsyncStorage implementation
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
         preventFetch?: boolean // whether to prevent fetching flags on init

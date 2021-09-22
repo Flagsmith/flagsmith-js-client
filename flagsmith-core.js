@@ -21,7 +21,7 @@ const Flagsmith = class {
     }
 
     getJSON = (url, method, body) => {
-        const { environmentID } = this;
+        const { environmentID, headers } = this;
         const options = {
             method: method || 'GET',
             body,
@@ -31,6 +31,10 @@ const Flagsmith = class {
         };
         if (method && method !== "GET")
             options.headers['Content-Type'] = 'application/json; charset=utf-8'
+
+        if (headers) {
+            Object.assign(options.headers, headers)
+        }
         return fetch(url, options)
             .then(res => {
                 return res.text()
@@ -145,6 +149,7 @@ const Flagsmith = class {
     init({
         environmentID,
         api = defaultAPI,
+        headers,
         onChange,
         cacheFlags,
         onError,
@@ -159,6 +164,7 @@ const Flagsmith = class {
         return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
             this.api = api;
+            this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
             this.onChange = onChange;
