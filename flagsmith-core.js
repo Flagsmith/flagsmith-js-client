@@ -20,6 +20,19 @@ const Flagsmith = class {
         AsyncStorage = props.AsyncStorage;
     }
 
+    getAuthToken = () => {
+        const { authToken } = this;
+
+        switch (typeof (authToken)) {
+            case 'function':
+                return authToken();
+            case 'string':
+                return authToken;
+            default:
+                return null;
+        }
+    };
+
     getJSON = (url, method, body) => {
         const { environmentID } = this;
         const options = {
@@ -29,8 +42,11 @@ const Flagsmith = class {
                 'x-environment-key': environmentID
             }
         };
+        const authToken = this.getAuthToken();
         if (method && method !== "GET")
             options.headers['Content-Type'] = 'application/json; charset=utf-8'
+        if (authToken)
+            options.headers['Authorization'] = authToken
         return fetch(url, options)
             .then(res => {
                 return res.text()
@@ -145,6 +161,7 @@ const Flagsmith = class {
     init({
         environmentID,
         api = defaultAPI,
+        authToken,
         onChange,
         cacheFlags,
         onError,
@@ -159,6 +176,7 @@ const Flagsmith = class {
         return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
             this.api = api;
+            this.authToken = authToken;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
             this.onChange = onChange;
