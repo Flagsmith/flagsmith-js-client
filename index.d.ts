@@ -1,6 +1,6 @@
 export interface IBulletTrainFeature {
     enabled: boolean
-    value?: string
+    value?: string|number|boolean
 }
 
 export interface IFlags {
