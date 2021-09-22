@@ -599,14 +599,14 @@
 
       forEach(e) {
         let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : void 0,
-            r = I(this),
+            r = k(this),
             n = 0;
 
         for (; n < r.length;) {
           var o = r[n];
           const i = o[0],
                 a = o[1];
-          e.call(t, a, i, this), r = I(this), n++;
+          e.call(t, a, i, this), r = k(this), n++;
         }
       }
 
@@ -650,7 +650,7 @@
 
     }
 
-    function I(e) {
+    function k(e) {
       let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : "key+value";
       return Object.keys(e[x]).sort().map("key" === t ? function (e) {
         return e.toLowerCase();
@@ -695,11 +695,11 @@
         enumerable: !0
       }
     });
-    const k = Symbol("internal");
+    const I = Symbol("internal");
 
     function L(e, t) {
       const r = Object.create(F);
-      return r[k] = {
+      return r[I] = {
         target: e,
         kind: t,
         index: 0
@@ -709,15 +709,15 @@
     const F = Object.setPrototypeOf({
       next() {
         if (!this || Object.getPrototypeOf(this) !== F) throw new TypeError("Value of `this` is not a HeadersIterator");
-        var e = this[k];
+        var e = this[I];
         const t = e.target,
               r = e.kind,
               n = e.index,
-              o = I(t, r);
+              o = k(t, r);
         return n >= o.length ? {
           value: void 0,
           done: !0
-        } : (this[k].index = n + 1, {
+        } : (this[I].index = n + 1, {
           value: o[n],
           done: !1
         });
@@ -1126,8 +1126,8 @@
 
       var x,
           A,
-          I,
-          k = Array.prototype,
+          k,
+          I = Array.prototype,
           L = Function.prototype,
           F = Object.prototype,
           B = w["__core-js_shared__"],
@@ -1141,12 +1141,12 @@
           q = w.Symbol,
           J = w.Uint8Array,
           M = D ? D.allocUnsafe : void 0,
-          H = (A = Object.getPrototypeOf, I = Object, function (e) {
-        return A(I(e));
+          H = (A = Object.getPrototypeOf, k = Object, function (e) {
+        return A(k(e));
       }),
           G = Object.create,
           V = F.propertyIsEnumerable,
-          K = k.splice,
+          K = I.splice,
           Z = q ? q.toStringTag : void 0,
           Y = function () {
         try {
@@ -1210,7 +1210,7 @@
       function se(e, t) {
         var r = xe(e),
             n = !r && Pe(e),
-            o = !r && !n && Ie(e),
+            o = !r && !n && ke(e),
             i = !r && !n && !o && Ce(e),
             a = r || n || o || i,
             s = a ? function (e, t) {
@@ -1359,7 +1359,7 @@
       function ge(e) {
         return !(!Fe(e) || function (e) {
           return !!$ && $ in e;
-        }(e)) && (ke(e) ? U : y).test(function (e) {
+        }(e)) && (Ie(e) ? U : y).test(function (e) {
           if (null != e) {
             try {
               return C.call(e);
@@ -1400,7 +1400,7 @@
 
             if (f) {
               var p = xe(u),
-                  d = !p && Ie(u),
+                  d = !p && ke(u),
                   y = !p && !d && Ce(u);
               l = u, p || d || y ? xe(s) ? l = s : Be(w = s) && Ae(w) ? l = function (e, t) {
                 var r = -1,
@@ -1436,7 +1436,7 @@
 
                   return r;
                 }(e, ze(e));
-              }(s) : Fe(s) && !ke(s) || (l = function (e) {
+              }(s) : Fe(s) && !Ie(s) || (l = function (e) {
                 return "function" != typeof e.constructor || je(e) ? {} : re(H(e));
               }(u))) : f = !1;
             }
@@ -1532,14 +1532,14 @@
           xe = Array.isArray;
 
       function Ae(e) {
-        return null != e && Le(e.length) && !ke(e);
+        return null != e && Le(e.length) && !Ie(e);
       }
 
-      var Ie = W || function () {
+      var ke = W || function () {
         return !1;
       };
 
-      function ke(e) {
+      function Ie(e) {
         if (!Fe(e)) return !1;
         var t = de(e);
         return t == c || t == l || t == u || t == p;
@@ -1612,15 +1612,7 @@
       }), e.webpackPolyfill = 1), e;
     };
   }, function (e, t, r) {
-    function n(e) {
-      return (n = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
-        return typeof e;
-      } : function (e) {
-        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
-      })(e);
-    }
-
-    function o(e, t) {
+    function n(e, t) {
       var r = Object.keys(e);
 
       if (Object.getOwnPropertySymbols) {
@@ -1633,14 +1625,22 @@
       return r;
     }
 
-    function i(e) {
-      for (var t, r = 1; r < arguments.length; r++) t = null == arguments[r] ? {} : arguments[r], r % 2 ? o(t, !0).forEach(function (r) {
+    function o(e) {
+      for (var t, r = 1; r < arguments.length; r++) t = null == arguments[r] ? {} : arguments[r], r % 2 ? n(t, !0).forEach(function (r) {
         s(e, r, t[r]);
-      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : o(t).forEach(function (r) {
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : n(t).forEach(function (r) {
         Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
       });
 
       return e;
+    }
+
+    function i(e) {
+      return (i = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
+        return typeof e;
+      } : function (e) {
+        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+      })(e);
     }
 
     function a(e, t) {
@@ -1668,15 +1668,29 @@
         var r = this;
         (function (e, t) {
           if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
-        })(this, e), s(this, "getJSON", function (e, t, n) {
+        })(this, e), s(this, "getAuthToken", function () {
+          var e = r.authToken;
+
+          switch (i(e)) {
+            case "function":
+              return e();
+
+            case "string":
+              return e;
+
+            default:
+              return null;
+          }
+        }), s(this, "getJSON", function (e, t, n) {
           var o = {
             method: t || "GET",
             body: n,
             headers: {
               "x-environment-key": r.environmentID
             }
-          };
-          return t && "GET" !== t && (o.headers["Content-Type"] = "application/json; charset=utf-8"), u(e, o).then(function (e) {
+          },
+              i = r.getAuthToken();
+          return t && "GET" !== t && (o.headers["Content-Type"] = "application/json; charset=utf-8"), i && (o.headers.Authorization = i), u(e, o).then(function (e) {
             return e.text().then(function (t) {
               var r = t;
 
@@ -1689,18 +1703,18 @@
           });
         }), s(this, "getFlags", function (e, t) {
           var n = r.onChange,
-              o = r.onError,
+              i = r.onError,
               a = r.identity,
               s = r.api,
               u = (r.disableCache, !1),
               c = function (e, t) {
-            var o = e.flags,
+            var i = e.flags,
                 a = e.traits;
             r.withTraits = !1;
             var s = {},
                 u = {};
 
-            if (a = a || [], (o = o || []).forEach(function (e) {
+            if (a = a || [], (i = i || []).forEach(function (e) {
               s[e.feature.name.toLowerCase().replace(/ /g, "_")] = {
                 id: e.feature.id,
                 enabled: e.enabled,
@@ -1708,7 +1722,7 @@
               };
             }), a.forEach(function (e) {
               u[e.trait_key.toLowerCase().replace(/ /g, "_")] = e.trait_value;
-            }), r.oldFlags = i({}, r.flags), t) {
+            }), r.oldFlags = o({}, r.flags), t) {
               var c = {};
               t.map(function (e) {
                 c[e.name] = e;
@@ -1736,7 +1750,7 @@
             c(e[0], e[1]);
           }).catch(function (e) {
             var t = e.message;
-            o && o({
+            i && i({
               message: t
             });
           }) : Promise.all([r.getJSON(s + "flags/")]).then(function (t) {
@@ -1744,12 +1758,12 @@
               flags: t[0]
             }, null), e && !u && (u = !0, e());
           }).catch(function (e) {
-            t && !u && (u = !0, t(e)), o && o(e);
+            t && !u && (u = !0, t(e)), i && i(e);
           });
         }), s(this, "analyticsFlags", function () {
           var e = r.api;
           if (0 !== Object.getOwnPropertyNames(r.evaluationEvent).length) return r.getJSON(e + "analytics/flags/", "POST", JSON.stringify(r.evaluationEvent)).then(function () {
-            state = r.getState(), r.setState(i({}, state, {
+            state = r.getState(), r.setState(o({}, state, {
               evaluationEvent: {}
             })), r.updateEventStorage();
           }).catch(function (e) {
@@ -1779,21 +1793,21 @@
           console.error(h("setTrait"));
         }), s(this, "setTraits", function (e) {
           var t = r.getJSON,
-              o = r.identity,
-              i = r.api;
+              n = r.identity,
+              o = r.api;
 
-          if (i) {
-            e && "object" === n(e) || console.error("Expected object for flagsmith.setTraits");
+          if (o) {
+            e && "object" === i(e) || console.error("Expected object for flagsmith.setTraits");
             var a = Object.keys(e).map(function (t) {
               return {
                 identity: {
-                  identifier: o
+                  identifier: n
                 },
                 trait_key: t,
                 trait_value: e[t]
               };
             });
-            return t("".concat(i, "traits/bulk/"), "PUT", JSON.stringify(a)).then(function () {
+            return t("".concat(o, "traits/bulk/"), "PUT", JSON.stringify(a)).then(function () {
               r.initialised && r.getFlags();
             });
           }
@@ -1823,18 +1837,19 @@
           var t = this,
               r = e.environmentID,
               n = e.api,
-              o = void 0 === n ? l : n,
-              a = e.onChange,
-              s = e.cacheFlags,
-              u = e.onError,
-              f = e.defaultFlags,
-              h = e.preventFetch,
-              p = e.enableLogs,
-              d = e.enableAnalytics,
-              y = e.AsyncStorage,
-              g = e.state;
+              i = void 0 === n ? l : n,
+              a = e.authToken,
+              s = e.onChange,
+              u = e.cacheFlags,
+              f = e.onError,
+              h = e.defaultFlags,
+              p = e.preventFetch,
+              d = e.enableLogs,
+              y = e.enableAnalytics,
+              g = e.AsyncStorage,
+              b = e.state;
           return new Promise(function (e, n) {
-            if (t.environmentID = r, t.api = o, t.getFlagInterval = null, t.analyticsInterval = null, t.onChange = a, t.onError = u, t.enableLogs = p, t.enableAnalytics = !!d && d, t.flags = Object.assign({}, f) || {}, t.initialised = !0, t.ticks = 1e4, t.timer = t.enableLogs ? new Date().valueOf() : null, y && (c = y), t.cacheFlags = void 0 !== c && s, t.setState(g), !r) throw n("Please specify a environment id"), "Please specify a environment id";
+            if (t.environmentID = r, t.api = i, t.authToken = a, t.getFlagInterval = null, t.analyticsInterval = null, t.onChange = s, t.onError = f, t.enableLogs = d, t.enableAnalytics = !!y && y, t.flags = Object.assign({}, h) || {}, t.initialised = !0, t.ticks = 1e4, t.timer = t.enableLogs ? new Date().valueOf() : null, g && (c = g), t.cacheFlags = void 0 !== c && u, t.setState(b), !r) throw n("Please specify a environment id"), "Please specify a environment id";
             c.getItem("BULLET_TRAIN_EVENT").then(function (e) {
               if (e) try {
                 t.evaluationEvent = JSON.parse(e);
@@ -1845,22 +1860,22 @@
             }), t.enableAnalytics && (t.analyticsInterval && clearInterval(t.analyticsInterval), c.getItem("BULLET_TRAIN_EVENT", function (e, r) {
               if (r) {
                 var n = JSON.parse(r);
-                n && (g = t.getState(), t.log("Retrieved events from cache", r), t.setState(i({}, g, {
+                n && (b = t.getState(), t.log("Retrieved events from cache", r), t.setState(o({}, b, {
                   evaluationEvent: n
                 })));
               }
-            })), s ? c.getItem("BULLET_TRAIN_DB", function (r, o) {
+            })), u ? c.getItem("BULLET_TRAIN_DB", function (r, o) {
               if (o) try {
                 var i = JSON.parse(o);
                 i && i.api === t.api && i.environmentID === t.environmentID && (t.setState(i), t.log("Retrieved flags from cache", i)), t.flags ? (t.onChange && t.onChange(null, {
                   isFromServer: !1
-                }), t.oldFlags = t.flags, e(), !h && t.getFlags(Promise.resolve, Promise.reject)) : h ? e() : t.getFlags(e, n);
+                }), t.oldFlags = t.flags, e(), !p && t.getFlags(Promise.resolve, Promise.reject)) : p ? e() : t.getFlags(e, n);
               } catch (e) {
                 t.log("Exception fetching cached logs", e);
-              } else h ? e() : t.getFlags(e, n);
-            }) : !h && t.getFlags(e, n);
+              } else p ? e() : t.getFlags(e, n);
+            }) : !p && t.getFlags(e, n);
           }).catch(function (e) {
-            return u(e);
+            return f(e);
           });
         }
       }, {

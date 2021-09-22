@@ -1,11 +1,11 @@
 {
-  "name": "flagsmith",
+  "name": "flagsmith-wi-fork",
   "version": "1.6.6",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Flagsmith/flagsmith-js-client"
+    "url": "https://github.com/workindia/flagsmith-js-client"
   },
   "keywords": [
     "feature flagger",
@@ -14,7 +14,7 @@
   "author": "Bullet Train Ltd",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"
+    "url": "https://github.com/workindia/flagsmith-js-client/issues"
   },
   "homepage": "https://flagsmith.com",
   "types": "./index.d.ts"
