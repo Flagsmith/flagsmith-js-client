@@ -352,6 +352,7 @@ const Flagsmith = class {
 
     evaluateFlag = (key) => {
         if (this.enableAnalytics) {
+            if (!this.evaluationEvent) return;
             if (this.evaluationEvent[key] === undefined) {
                 this.evaluationEvent[key] = 0;
             }

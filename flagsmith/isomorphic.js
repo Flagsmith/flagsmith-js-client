@@ -1756,7 +1756,12 @@
             r.log("Exception fetching evaluationEvent", e);
           });
         }), s(this, "evaluateFlag", function (e) {
-          r.enableAnalytics && (void 0 === r.evaluationEvent[e] && (r.evaluationEvent[e] = 0), r.evaluationEvent[e] += 1), r.updateEventStorage();
+          if (r.enableAnalytics) {
+            if (!r.evaluationEvent) return;
+            void 0 === r.evaluationEvent[e] && (r.evaluationEvent[e] = 0), r.evaluationEvent[e] += 1;
+          }
+
+          r.updateEventStorage();
         }), s(this, "getValue", function (e) {
           var t = r.flags && r.flags[e.toLowerCase().replace(/ /g, "_")],
               n = null;
