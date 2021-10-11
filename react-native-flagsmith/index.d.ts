@@ -120,7 +120,6 @@ declare class IFlagsmith {
     )=> Promise<null>
 
 }
-
 declare module 'react-native-flagsmith' {
     // @ts-ignore
     export default new IFlagsmith()

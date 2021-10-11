@@ -256,6 +256,9 @@ const Flagsmith = class {
                         if (!preventFetch) {
                             this.getFlags(resolve, reject)
                         } else {
+                            if (this.flags) {
+                                this.onChange(null, { isFromServer: false });
+                            }
                             resolve();
                         }
                     }
