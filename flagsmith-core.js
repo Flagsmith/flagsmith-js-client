@@ -256,7 +256,7 @@ const Flagsmith = class {
                         if (!preventFetch) {
                             this.getFlags(resolve, reject)
                         } else {
-                            if (this.flags) {
+                            if (defaultFlags) {
                                 this.onChange(null, { isFromServer: false });
                             }
                             resolve();
@@ -265,6 +265,11 @@ const Flagsmith = class {
                 });
             } else if (!preventFetch) {
                 this.getFlags(resolve, reject);
+            } else {
+                if (defaultFlags) {
+                    this.onChange(null, { isFromServer: false });
+                }
+                resolve();
             }
         })
         .catch(error => onError(error));

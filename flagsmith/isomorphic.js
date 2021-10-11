@@ -725,7 +725,7 @@
 
     }, Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]())));
 
-    function B(e) {
+    function C(e) {
       const t = Object.assign({
         __proto__: null
       }, e[x]),
@@ -739,7 +739,7 @@
       enumerable: !1,
       configurable: !0
     });
-    const C = Symbol("Response internals"),
+    const B = Symbol("Response internals"),
           z = o.STATUS_CODES;
 
     class $ {
@@ -756,7 +756,7 @@
           t && n.append("Content-Type", t);
         }
 
-        this[C] = {
+        this[B] = {
           url: t.url,
           status: r,
           statusText: t.statusText || z[r],
@@ -766,27 +766,27 @@
       }
 
       get url() {
-        return this[C].url || "";
+        return this[B].url || "";
       }
 
       get status() {
-        return this[C].status;
+        return this[B].status;
       }
 
       get ok() {
-        return this[C].status >= 200 && this[C].status < 300;
+        return this[B].status >= 200 && this[B].status < 300;
       }
 
       get redirected() {
-        return this[C].counter > 0;
+        return this[B].counter > 0;
       }
 
       get statusText() {
-        return this[C].statusText;
+        return this[B].statusText;
       }
 
       get headers() {
-        return this[C].headers;
+        return this[B].headers;
       }
 
       clone() {
@@ -952,7 +952,7 @@
           let i = e.agent;
           return "function" == typeof i && (i = i(t)), r.has("Connection") || i || r.set("Connection", "close"), Object.assign({}, t, {
             method: e.method,
-            headers: B(r),
+            headers: C(r),
             agent: i
           });
         }(u),
@@ -1130,13 +1130,13 @@
           k = Array.prototype,
           F = Function.prototype,
           L = Object.prototype,
-          B = w["__core-js_shared__"],
-          C = F.toString,
+          C = w["__core-js_shared__"],
+          B = F.toString,
           z = L.hasOwnProperty,
-          $ = (x = /[^.]+$/.exec(B && B.keys && B.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
+          $ = (x = /[^.]+$/.exec(C && C.keys && C.keys.IE_PROTO || "")) ? "Symbol(src)_1." + x : "",
           R = L.toString,
-          N = C.call(Object),
-          U = RegExp("^" + C.call(z).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
+          N = B.call(Object),
+          U = RegExp("^" + B.call(z).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"),
           D = j ? w.Buffer : void 0,
           q = w.Symbol,
           J = w.Uint8Array,
@@ -1211,7 +1211,7 @@
         var r = xe(e),
             n = !r && Pe(e),
             o = !r && !n && Ie(e),
-            i = !r && !n && !o && Ce(e),
+            i = !r && !n && !o && Be(e),
             a = r || n || o || i,
             s = a ? function (e, t) {
           for (var r = -1, n = Array(e); ++r < e;) n[r] = t(r);
@@ -1353,7 +1353,7 @@
       }
 
       function ye(e) {
-        return Be(e) && de(e) == s;
+        return Ce(e) && de(e) == s;
       }
 
       function ge(e) {
@@ -1362,7 +1362,7 @@
         }(e)) && (ke(e) ? U : y).test(function (e) {
           if (null != e) {
             try {
-              return C.call(e);
+              return B.call(e);
             } catch (e) {}
 
             try {
@@ -1401,8 +1401,8 @@
             if (f) {
               var p = xe(u),
                   d = !p && Ie(u),
-                  y = !p && !d && Ce(u);
-              l = u, p || d || y ? xe(s) ? l = s : Be(w = s) && Ae(w) ? l = function (e, t) {
+                  y = !p && !d && Be(u);
+              l = u, p || d || y ? xe(s) ? l = s : Ce(w = s) && Ae(w) ? l = function (e, t) {
                 var r = -1,
                     n = e.length;
                 t || (t = Array(n));
@@ -1416,11 +1416,11 @@
                     n = M ? M(r) : new e.constructor(r);
                 return e.copy(n), n;
               }(u, !0)) : y ? (f = !1, g = u, b = !0 ? (v = g.buffer, m = new v.constructor(v.byteLength), new J(m).set(new J(v)), m) : g.buffer, l = new g.constructor(b, g.byteOffset, g.length)) : l = [] : function (e) {
-                if (!Be(e) || de(e) != h) return !1;
+                if (!Ce(e) || de(e) != h) return !1;
                 var t = H(e);
                 if (null === t) return !0;
                 var r = z.call(t, "constructor") && t.constructor;
-                return "function" == typeof r && r instanceof r && C.call(r) == N;
+                return "function" == typeof r && r instanceof r && B.call(r) == N;
               }(u) || Pe(u) ? (l = s, Pe(s) ? l = function (e) {
                 return function (e, t, r, n) {
                   var o = !r;
@@ -1527,7 +1527,7 @@
       var Pe = ye(function () {
         return arguments;
       }()) ? ye : function (e) {
-        return Be(e) && z.call(e, "callee") && !V.call(e, "callee");
+        return Ce(e) && z.call(e, "callee") && !V.call(e, "callee");
       },
           xe = Array.isArray;
 
@@ -1554,16 +1554,16 @@
         return null != e && ("object" == t || "function" == t);
       }
 
-      function Be(e) {
+      function Ce(e) {
         return null != e && "object" == typeof e;
       }
 
-      var Ce = E ? function (e) {
+      var Be = E ? function (e) {
         return function (t) {
           return e(t);
         };
       }(E) : function (e) {
-        return Be(e) && Fe(e.length) && !!b[de(e)];
+        return Ce(e) && Fe(e.length) && !!b[de(e)];
       };
 
       function ze(e) {
@@ -1865,10 +1865,12 @@
                 }), t.oldFlags = t.flags, e(), !p && t.getFlags(Promise.resolve, Promise.reject)) : p ? e() : t.getFlags(e, n);
               } catch (e) {
                 t.log("Exception fetching cached logs", e);
-              } else p ? (t.flags && t.onChange(null, {
+              } else p ? (h && t.onChange(null, {
                 isFromServer: !1
               }), e()) : t.getFlags(e, n);
-            }) : !p && t.getFlags(e, n);
+            }) : p ? (h && t.onChange(null, {
+              isFromServer: !1
+            }), e()) : t.getFlags(e, n);
           }).catch(function (e) {
             return f(e);
           });
