@@ -106,6 +106,10 @@ const Flagsmith = class {
             ])
                 .then((res) => {
                     handleResponse(res[0], res[1])
+                    if (resolve && !resolved) {
+                        resolved = true;
+                        resolve();
+                    }
                 }).catch(({ message }) => {
                     onError && onError({ message })
                 });
