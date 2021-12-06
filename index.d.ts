@@ -120,6 +120,10 @@ declare class IFlagsmith {
         incrementBy:number
     )=> Promise<IFlags>
 
+    /**
+     * The stored identity of the user
+     */
+    identity?:string
 }
 
 declare module 'flagsmith' {

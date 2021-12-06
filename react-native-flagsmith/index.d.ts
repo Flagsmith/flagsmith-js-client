@@ -119,6 +119,10 @@ declare class IFlagsmith {
         incrementBy:number
     )=> Promise<null>
 
+    /**
+     * The stored identity of the user
+     */
+    identity?:string
 }
 declare module 'react-native-flagsmith' {
     // @ts-ignore
