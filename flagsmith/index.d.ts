@@ -1,10 +1,13 @@
+// Deprecated
 export interface IBulletTrainFeature {
     enabled: boolean
-    value?: string
+    value?: string|number|boolean
 }
 
+export interface IFlagsmithFeature extends IBulletTrainFeature {}
+
 export interface IFlags {
-    [key: string]: IBulletTrainFeature
+    [key: string]: IFlagsmithFeature
 }
 
 export interface ITraits {
@@ -12,7 +15,7 @@ export interface ITraits {
 }
 
 export interface IUserIdentity {
-    flags: IBulletTrainFeature
+    flags: IFlagsmithFeature
     traits: ITraits
 }
 export interface IRetrieveInfo {
@@ -33,8 +36,9 @@ declare class IFlagsmith {
      * Initialise the sdk against a particular environment
      */
     init:(config: {
-        environmentID: string // your Bullet Train environment id
+        environmentID: string // your Flagsmith environment id
         api?: string // the api you wish to use, important if self hosting
+        headers?: object // pass custom headers for flagsmith api calls
         AsyncStorage?: any // an AsyncStorage implementation
         cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
         preventFetch?: boolean // whether to prevent fetching flags on init

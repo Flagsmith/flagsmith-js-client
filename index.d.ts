@@ -1,10 +1,13 @@
+// Deprecated
 export interface IBulletTrainFeature {
     enabled: boolean
     value?: string|number|boolean
 }
 
+export interface IFlagsmithFeature extends IBulletTrainFeature {}
+
 export interface IFlags {
-    [key: string]: IBulletTrainFeature
+    [key: string]: IFlagsmithFeature
 }
 
 export interface ITraits {
@@ -12,7 +15,7 @@ export interface ITraits {
 }
 
 export interface IUserIdentity {
-    flags: IBulletTrainFeature
+    flags: IFlagsmithFeature
     traits: ITraits
 }
 export interface IRetrieveInfo {
@@ -33,7 +36,7 @@ declare class IFlagsmith {
      * Initialise the sdk against a particular environment
      */
     init:(config: {
-        environmentID: string // your Bullet Train environment id
+        environmentID: string // your Flagsmith environment id
         api?: string // the api you wish to use, important if self hosting
         headers?: object // pass custom headers for flagsmith api calls
         AsyncStorage?: any // an AsyncStorage implementation
@@ -50,7 +53,7 @@ declare class IFlagsmith {
     /**
      * Trigger a manual fetch of the environment features
      */
-    getFlags:()=> Promise<IFlags>
+    getFlags:()=> Promise<null>
 
     /**
      * Returns the current flags
@@ -70,7 +73,7 @@ declare class IFlagsmith {
     /**
      * Clears the identity, triggers a call to getFlags
      */
-    logout:()=> Promise<IFlags>
+    logout:()=> Promise<null>
 
     /**
      * Polls the flagsmith API, specify interval in ms
@@ -103,14 +106,14 @@ declare class IFlagsmith {
     setTrait:(
         key: string,
         value: string|number|boolean
-    )=> Promise<IFlags>
+    )=> Promise<null>
 
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
     setTraits:(
         traits: Record<string, string|number|boolean>,
-    )=> Promise<IFlags>
+    )=> Promise<null>
 
     /**
      * Increments the value of a numeric trait by a given amount (can be negative number)
@@ -118,7 +121,7 @@ declare class IFlagsmith {
     incrementTrait:(
         key:string,
         incrementBy:number
-    )=> Promise<IFlags>
+    )=> Promise<null>
 
     /**
      * The stored identity of the user

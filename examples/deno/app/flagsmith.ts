@@ -5,8 +5,8 @@ const flagsmith = Flagsmith({fetch, AsyncStorage: null});
 export default flagsmith;
 export const init  = async function (){
     return await flagsmith.init({
-        environmentID: Deno.env("BULLET_TRAIN"),
-        api: "https://api.bullet-train.io/api/v1/",
+        environmentID: Deno.env("FLAGSMITH"),
+        api: "https://api.flagsmith.com/api/v1/",
         onError: (err) => {},
         onChange: (err) => {},
         cacheFlags: false,

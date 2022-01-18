@@ -1,13 +1,13 @@
-<img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
+<img width="100%" src="https://github.com/Flagsmith/flagsmith/raw/main/static-files/hero.png"/>
 
 # Flagsmith Client
 [![npm version](https://badge.fury.io/js/flagsmith.svg)](https://badge.fury.io/js/flagsmith)
 [![](https://data.jsdelivr.com/v1/package/npm/flagsmith/badge)](https://www.jsdelivr.com/package/npm/flagsmith)
 
-The SDK clients for web and React Native for [https://bullet-train.io/](https://www.bullet-train.io/). Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
+The SDK clients for web and React Native for [https://flagsmith.com/](https://flagsmith.com/). Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
 
 ## Getting Started
-**For full documentation visit [https://docs.bullet-train.io/clients/javascript/](https://docs.bullet-train.io/clients/javascript/)**
+**For full documentation visit [https://docs.flagsmith.com/clients/javascript/](https://docs.flagsmith.com/clients/javascript/)**
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See running in production for notes on how to deploy the project on a live system.
 
