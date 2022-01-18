@@ -1,7 +1,7 @@
 {
   "name": "deno-example",
   "version": "1.0.0",
-  "description": "Using Bullet Train with Deno",
+  "description": "Using Flagsmith with Deno",
   "scripts": {
     "build": "deno bundle ./app/index.ts ./out.ts",
     "dev": "nodemon --exec deno --allow-net --allow-env ./app/index.ts",

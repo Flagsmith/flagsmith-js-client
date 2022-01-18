@@ -1,5 +1,5 @@
 import {Application, Router} from "https://deno.land/x/oak/mod.ts";
-import {init} from './bullet-train.ts';
+import {init} from './flagsmith.ts';
 import router from './router.ts';
 
 const start = async ()=> {
@@ -11,3 +11,4 @@ const start = async ()=> {
 };
 
 start();
+``

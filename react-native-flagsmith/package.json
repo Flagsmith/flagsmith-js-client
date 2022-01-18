@@ -1,11 +1,11 @@
 {
   "name": "react-native-flagsmith",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "Feature flagging to support continuous development",
   "main": "./lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SolidStateGroup/bullet-train-js-client"
+    "url": "https://github.com/Flagsmith/flagsmith-js-client/"
   },
   "keywords": [
     "react native",
@@ -15,9 +15,9 @@
   "author": "SSG",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SolidStateGroup/bullet-train-js-client/issues"
+    "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"
   },
-  "homepage": "https://bullet-train.io",
+  "homepage": "https://flagsmith.com",
   "peerDependencies": {
     "react-native": ">=0.20.0"
   },

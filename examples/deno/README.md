@@ -1,6 +1,6 @@
 <img width="100%" src="https://raw.githubusercontent.com/Flagsmith/flagsmith/main/static-files/hero.png"/>
 
-# Bullet Train Feature Flags with Deno
+# Flagsmith Flags with Deno
 
 This repository contains basic integration with Deno.
 
@@ -17,13 +17,13 @@ mode with nodemon reloading npm install.
 
 ```bash
 npm i
-BULLET_TRAIN="YOUR_ENV" npm run dev
+FLAGSMITH="YOUR_ENV" npm run dev
 ```
 
 ## Bundling and running
 
 ```bash
-BULLET_TRAIN="YOUR_ENV" npm start
+FLAGSMITH="YOUR_ENV" npm start
 ```
 
 Goto http://localhost:8000.

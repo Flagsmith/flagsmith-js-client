@@ -1,5 +1,5 @@
 import {Router} from "https://deno.land/x/oak/mod.ts";
-import flagsmith from './bullet-train.ts';
+import flagsmith from './flagsmith.ts';
 
 const router = new Router();
 router
