@@ -276,7 +276,7 @@ const Flagsmith = class {
                 resolve();
             }
         })
-        .catch(error => onError(error));
+        .catch(error => onError && onError(error));
     }
 
     getAllFlags() {
