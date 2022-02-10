@@ -244,7 +244,7 @@ const Flagsmith = class {
                                 this.oldFlags = this.flags;
                                 resolve();
                                 if (!preventFetch) {
-                                    this.getFlags(Promise.resolve, Promise.reject);
+                                    this.getFlags();
                                 }
                             } else {
                                 if (!preventFetch) {
