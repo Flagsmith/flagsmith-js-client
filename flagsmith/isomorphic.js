@@ -1862,7 +1862,7 @@
                 var i = JSON.parse(o);
                 i && i.api === t.api && i.environmentID === t.environmentID && (t.setState(i), t.log("Retrieved flags from cache", i)), t.flags ? (t.onChange && t.onChange(null, {
                   isFromServer: !1
-                }), t.oldFlags = t.flags, e(), !p && t.getFlags(Promise.resolve, Promise.reject)) : p ? e() : t.getFlags(e, n);
+                }), t.oldFlags = t.flags, e(), !p && t.getFlags()) : p ? e() : t.getFlags(e, n);
               } catch (e) {
                 t.log("Exception fetching cached logs", e);
               } else p ? (h && t.onChange(null, {
@@ -1872,7 +1872,7 @@
               isFromServer: !1
             }), e()) : t.getFlags(e, n);
           }).catch(function (e) {
-            return f(e);
+            return f && f(e);
           });
         }
       }, {
