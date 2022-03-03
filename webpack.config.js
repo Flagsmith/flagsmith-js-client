@@ -57,8 +57,22 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
         path: path.join(__dirname, '/react-native-flagsmith/lib'),
     }
 });
+const reactBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile the react native client for the example project
+    entry: {
+        main: './react/index.ts'
+    },
+    externals: {
+        'react': 'react'
+    },
+    output: {
+        filename: "index.js",
+        library: "flagsmith",
+        libraryTarget: "umd",
+        path: path.join(__dirname, '/flagsmith/react'),
+    }
+});
 
 module.exports = [
-    webBundle, reactNativeBundle, isomorphicBundle
+    webBundle, reactNativeBundle, isomorphicBundle, reactBundle
     // isomorphicBundle2
 ];

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "./flagsmith/",
     "module": "commonjs",
     "target": "es5",
     "lib": [ "es2015", "dom" ],
@@ -9,8 +9,7 @@
     "allowJs": true,
     "moduleResolution": "node",
     "declaration": true,
-    "sourceMap": true,
-    "noEmit": true
+    "sourceMap": true
   },
   "exclude": ["examples"]
 }

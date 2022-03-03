@@ -502,6 +502,8 @@ const Flagsmith = class {
 
 };
 
-module.exports = function ({ fetch, AsyncStorage }) {
+type Config= {fetch?:any, AsyncStorage?:any};
+
+module.exports = function ({ fetch, AsyncStorage }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage }) as IFlagsmith;
 };
