@@ -6,7 +6,7 @@
     "prepublish": "npm run build",
     "deploy": "npm run build && cd ./flagsmith/ && npm publish && cd ../react-native-flagsmith && npm publish",
     "start": "node_modules/.bin/webpack --watch",
-    "build": "node_modules/.bin/webpack && babel ./flagsmith/isomorphic-es6.js --out-file flagsmith/isomorphic.js"
+    "build": "node_modules/.bin/webpack"
   },
   "repository": {
     "type": "git",
@@ -24,14 +24,13 @@
   },
   "homepage": "https://flagsmith.com",
   "devDependencies": {
-    "@babel/cli": "^7.13.14",
-    "@babel/core": "^7.6.4",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.6.3",
-    "babel-loader": "^8.0.6",
-    "babel-preset-minify": "^0.5.1",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9"
+    "fork-ts-checker-webpack-plugin": "^7.2.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "ts-loader": "^9.2.7",
+    "typescript": "^4.6.2",
+    "webpack": "^5.69.1",
+    "webpack-cli": "4.9.2"
   },
   "dependencies": {
     "@callstack/async-storage": "^1.1.0",

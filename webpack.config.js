@@ -1,20 +1,22 @@
 var path = require("path");
 
 const defaultConfig = {
-    entry: './index.js',
-    mode: "production",
-    target: "node",
+    entry: './index.ts',
+    devtool: 'inline-source-map',
+    target:"node",
+    mode:"production",
     module: {
         rules: [
             {
-                test: /\.js$/,
-                exclude: /node_modules\/(?!.)/,
-                use: {
-                    loader: 'babel-loader'
-                }
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+                exclude: /node_modules/,
             }
         ]
-    }
+    },
+    resolve: {
+        extensions: [ '.tsx', '.ts', '.js' ],
+    },
 };
 
 const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web client
@@ -25,25 +27,25 @@ const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web
         globalObject: 'this',
     },
     entry: {
-        main: './index.js'
+        main: './index.ts'
     }
 });
 
 const isomorphicBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web client
     output: {
         libraryTarget:'umd',
-        filename: "isomorphic-es6.js",
-        path: path.join(__dirname, '/flagsmith/'),
+        filename: "index.js",
+        path: path.join(__dirname, '/flagsmith/isomorphic'),
         globalObject: 'this',
     },
     entry: {
-        main: './isomorphic.js'
+        main: './isomorphic/index.ts'
     }
 });
 
 const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile the react native client for the example project
     entry: {
-        main: './index.react-native.js'
+        main: './index.react-native.ts'
     },
     externals: {
         'react-native': 'react-native'
@@ -56,22 +58,7 @@ const reactNativeBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile
     }
 });
 
-const reactNativeExampleBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile the react native client for the example project
-    entry: {
-        main: './index.react-native.js'
-    },
-    externals: {
-        'react-native': 'react-native'
-    },
-    output: {
-        filename: "index.js",
-        library: "flagsmith",
-        libraryTarget: "umd",
-        path: path.join(__dirname, '/examples/react-native/react-native-flagsmith'),
-    }
-});
-
 module.exports = [
-    webBundle, reactNativeBundle, isomorphicBundle,reactNativeExampleBundle
+    webBundle, reactNativeBundle, isomorphicBundle
     // isomorphicBundle2
 ];

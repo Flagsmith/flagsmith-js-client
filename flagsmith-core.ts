@@ -1,4 +1,6 @@
-let fetch;
+import {IFlagsmith} from "./react-native-flagsmith";
+
+let _fetch: typeof global.fetch;
 let AsyncStorage;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
@@ -13,14 +15,14 @@ const Flagsmith = class {
 
     constructor(props) {
         if (props.fetch) {
-            fetch = props.fetch;
+            _fetch = props.fetch;
         } else {
-            fetch = global.fetch;
+            _fetch = global.fetch;
         }
         AsyncStorage = props.AsyncStorage;
     }
 
-    getJSON = (url, method, body) => {
+    getJSON = (url:string, method?:"GET"|"POST"|"PUT", body?:BodyInit) => {
         const { environmentID, headers } = this;
         const options = {
             method: method || 'GET',
@@ -35,7 +37,7 @@ const Flagsmith = class {
         if (headers) {
             Object.assign(options.headers, headers)
         }
-        return fetch(url, options)
+        return _fetch(url, options)
             .then(res => {
                 return res.text()
                     .then((text) => {
@@ -48,8 +50,8 @@ const Flagsmith = class {
             })
     };
 
-    getFlags = (resolve, reject) => {
-        const { onChange, onError, identity, api, disableCache } = this;
+    getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
+        const { onChange, onError, identity, api } = this;
         let resolved = false;
         const handleResponse = ({ flags: features, traits }, segments) => {
             this.withTraits = false;
@@ -105,6 +107,7 @@ const Flagsmith = class {
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
+                    // @ts-ignore
                     handleResponse(res[0], res[1])
                     if (resolve && !resolved) {
                         resolved = true;
@@ -118,6 +121,7 @@ const Flagsmith = class {
                 this.getJSON(api + "flags/")
             ])
                 .then((res) => {
+                    // @ts-ignore
                     handleResponse({ flags: res[0] }, null)
                     if (resolve && !resolved) {
                         resolved = true;
@@ -138,7 +142,7 @@ const Flagsmith = class {
         if (Object.getOwnPropertyNames(this.evaluationEvent).length !== 0) {
             return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent))
                 .then((res) => {
-                    state = this.getState();
+                    const state = this.getState();
                     this.setState({
                         ...state,
                         evaluationEvent: {},
@@ -149,6 +153,27 @@ const Flagsmith = class {
                 });
         }
     };
+
+    analyticsInterval= null
+    api= null
+    cacheFlags= null
+    enableAnalytics= null
+    enableLogs= null
+    environmentID= null
+    evaluationEvent= null
+    flags= null
+    getFlagInterval= null
+    headers= null
+    initialised= null
+    oldFlags= null
+    onChange= null
+    onError= null
+    identity= null
+    segments= null
+    ticks= null
+    timer= null
+    traits= null
+    withTraits= null
 
     init({
         environmentID,
@@ -242,7 +267,7 @@ const Flagsmith = class {
                                     this.onChange(null, { isFromServer: false });
                                 }
                                 this.oldFlags = this.flags;
-                                resolve();
+                                resolve(true);
                                 if (!preventFetch) {
                                     this.getFlags();
                                 }
@@ -250,7 +275,7 @@ const Flagsmith = class {
                                 if (!preventFetch) {
                                     this.getFlags(resolve, reject);
                                 } else {
-                                    resolve();
+                                    resolve(true);
                                 }
                             }
                         } catch (e) {
@@ -263,7 +288,7 @@ const Flagsmith = class {
                             if (defaultFlags) {
                                 this.onChange(null, { isFromServer: false });
                             }
-                            resolve();
+                            resolve(true);
                         }
                     }
                 });
@@ -273,7 +298,7 @@ const Flagsmith = class {
                 if (defaultFlags) {
                     this.onChange(null, { isFromServer: false });
                 }
-                resolve();
+                resolve(true);
             }
         })
         .catch(error => onError && onError(error));
@@ -458,6 +483,7 @@ const Flagsmith = class {
             increment_by,
             identifier: identity
         }))
+            // @ts-ignore
             .then(this.getFlags)
     };
 
@@ -477,5 +503,5 @@ const Flagsmith = class {
 };
 
 module.exports = function ({ fetch, AsyncStorage }) {
-    return new Flagsmith({ fetch, AsyncStorage });
+    return new Flagsmith({ fetch, AsyncStorage }) as IFlagsmith;
 };
