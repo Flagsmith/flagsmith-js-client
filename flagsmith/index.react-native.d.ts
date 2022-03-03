@@ -1,3 +1,3 @@
-declare const _default: any;
+declare const _default: import("./types").IFlagsmith;
 export default _default;
-export declare const createFlagsmithInstance: () => any;
+export declare const createFlagsmithInstance: () => import("./types").IFlagsmith;

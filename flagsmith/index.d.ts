@@ -1,3 +1,4 @@
-declare const flagsmith: any;
+import { IFlagsmith } from './types';
+declare const flagsmith: IFlagsmith;
 export default flagsmith;
-export declare const createFlagsmithInstance: () => any;
+export declare const createFlagsmithInstance: () => IFlagsmith;

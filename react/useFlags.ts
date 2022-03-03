@@ -11,7 +11,7 @@ import {
   FlagsmithContext,
 } from './FlagsmithProvider'
 // @ts-ignore
-import { IFlagsmith, IFlagsmithFeature } from '../'
+import { IFlagsmith, IFlagsmithFeature } from '../types'
 import events from './util/events'
 
 const useConstant = function <T>(value: T): T {
@@ -45,7 +45,7 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[]) => {
     })
     .join(',')
 }
-function useFlags<P extends string>(_flags: readonly P[]): { [K in P]: IFlagsmithFeature } {
+export function useFlags<P extends string>(_flags: readonly P[]): { [K in P]: IFlagsmithFeature } {
   const flags = useConstant<string[]>(flagsAsArray(_flags))
   const flagsmith = useContext(FlagsmithContext)
   const [renderKey, setRenderKey] = useState<string>(
@@ -66,7 +66,7 @@ function useFlags<P extends string>(_flags: readonly P[]): { [K in P]: IFlagsmit
     }
   }, [])
   const res =  useMemo(() => {
-    const res: Record<string, IFlagsmithFeature> = {}
+    const res: any = {}
     flags.map((k) => {
       res[k] = {
         enabled: flagsmith!.hasFeature(k),

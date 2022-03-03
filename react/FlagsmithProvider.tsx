@@ -1,6 +1,6 @@
 // @ts-ignore
 import { createContext, FC, useEffect, useState } from 'react'
-import { IFlagsmith, IState } from '../'
+import { IFlagsmith, IState } from '../types'
 
 export const FlagsmithContext = createContext<IFlagsmith | null>(null)
 import events from './util/events'
@@ -16,6 +16,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
   serverState,
   children,
 }) => {
+  // @ts-ignore
   if (serverState && !flagsmith.api) {
     // @ts-ignore
     flagsmith.setState(serverState)

@@ -1,2 +1,2 @@
-import { IFlagsmith } from '../';
+import { IFlagsmith } from '../types';
 export declare const useFlagsmith: () => IFlagsmith;

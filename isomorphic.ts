@@ -4,7 +4,7 @@ if (typeof window === 'undefined')  {
 }
 
 import AsyncStorage from "@callstack/async-storage";
-const core = require('../flagsmith-core');
+const core = require('./flagsmith-core');
 const flagsmith = core({AsyncStorage, fetch});
 if (typeof window !== "undefined") {
     // @ts-ignore
