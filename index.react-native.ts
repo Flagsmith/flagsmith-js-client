@@ -1,5 +1,5 @@
 
-const core = require('./flagsmith-core');
+import core  from './flagsmith-core'
 export default core({});
 export const createFlagsmithInstance = ()=>{
     return core({})

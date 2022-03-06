@@ -11,7 +11,7 @@ import {
   FlagsmithContext,
 } from './FlagsmithProvider'
 // @ts-ignore
-import { IFlagsmith, ITraits, IFlagsmithFeature, IFlagsmithTrait } from '../'
+import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature } from '../types'
 import events from './util/events'
 
 const useConstant = function <T>(value: T): T {
@@ -73,7 +73,7 @@ function useFlags<F extends string, T extends string>(_flags: readonly F[], _tra
     }
   }, [])
   const res =  useMemo(() => {
-    const res: Record<string, IFlagsmithFeature> = {}
+    const res: any = {}
     flags.map((k) => {
       res[k] = {
         enabled: flagsmith!.hasFeature(k),

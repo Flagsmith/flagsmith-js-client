@@ -21,8 +21,8 @@ export class AppComponent {
       onChange: handleFlags,
       onError: handleFlagsError,
       defaultFlags: {
-        default_feature: true,
-        font_size: 12,
+        default_feature: {enabled: true},
+        font_size: { enabled: true, value: 12 },
       }
     });
   }

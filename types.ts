@@ -9,9 +9,9 @@ export interface IFlagsmithFeature extends IBulletTrainFeature {}
 export interface IFlags {
     [key: string]: IFlagsmithFeature
 }
-export type IFlagsmithTrait = string|number|boolean
+
 export interface ITraits {
-    [key: string]: IFlagsmithTrait
+    [key: string]: string
 }
 
 export interface IUserIdentity {
@@ -31,7 +31,7 @@ export interface IState {
     traits: ITraits
 }
 
-declare class IFlagsmith {
+export interface IFlagsmith {
     /**
      * Initialise the sdk against a particular environment
      */
@@ -63,7 +63,7 @@ declare class IFlagsmith {
     /**
      * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
-    identify:(userId:string, traits?: Record<string, string|number|boolean>,) => Promise<IFlags|undefined>
+    identify:(userId:string, traits?: Record<string, string|number|boolean>,) => Promise<void>
 
     /**
      * Retrieves the current state of flagsmith
@@ -127,16 +127,4 @@ declare class IFlagsmith {
      * The stored identity of the user
      */
     identity?:string
-}
-
-declare module 'flagsmith' {
-    // @ts-ignore
-    export default new IFlagsmith()
-    export function createFlagsmithInstance (): IFlagsmith
-}
-
-// @ts-ignore
-declare module 'flagsmith/isomorphic' {
-    // @ts-ignore
-    export default new IFlagsmith()
 }

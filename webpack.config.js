@@ -34,12 +34,12 @@ const webBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web
 const isomorphicBundle = Object.assign({}, defaultConfig, { //Bundle 1: compile the web client
     output: {
         libraryTarget:'umd',
-        filename: "index.js",
-        path: path.join(__dirname, '/flagsmith/isomorphic'),
+        filename: "isomorphic.js",
+        path: path.join(__dirname, '/flagsmith'),
         globalObject: 'this',
     },
     entry: {
-        main: './isomorphic/index.ts'
+        main: './isomorphic.ts'
     }
 });
 

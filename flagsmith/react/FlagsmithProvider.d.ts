@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { IFlagsmith, IState } from '../';
-export declare const FlagsmithContext: any;
+import { IFlagsmith, IState } from '../types';
+export declare const FlagsmithContext: import("react").Context<IFlagsmith>;
 export declare type FlagsmithContextType = {
     flagsmith: IFlagsmith;
     serverState?: IState;

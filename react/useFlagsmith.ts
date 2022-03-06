@@ -1,10 +1,10 @@
 // @ts-ignore
 import { useContext } from 'react'
-import { FlagsmithProvider } from './FlagsmithProvider'
-import { IFlagsmith } from '../'
+import { FlagsmithContext } from './FlagsmithProvider';
+import { IFlagsmith } from '../types'
 
 export const useFlagsmith = () => {
-  const context = useContext(FlagsmithProvider)
+  const context = useContext<IFlagsmith>(FlagsmithContext)
 
   if (!context) {
     throw new Error('useFlagsmith must be used with in a FlagsmithProvider')

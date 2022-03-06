@@ -1,4 +1,4 @@
-import {IFlagsmith} from "./react-native-flagsmith";
+import {IFlagsmith} from "./types";
 
 let _fetch: typeof global.fetch;
 let AsyncStorage;
@@ -504,6 +504,6 @@ const Flagsmith = class {
 
 type Config= {fetch?:any, AsyncStorage?:any};
 
-module.exports = function ({ fetch, AsyncStorage }:Config):IFlagsmith {
+export default function ({ fetch, AsyncStorage }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage }) as IFlagsmith;
 };
