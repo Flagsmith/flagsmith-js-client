@@ -4,11 +4,12 @@ export interface IBulletTrainFeature {
 }
 export interface IFlagsmithFeature extends IBulletTrainFeature {
 }
+export declare type IFlagsmithTrait = string | number | boolean;
 export interface IFlags {
     [key: string]: IFlagsmithFeature;
 }
 export interface ITraits {
-    [key: string]: string;
+    [key: string]: IFlagsmithTrait;
 }
 export interface IUserIdentity {
     flags: IFlagsmithFeature;

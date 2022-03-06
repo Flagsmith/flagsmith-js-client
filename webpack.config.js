@@ -62,7 +62,8 @@ const reactBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile the r
         main: './react/index.ts'
     },
     externals: {
-        'react': 'react'
+        react: 'react',
+        reactDOM: 'react-dom'
     },
     output: {
         filename: "index.js",
