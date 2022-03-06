@@ -9,9 +9,9 @@ export interface IFlagsmithFeature extends IBulletTrainFeature {}
 export interface IFlags {
     [key: string]: IFlagsmithFeature
 }
-
+export type IFlagsmithTrait = string|number|boolean
 export interface ITraits {
-    [key: string]: string
+    [key: string]: IFlagsmithTrait
 }
 
 export interface IUserIdentity {

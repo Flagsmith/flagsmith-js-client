@@ -11,7 +11,7 @@ import {
   FlagsmithContext,
 } from './FlagsmithProvider'
 // @ts-ignore
-import { IFlagsmith, IFlagsmithFeature } from '../'
+import { IFlagsmith, ITraits, IFlagsmithFeature, IFlagsmithTrait } from '../'
 import events from './util/events'
 
 const useConstant = function <T>(value: T): T {
@@ -38,22 +38,29 @@ const flagsAsArray = (_flags: any): string[] => {
     'Flagsmith: please supply an array of strings or a single string of flag keys to useFlags',
   )
 }
-const getRenderKey = (flagsmith: IFlagsmith, flags: string[]) => {
+const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] = []) => {
   return flags
     .map((k) => {
       return `${flagsmith.getValue(k)}${flagsmith.hasFeature(k)}`
-    })
+    }).concat(traits.map((t)=>(
+        `${flagsmith.getTrait(t)}`
+      )))
     .join(',')
 }
-function useFlags<P extends string>(_flags: readonly P[]): { [K in P]: IFlagsmithFeature } {
+function useFlags<F extends string, T extends string>(_flags: readonly F[], _traits?: readonly T[]): {
+  [K in F]: IFlagsmithFeature
+} & {
+  [K in T]: IFlagsmithTrait
+} {
   const flags = useConstant<string[]>(flagsAsArray(_flags))
+  const traits = useConstant<string[]>(flagsAsArray(_traits))
   const flagsmith = useContext(FlagsmithContext)
   const [renderKey, setRenderKey] = useState<string>(
     getRenderKey(flagsmith, flags),
   )
   const renderRef = useRef<string>(renderKey)
   const eventListener = useCallback(() => {
-    const newRenderKey = getRenderKey(flagsmith, flags)
+    const newRenderKey = getRenderKey(flagsmith, flags, traits)
     if (newRenderKey !== renderRef.current) {
       renderRef.current = newRenderKey
       setRenderKey(newRenderKey)
