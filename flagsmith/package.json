@@ -1,6 +1,6 @@
 {
   "name": "flagsmith",
-  "version": "1.7.4",
+  "version": "2.0.0-beta.1",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "repository": {
@@ -11,7 +11,7 @@
     "feature flagger",
     "continuous deployment"
   ],
-  "author": "Bullet Train Ltd",
+  "author": "Flagsmith Ltd",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "./flagsmith/",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "jsx": "react",
+    "module": "ESNext",
+    "declaration": true,
+    "declarationDir": ".",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "emitDeclarationOnly": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": ["examples","flagsmith"]
+}
