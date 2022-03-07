@@ -1,6 +1,6 @@
 import { IFlagsmith } from './types';
 
-let fetch = require("unfetch").default;
+import fetch from "unfetch"
 import AsyncStorage from "@callstack/async-storage";
 import core from './flagsmith-core'
 const flagsmith = core({AsyncStorage, fetch});

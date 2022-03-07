@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
     "outDir": "./flagsmith/",
-    "module": "commonjs",
-    "target": "es5",
-    "lib": [ "es2015", "dom" ],
-    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
     "jsx": "react",
-    "allowJs": true,
-    "moduleResolution": "node",
+    "module": "ESNext",
     "declaration": true,
-    "sourceMap": true
+    "declarationDir": ".",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "emitDeclarationOnly": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["examples"]
+  "exclude": ["examples","flagsmith"]
 }

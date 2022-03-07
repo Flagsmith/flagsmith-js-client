@@ -5,7 +5,7 @@ let AsyncStorage;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
 const defaultAPI = 'https://api.flagsmith.com/api/v1/';
-const deepEqual = require('fast-deep-equal');
+import deepEqual from 'fast-deep-equal';
 
 const initError = function (caller) {
     return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."

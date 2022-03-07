@@ -1,6 +1,7 @@
 import AsyncStorage from "@callstack/async-storage";
-const core = require('./flagsmith-core');
-const flagsmith = core({AsyncStorage});
+import {IFlagsmith} from "./types";
+import core from './flagsmith-core'
+const flagsmith: IFlagsmith = core({AsyncStorage});
 if (typeof window !== "undefined") {
     // @ts-ignore
     window.flagsmith = flagsmith;

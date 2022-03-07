@@ -2,7 +2,7 @@ var path = require("path");
 
 const defaultConfig = {
     entry: './index.ts',
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     target:"node",
     mode:"production",
     module: {
@@ -62,8 +62,20 @@ const reactBundle = Object.assign({}, defaultConfig, { //Bundle 4: compile the r
         main: './react/index.ts'
     },
     externals: {
-        react: 'react',
-        reactDOM: 'react-dom'
+        react: {
+            root: 'React',
+            commonjs2: 'react',
+            commonjs: 'react',
+            amd: 'react',
+            umd: 'react',
+        },
+        'react-dom': {
+            root: 'ReactDOM',
+            commonjs2: 'react-dom',
+            commonjs: 'react-dom',
+            amd: 'react-dom',
+            umd: 'react-dom',
+        },
     },
     output: {
         filename: "index.js",
