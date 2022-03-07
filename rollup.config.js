@@ -22,7 +22,11 @@ const plugins = (exclude)=>[
         }
     }),
     typescript({ tsconfig: "./tsconfig.json",exclude }),
-    // terser(),
+    terser({
+        format: {
+            comments: false
+        },
+    }),
     // replace({
     //     'Object.defineProperty(exports,"__esModule",{value:!0});': '',
     // }),
@@ -57,7 +61,32 @@ export default [
                 sourcemap: true,
             },
         ],
-        plugins: plugins(),
+        plugins: plugins(
+            [
+                "./index.ts",
+                "./types.ts",
+                "./isomorphic.ts",
+                "./index.react-native.ts",
+            ]
+        ),
+        external: ["react", "react-dom"]
+    },
+    {
+        input: './isomorphic.ts',
+        output: [
+            {
+                file: path.join(__dirname, '/flagsmith/isomorphic.js'),
+                format: "umd",
+                name:"isomorphic",
+                sourcemap: true,
+            },
+        ],
+        plugins: plugins(
+            [
+                "./react/index.ts",
+                "./index.react-native.ts",
+            ]
+        ),
         external: ["react", "react-dom"]
     },
 ];
