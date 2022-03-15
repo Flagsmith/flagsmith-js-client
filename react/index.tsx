@@ -84,7 +84,7 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
         .join(',')
 }
 
-export function useFlags<F extends string, T extends string>(_flags: readonly F[], _traits?: readonly T[]): {
+export function useFlags<F extends string, T extends string>(_flags: readonly F[], _traits: readonly T[] = []): {
     [K in F]: IFlagsmithFeature
 } & {
     [K in T]: IFlagsmithTrait
