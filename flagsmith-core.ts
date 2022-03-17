@@ -313,7 +313,7 @@ const Flagsmith = class {
         if(traits) {
             this.withTraits = traits;
         }
-        if (this.initialised && !this.getFlagInterval) {
+        if (this.initialised) {
             return this.getFlags();
         }
         return Promise.resolve();
@@ -370,7 +370,7 @@ const Flagsmith = class {
         this.identity = null;
         this.segments = null;
         this.traits = null;
-        if (this.initialised && !this.getFlagInterval) {
+        if (this.initialised) {
             return this.getFlags();
         }
         return Promise.resolve();
