@@ -2,7 +2,7 @@ import React from 'react';
 import flagsmith from 'react-native-flagsmith';
 import {FlagsmithProvider} from 'flagsmith/react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ExampleComponent from './ExampleComponent';
+import AppComponent from './ExampleComponent';
 
 
 export default function () {
@@ -15,7 +15,7 @@ export default function () {
         AsyncStorage: AsyncStorage,
       }}
       flagsmith={flagsmith}>
-      <ExampleComponent />
+      <AppComponent />
     </FlagsmithProvider>
   );
 }
