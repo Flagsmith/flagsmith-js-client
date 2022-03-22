@@ -7,9 +7,6 @@ function ExampleComponent() {
   const identify = useCallback(() => {
     flagsmith.identify('flagsmith_sample_user');
   }, [flagsmith]);
-  useEffect(() => {
-    identify();
-  }, [identify]);
   return (
     <View style={{paddingTop: 100}}>
       <Text>font_size: {flags.font_size?.value}</Text>
