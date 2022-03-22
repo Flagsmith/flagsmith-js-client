@@ -52,6 +52,25 @@ export default [
         external: ["react", "react-dom"]
     },
     {
+        input: './index.react-native.ts',
+        output: [
+            {
+                file: path.join(__dirname, '/react-native-flagsmith/index.js'),
+                format: "umd",
+                name:"react-native-flagsmith",
+                sourcemap: true,
+            },
+        ],
+        plugins: plugins(
+            [
+                "./react/**",
+                "./isomorphic.ts",
+                "./index.react-native.ts",
+            ]
+        ),
+        external: ["react", "react-dom", "react-native"]
+    },
+    {
         input: './react/index.tsx',
         output: [
             {
