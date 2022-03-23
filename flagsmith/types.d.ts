@@ -44,6 +44,7 @@ export interface IInitConfig {
     }) => void;
     preventFetch?: boolean;
     state?: IState;
+    _trigger?: () => void;
 }
 export interface IFlagsmith {
     /**
@@ -106,4 +107,12 @@ export interface IFlagsmith {
      * The stored identity of the user
      */
     identity?: string;
+    /**
+     * Whether the flagsmith SDK is initialised
+     */
+    initialised?: boolean;
+    /**
+     * Used internally, this function will callback separately to onChange whenever flags are updated
+     */
+    trigger?: () => {};
 }

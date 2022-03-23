@@ -27,7 +27,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
  flagsmith, options, serverState, children,
 }) => {
     // @ts-ignore
-    if (serverState && !flagsmith.api) {
+    if (serverState && !flagsmith.initialised) {
         // @ts-ignore
         flagsmith.setState(serverState)
     }
