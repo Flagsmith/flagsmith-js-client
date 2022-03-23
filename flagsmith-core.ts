@@ -85,10 +85,10 @@ const Flagsmith = class {
             this.flags = flags;
             this.traits = userTraits;
             this.updateStorage();
+            if(this.trigger) {
+                this.trigger()
+            }
             if (onChange) {
-                if(this.trigger) {
-                    this.trigger()
-                }
                 onChange(this.oldFlags, {
                     isFromServer: true,
                     flagsChanged: !flagsEqual,
@@ -273,10 +273,10 @@ const Flagsmith = class {
                             }
 
                             if (this.flags) { // retrieved flags from local storage
+                                if(this.trigger) {
+                                    this.trigger()
+                                }
                                 if (this.onChange) {
-                                    if(this.trigger) {
-                                        this.trigger()
-                                    }
                                     this.onChange(null, { isFromServer: false });
                                 }
                                 this.oldFlags = this.flags;
@@ -302,7 +302,9 @@ const Flagsmith = class {
                                 if(this.trigger) {
                                     this.trigger()
                                 }
-                                this.onChange(null, { isFromServer: false });
+                                if (this.onChange) {
+                                    this.onChange(null, { isFromServer: false });
+                                }
                             }
                             resolve(true);
                         }
@@ -315,7 +317,9 @@ const Flagsmith = class {
                     if(this.trigger) {
                         this.trigger()
                     }
-                    this.onChange(null, { isFromServer: false });
+                    if (this.onChange) {
+                        this.onChange(null, { isFromServer: false });
+                    }
                 }
                 resolve(true);
             }

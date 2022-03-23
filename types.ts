@@ -133,6 +133,11 @@ export interface IFlagsmith {
     identity?:string
 
     /**
+     * Whether the flagsmith SDK is initialised
+     */
+    initialised?:boolean
+
+    /**
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
     trigger?:()=>{}
