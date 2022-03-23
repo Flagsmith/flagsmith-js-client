@@ -53,9 +53,10 @@ const pluginsES = (exclude)=>[
     // }),
 ];
 
-const generateES = (config, filePath, _plugins) => {
+const generateES = (config, filePath, _plugins, input) => {
     return {
         ...config,
+        input,
         plugins: pluginsES(_plugins),
         output: [
             {
