@@ -8,10 +8,7 @@ function MyApp({ Component, pageProps, flagsmithState }: AppProps & {flagsmithSt
     return (
         <FlagsmithProvider flagsmith={flagsmith}
                            serverState={flagsmithState as IState}
-                           options={{
-                               environmentID,
-                               cacheFlags: true
-                           }}>
+>
             <Component {...pageProps} />
         </FlagsmithProvider>
     );

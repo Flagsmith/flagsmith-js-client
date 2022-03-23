@@ -31,24 +31,28 @@ export interface IState {
     traits: ITraits
 }
 
+export interface IInitConfig {
+    AsyncStorage?: any // an AsyncStorage implementation
+    api?: string // the api you wish to use, important if self hosting
+    cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
+    defaultFlags?: IFlags //
+    enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
+    enableLogs?: boolean // whether to enable logs
+    environmentID: string // your Flagsmith environment id
+    headers?: object // pass custom headers for flagsmith api calls
+    identity?: string // Initialise with a given identity
+    traits?: ITraits // Initialise with a given set of traits
+    onChange?: (previousFlags:IFlags, params:IRetrieveInfo)=> void // triggered when the flags are retrieved
+    onError?: (res:{message:string}) => void // triggered if there was an api error
+    preventFetch?: boolean // whether to prevent fetching flags on init
+    state?: IState // set a predefined state, useful for isomorphic applications
+    _trigger?: ()=>void // Used internally, this function will callback separately to onChange whenever flags are updated
+}
 export interface IFlagsmith {
     /**
      * Initialise the sdk against a particular environment
      */
-    init:(config: {
-        environmentID: string // your Flagsmith environment id
-        api?: string // the api you wish to use, important if self hosting
-        headers?: object // pass custom headers for flagsmith api calls
-        AsyncStorage?: any // an AsyncStorage implementation
-        cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
-        preventFetch?: boolean // whether to prevent fetching flags on init
-        enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
-        enableLogs?: boolean // whether to enable logs
-        onChange?: (previousFlags:IFlags, params:IRetrieveInfo)=> void // triggered when the flags are retrieved
-        state?: IState // set a predefined state, useful for isomorphic applications
-        onError?: (res:{message:string}) => void // triggered if there was an api error
-        defaultFlags?: IFlags //
-    }) => Promise<void>
+    init:(config: IInitConfig) => Promise<void>
 
     /**
      * Trigger a manual fetch of the environment features
@@ -127,4 +131,9 @@ export interface IFlagsmith {
      * The stored identity of the user
      */
     identity?:string
+
+    /**
+     * Used internally, this function will callback separately to onChange whenever flags are updated
+     */
+    trigger?:()=>{}
 }

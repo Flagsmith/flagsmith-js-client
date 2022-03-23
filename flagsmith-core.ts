@@ -1,4 +1,4 @@
-import {IFlagsmith} from "./types";
+import {IFlagsmith, IInitConfig} from "./types";
 
 let _fetch: typeof global.fetch;
 let AsyncStorage;
@@ -86,6 +86,9 @@ const Flagsmith = class {
             this.traits = userTraits;
             this.updateStorage();
             if (onChange) {
+                if(this.trigger) {
+                    this.trigger()
+                }
                 onChange(this.oldFlags, {
                     isFromServer: true,
                     flagsChanged: !flagsEqual,
@@ -168,6 +171,7 @@ const Flagsmith = class {
     oldFlags= null
     onChange= null
     onError= null
+    trigger= null
     identity= null
     segments= null
     ticks= null
@@ -187,8 +191,11 @@ const Flagsmith = class {
         enableLogs,
         enableAnalytics,
         AsyncStorage: _AsyncStorage,
+        identity,
+        traits,
+        _trigger,
         state
-    }) {
+    }: IInitConfig) {
 
         return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
@@ -197,7 +204,10 @@ const Flagsmith = class {
             this.getFlagInterval = null;
             this.analyticsInterval = null;
             this.onChange = onChange;
+            this.trigger = _trigger;
             this.onError = onError;
+            this.identity = identity;
+            this.withTraits = traits;
             this.enableLogs = enableLogs;
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};
@@ -264,6 +274,9 @@ const Flagsmith = class {
 
                             if (this.flags) { // retrieved flags from local storage
                                 if (this.onChange) {
+                                    if(this.trigger) {
+                                        this.trigger()
+                                    }
                                     this.onChange(null, { isFromServer: false });
                                 }
                                 this.oldFlags = this.flags;
@@ -286,6 +299,9 @@ const Flagsmith = class {
                             this.getFlags(resolve, reject)
                         } else {
                             if (defaultFlags) {
+                                if(this.trigger) {
+                                    this.trigger()
+                                }
                                 this.onChange(null, { isFromServer: false });
                             }
                             resolve(true);
@@ -296,6 +312,9 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
+                    if(this.trigger) {
+                        this.trigger()
+                    }
                     this.onChange(null, { isFromServer: false });
                 }
                 resolve(true);

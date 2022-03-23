@@ -27,26 +27,29 @@ export interface IState {
     identity?: string;
     traits: ITraits;
 }
+export interface IInitConfig {
+    AsyncStorage?: any;
+    api?: string;
+    cacheFlags?: boolean;
+    defaultFlags?: IFlags;
+    enableAnalytics?: boolean;
+    enableLogs?: boolean;
+    environmentID: string;
+    headers?: object;
+    identity?: string;
+    traits?: ITraits;
+    onChange?: (previousFlags: IFlags, params: IRetrieveInfo) => void;
+    onError?: (res: {
+        message: string;
+    }) => void;
+    preventFetch?: boolean;
+    state?: IState;
+}
 export interface IFlagsmith {
     /**
      * Initialise the sdk against a particular environment
      */
-    init: (config: {
-        environmentID: string;
-        api?: string;
-        headers?: object;
-        AsyncStorage?: any;
-        cacheFlags?: boolean;
-        preventFetch?: boolean;
-        enableAnalytics?: boolean;
-        enableLogs?: boolean;
-        onChange?: (previousFlags: IFlags, params: IRetrieveInfo) => void;
-        state?: IState;
-        onError?: (res: {
-            message: string;
-        }) => void;
-        defaultFlags?: IFlags;
-    }) => Promise<void>;
+    init: (config: IInitConfig) => Promise<void>;
     /**
      * Trigger a manual fetch of the environment features
      */

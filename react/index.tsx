@@ -18,9 +18,9 @@ import {IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState} from '../types'
 
 export const FlagsmithContext = createContext<IFlagsmith | null>(null)
 export type FlagsmithContextType = {
-    flagsmith: IFlagsmith
+    flagsmith: IFlagsmith // The flagsmith instance
+    options?: Parameters<IFlagsmith['init']>[0] // Initialisation options, if you do not provide this you will have to call init manually
     serverState?: IState
-    options: Parameters<IFlagsmith['init']>[0]
 }
 
 export const FlagsmithProvider: FC<FlagsmithContextType> = ({
@@ -32,16 +32,21 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
         flagsmith.setState(serverState)
     }
     useEffect(() => {
+        if (options) {
+            flagsmith.init({
+                ...options,
+                onChange: (...args) => {
+                    if (options.onChange) {
+                        options.onChange(...args)
+                    }
+                    events.trigger('event')
+                },
+            })
+        } else {
+            // @ts-ignore
+            flagsmith.trigger = ()=>events.trigger('event');
+        }
 
-        flagsmith.init({
-            ...options,
-            onChange: (...args) => {
-                if (options.onChange) {
-                    options.onChange(...args)
-                }
-                events.trigger('event')
-            },
-        })
         // eslint-disable-next-line
     }, [])
     return (

@@ -11,9 +11,6 @@ const Home: NextPage = () => {
   const identify = ()=>{
     flagsmith.identify("flagsmith_sample_user")
   }
-  useEffect(()=>{
-    identify()
-  },[])
   return (
       <div className="App">
         font_size: {flags.font_size?.value}
