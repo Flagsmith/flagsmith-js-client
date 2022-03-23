@@ -4,7 +4,7 @@
   "main": "./flagsmith/index.js",
   "scripts": {
     "prepublish": "npm run build",
-    "deploy": "npm run build && cd ./flagsmith/ && npm publish && cd ../react-native-flagsmith && npm publish",
+    "deploy": "npm run build && cd ./flagsmith/ && npm publish && cd ../react-native-flagsmith && npm publish && cd ../flagsmith-es && npm publish",
     "build": "rollup -c && node ./move-react.js"
   },
   "repository": {

@@ -31,26 +31,140 @@ const plugins = (exclude)=>[
     //     'Object.defineProperty(exports,"__esModule",{value:!0});': '',
     // }),
 ];
-export default [
-    {
-        input: './index.ts',
+
+const pluginsES = (exclude)=>[
+    peerDepsExternal(),
+    nodeResolve(),
+    resolve(),
+    commonjs({
+        namedExports: {
+            react: Object.keys(react),
+            'react-dom': Object.keys(reactDom)
+        }
+    }),
+    typescript({ tsconfig: "./tsconfig.json",exclude }),
+    terser({
+        format: {
+            comments: false
+        },
+    }),
+    // replace({
+    //     'Object.defineProperty(exports,"__esModule",{value:!0});': '',
+    // }),
+];
+
+const generateES = (config, filePath, _plugins) => {
+    return {
+        ...config,
+        plugins: pluginsES(_plugins),
         output: [
             {
-                file: path.join(__dirname, '/flagsmith/index.js'),
-                format: "umd",
-                name:"flagsmith",
-                sourcemap: true,
-            },
-        ],
-        plugins: plugins(
-            [
-                "./react/**",
-                "./isomorphic.ts",
-                "./index.react-native.ts",
-            ]
-        ),
-        external: ["react", "react-dom"]
-    },
+                ...config.output[0],
+                file: filePath,
+                format: 'es'
+            }
+        ]
+    }
+}
+
+const webModule = {
+    input: './index.ts',
+    output: [
+        {
+            file: path.join(__dirname, '/flagsmith/index.js'),
+            format: "umd",
+            name:"flagsmith",
+            sourcemap: true,
+        },
+    ],
+    plugins: plugins(
+        [
+            "./react/**",
+            "./isomorphic.ts",
+            "./index.react-native.ts",
+        ]
+    ),
+    external: ["react", "react-dom"]
+}
+
+const webES = generateES(
+    webModule,
+    path.join(__dirname, '/flagsmith-es/index.js'),
+    [
+        "./react/**",
+        "./isomorphic.ts",
+        "./index.react-native.ts",
+    ],
+    './index-es.ts',
+)
+
+
+
+const isomorphicModule =  {
+    input: './isomorphic.ts',
+    output: [
+        {
+            file: path.join(__dirname, '/flagsmith/isomorphic.js'),
+            format: "umd",
+            name:"isomorphic",
+            sourcemap: true,
+        },
+    ],
+    plugins: plugins(
+        [
+            "./react/index.ts",
+            "./index.react-native.ts",
+        ]
+    ),
+    external: ["react", "react-dom"]
+};
+
+const isomorphicES = generateES(
+    isomorphicModule,
+    path.join(__dirname, '/flagsmith-es/isomorphic.js'),
+    [
+        "./react/index.ts",
+        "./index.react-native.ts",
+    ],
+    './isomorphic-es.ts',
+
+)
+
+const reactModule =     {
+    input: './react/index.tsx',
+    output: [
+        {
+            file: path.join(__dirname, '/flagsmith/react/index.js'),
+            format: "umd",
+            name:"flagsmith/react",
+            sourcemap: true,
+        },
+    ],
+    plugins: plugins(
+        [
+            "./index.ts",
+            "./types.ts",
+            "./isomorphic.ts",
+            "./index.react-native.ts",
+        ]
+    ),
+    external: ["react", "react-dom"]
+}
+
+const reactModuleES = generateES(
+    reactModule,
+    path.join(__dirname, '/flagsmith-es/react/index.js'),
+    [
+        "./index.ts",
+        "./types.ts",
+        "./isomorphic.ts",
+        "./index.react-native.ts",
+    ],
+    reactModule.input
+)
+
+
+export default [webModule, isomorphicModule, webES,isomorphicES, reactModule, reactModuleES].concat([
     {
         input: './index.react-native.ts',
         output: [
@@ -70,42 +184,4 @@ export default [
         ),
         external: ["react", "react-dom", "react-native"]
     },
-    {
-        input: './react/index.tsx',
-        output: [
-            {
-                file: path.join(__dirname, '/flagsmith/react/index.js'),
-                format: "umd",
-                name:"flagsmith/react",
-                sourcemap: true,
-            },
-        ],
-        plugins: plugins(
-            [
-                "./index.ts",
-                "./types.ts",
-                "./isomorphic.ts",
-                "./index.react-native.ts",
-            ]
-        ),
-        external: ["react", "react-dom"]
-    },
-    {
-        input: './isomorphic.ts',
-        output: [
-            {
-                file: path.join(__dirname, '/flagsmith/isomorphic.js'),
-                format: "umd",
-                name:"isomorphic",
-                sourcemap: true,
-            },
-        ],
-        plugins: plugins(
-            [
-                "./react/index.ts",
-                "./index.react-native.ts",
-            ]
-        ),
-        external: ["react", "react-dom"]
-    },
-];
+])
