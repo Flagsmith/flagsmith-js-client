@@ -1,5 +1,5 @@
 import {IFlagsmith, IInitConfig} from "./types";
-
+var global = typeof global != "undefined" ? global: typeof window != 'undefined' ? window : {}
 let _fetch: typeof global.fetch;
 let AsyncStorage;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
@@ -17,7 +17,7 @@ const Flagsmith = class {
         if (props.fetch) {
             _fetch = props.fetch;
         } else {
-            _fetch = global.fetch;
+            _fetch = typeof fetch !== 'undefined'? fetch : global.fetch;
         }
         AsyncStorage = props.AsyncStorage;
     }
