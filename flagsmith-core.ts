@@ -506,8 +506,7 @@ const Flagsmith = class {
             increment_by,
             identifier: identity
         }))
-            // @ts-ignore
-            .then(this.getFlags)
+            .then(() => this.getFlags())
     };
 
     hasFeature = (key) => {
