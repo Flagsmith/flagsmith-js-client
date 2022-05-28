@@ -5,6 +5,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "deploy": "npm run build && cd ./flagsmith/ && npm publish && cd ../react-native-flagsmith && npm publish && cd ../flagsmith-es && npm publish",
+    "deploy:beta": "npm run build && cd ./flagsmith/ && npm publish --tag beta && cd ../react-native-flagsmith && npm publish --tag beta && cd ../flagsmith-es && npm publish --tag beta",
     "build": "rollup -c && node ./move-react.js"
   },
   "repository": {
