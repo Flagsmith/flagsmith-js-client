@@ -64,7 +64,7 @@ See all available types [here](https://github.com/Flagsmith/flagsmith-js-client/
 | `defaultFlags?: IFlags`    |                                         Allows you define default features, these will all be overridden on first retrieval of features.                                          |          |                              null |
 | `preventFetch?: boolean`    |                                                          If you want to disable fetching flags and call getFlags later.                                                           |          |                             false |
 | `state?: IState`    |                                                          Set a predefined state, useful for SSR / isomorphic applications.                                                           |          |                             false |
-| `api?: string`             |                                         Use this property to define where you're getting feature flags from, e.g. if you're self hosting.                                         |          | https://api.flagsmith.com/api/v1/ |
+| `api?: string`             |                                         Use this property to define where you're getting feature flags from, e.g. if you're self hosting.                                         |          | https://edge.api.flagsmith.com/api/v1/ |
 
 ### Available Functions
 
