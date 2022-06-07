@@ -4,7 +4,7 @@ let _fetch: typeof global.fetch;
 let AsyncStorage;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
-const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
+const defaultAPI = 'https://api.flagsmith.com/api/v1/';
 import deepEqual from 'fast-deep-equal';
 
 const initError = function (caller) {
@@ -194,8 +194,9 @@ const Flagsmith = class {
         identity,
         traits,
         _trigger,
-        state
-    }: IInitConfig) {
+        state,
+        angularHttpClient,
+         }: IInitConfig) {
 
         return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
@@ -226,90 +227,141 @@ const Flagsmith = class {
                 throw ('Please specify a environment id');
             }
 
-            AsyncStorage.getItem(FLAGSMITH_EVENT)
-                .then((res)=>{
-                    if (res){
-                        try {
-                            this.evaluationEvent = JSON.parse(res)
+            if(angularHttpClient) {
+                _fetch = (url: string, params: { headers: Record<string, string>, method: "GET" | "POST" | "PUT", body: string }) => {
+                    const {headers, method, body} = params
+                    return new Promise((resolve) => {
+                        switch (method) {
+                            case "GET": {
+                                return angularHttpClient.get(url, {
+                                    headers,
+                                }).subscribe((v) => {
+                                    resolve({
+                                        ok: 1,
+                                        text: () => Promise.resolve(v)
+                                    })
+                                })
+                            }
+                            case "POST": {
+                                return angularHttpClient.post(url, body, {
+                                    headers,
+                                }).subscribe((v) => {
+                                    resolve({
+                                        ok: 1,
+                                        text: () => Promise.resolve(v)
+                                    })
+                                })
+                            }
+                            case "PUT": {
+                                return angularHttpClient.post(url, body, {
+                                    headers,
+                                }).subscribe((v) => {
+                                    resolve({
+                                        ok: 1,
+                                        text: () => Promise.resolve(v)
+                                    })
+                                })
+                            }
+                        }
+                    })
+                }
+            }
 
-                        } catch (e){
+            if (AsyncStorage && typeof window!=='undefined') {
+                AsyncStorage.getItem(FLAGSMITH_EVENT)
+                    .then((res)=>{
+                        if (res){
+                            try {
+                                this.evaluationEvent = JSON.parse(res)
+
+                            } catch (e){
+                                this.evaluationEvent = {};
+                            }
+                        } else {
                             this.evaluationEvent = {};
                         }
-                    } else {
-                        this.evaluationEvent = {};
-                    }
-                    this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
-                })
+                        this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
+                        return true
+                    })
+            }
+
 
             if (this.enableAnalytics) {
                 if (this.analyticsInterval) {
                     clearInterval(this.analyticsInterval);
                 }
 
-                AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
-                    if (res) {
-                        var json = JSON.parse(res);
-                        if (json) {
-                            state = this.getState();
-                            this.log("Retrieved events from cache", res);
-                            this.setState({
-                                ...state,
-                                evaluationEvent: json,
-                            });
+                if (AsyncStorage && typeof window!=='undefined') {
+                    AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
+                        if (res) {
+                            var json = JSON.parse(res);
+                            if (json) {
+                                state = this.getState();
+                                this.log("Retrieved events from cache", res);
+                                this.setState({
+                                    ...state,
+                                    evaluationEvent: json,
+                                });
+                            }
                         }
-                    }
-                });
+                        return true
+                    });
+                }
+
             }
 
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
-                AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
-                    if (res) {
-                        try {
-                            var json = JSON.parse(res);
-                            if (json && json.api === this.api && json.environmentID === this.environmentID) {
-                                this.setState(json);
-                                this.log("Retrieved flags from cache", json);
-                            }
+                if (AsyncStorage && typeof window!=='undefined') {
+                    AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
+                        if (res) {
+                            try {
+                                var json = JSON.parse(res);
+                                if (json && json.api === this.api && json.environmentID === this.environmentID) {
+                                    this.setState(json);
+                                    this.log("Retrieved flags from cache", json);
+                                }
 
-                            if (this.flags) { // retrieved flags from local storage
-                                if(this.trigger) {
-                                    this.trigger()
-                                }
-                                if (this.onChange) {
-                                    this.onChange(null, { isFromServer: false });
-                                }
-                                this.oldFlags = this.flags;
-                                resolve(true);
-                                if (!preventFetch) {
-                                    this.getFlags();
-                                }
-                            } else {
-                                if (!preventFetch) {
-                                    this.getFlags(resolve, reject);
-                                } else {
+                                if (this.flags) { // retrieved flags from local storage
+                                    if(this.trigger) {
+                                        this.trigger()
+                                    }
+                                    if (this.onChange) {
+                                        this.onChange(null, { isFromServer: false });
+                                    }
+                                    this.oldFlags = this.flags;
                                     resolve(true);
+                                    if (!preventFetch) {
+                                        this.getFlags();
+                                    }
+                                } else {
+                                    if (!preventFetch) {
+                                        this.getFlags(resolve, reject);
+                                    } else {
+                                        resolve(true);
+                                    }
                                 }
+                            } catch (e) {
+                                this.log("Exception fetching cached logs", e);
                             }
-                        } catch (e) {
-                            this.log("Exception fetching cached logs", e);
-                        }
-                    } else {
-                        if (!preventFetch) {
-                            this.getFlags(resolve, reject)
                         } else {
-                            if (defaultFlags) {
-                                if(this.trigger) {
-                                    this.trigger()
+                            if (!preventFetch) {
+                                this.getFlags(resolve, reject)
+                            } else {
+                                if (defaultFlags) {
+                                    if(this.trigger) {
+                                        this.trigger()
+                                    }
+                                    if (this.onChange) {
+                                        this.onChange(null, { isFromServer: false });
+                                    }
                                 }
-                                if (this.onChange) {
-                                    this.onChange(null, { isFromServer: false });
-                                }
+                                resolve(true);
                             }
-                            resolve(true);
                         }
-                    }
-                });
+                        return true
+                    });
+                }
             } else if (!preventFetch) {
                 this.getFlags(resolve, reject);
             } else {
