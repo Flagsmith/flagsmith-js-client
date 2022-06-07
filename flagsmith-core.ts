@@ -4,7 +4,7 @@ let _fetch: typeof global.fetch;
 let AsyncStorage;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
-const defaultAPI = 'https://api.flagsmith.com/api/v1/';
+const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
 import deepEqual from 'fast-deep-equal';
 
 const initError = function (caller) {
