@@ -13,7 +13,9 @@ export class AppComponent {
     this.fontSize = `${flagsmith.getValue("font_size")}`
     this.identity = !!flagsmith.identity;
     this.trait = flagsmith.getTrait("example_trait") + "";
+    this.buttonClicks = parseInt(`${flagsmith.getTrait("button_clicks")}`);
   }
+
   ngOnInit() {
     this.flagsmithService.init(() => {
       this.setState()
@@ -33,6 +35,11 @@ export class AppComponent {
     flagsmith.setTrait('example_trait', 'Some value ' + Math.floor(Math.random() * 10) + '');
   }
 
+  increment = (value) => {
+    flagsmith.setTrait('button_clicks', this.buttonClicks+value)
+  };
+
+  buttonClicks = 0;
   fontSize = '';
   identity = false
   trait = ''
