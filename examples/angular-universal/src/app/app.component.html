@@ -1,0 +1,22 @@
+
+<div class="content" role="main">
+  Font Size: {{fontSize}}
+  <div *ngIf="identity">
+    <div>
+      <button (click)="submitTrait()">
+        Toggle user trait
+      </button>
+      <div>
+        example_trait: {{trait}}
+      </div>
+      <button (click)="logout()">
+        logout
+      </button>
+    </div>
+  </div>
+  <div *ngIf="!identity">
+    <button (click)="login()">
+      Login as sample user
+    </button>
+  </div>
+</div>
