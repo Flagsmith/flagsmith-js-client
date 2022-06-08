@@ -551,16 +551,6 @@ const Flagsmith = class {
             })
     };
 
-    incrementTrait = (trait_key, increment_by) => {
-        const { getJSON, identity, api } = this;
-        return getJSON(`${api}traits/increment-value/`, 'POST', JSON.stringify({
-            trait_key,
-            increment_by,
-            identifier: identity
-        }))
-            .then(() => this.getFlags())
-    };
-
     hasFeature = (key) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = false;

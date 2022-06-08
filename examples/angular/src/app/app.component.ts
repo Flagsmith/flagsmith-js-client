@@ -56,8 +56,4 @@ export class AppComponent {
     flagsmith.setTrait('example_trait', 'Some value ' + Math.floor(Math.random() * 10) + '');
   }
 
-  increment = (value) => {
-    flagsmith.incrementTrait('button_clicks', value)
-  };
-
 }
