@@ -22,21 +22,11 @@ function evaluateFlag () {
     alert(flagsmith.hasFeature("flag")? "true":"false");
 };
 
-function increment (value) {
-    flagsmith.incrementTrait("button_clicks", value)
-};
-
 $("#js-login").on("click", login);
 $("#js-evaluate-config").on("click", evaluateConfig);
 $("#js-evaluate-flag").on("click", evaluateFlag);
 $("#js-logout").on("click", logout);
 $("#js-toggle-trait").on("click", toggleTrait);
-$("#js-increment").on("click", function (){
-    increment(1)
-});
-$("#js-decrement").on("click", function (){
-    increment(-1)
-});
 
 //Intialise Flagsmith
 flagsmith.init({
@@ -54,7 +44,6 @@ flagsmith.init({
         if (flagsmith.identity) {
             $("#logged-in").removeClass("hidden")
             $("#logged-out").addClass("hidden")
-            $("#js-button-clicks").text(flagsmith.getTrait("button_clicks"));
             $("#js-example-trait").text(flagsmith.getTrait("example_trait") + "");
             if (flagsmith.getSegments()) {
                 $("#js-segments").text(Object.keys(flagsmith.getSegments() ).join(", "));
