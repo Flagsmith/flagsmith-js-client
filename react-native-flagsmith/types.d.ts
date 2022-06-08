@@ -34,7 +34,7 @@ export interface IInitConfig {
     defaultFlags?: IFlags;
     enableAnalytics?: boolean;
     enableLogs?: boolean;
-    angularHttpClient: any;
+    angularHttpClient?: any;
     environmentID: string;
     headers?: object;
     identity?: string;

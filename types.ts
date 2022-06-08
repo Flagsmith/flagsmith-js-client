@@ -38,7 +38,7 @@ export interface IInitConfig {
     defaultFlags?: IFlags //
     enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
     enableLogs?: boolean // whether to enable logs
-    angularHttpClient: any // an angular http client to support ssr
+    angularHttpClient?: any // an angular http client to support ssr
     environmentID: string // your Flagsmith environment id
     headers?: object // pass custom headers for flagsmith api calls
     identity?: string // Initialise with a given identity
