@@ -121,14 +121,6 @@ export interface IFlagsmith {
     )=> Promise<null>
 
     /**
-     * Increments the value of a numeric trait by a given amount (can be negative number)
-     */
-    incrementTrait:(
-        key:string,
-        incrementBy:number
-    )=> Promise<null>
-
-    /**
      * The stored identity of the user
      */
     identity?:string

@@ -22,21 +22,11 @@ function evaluateFlag () {
     alert(flagsmith.hasFeature("flag")? "true":"false");
 };
 
-function increment (value) {
-    flagsmith.incrementTrait("button_clicks", value)
-};
-
 $("#js-login").on("click", login);
 $("#js-evaluate-config").on("click", evaluateConfig);
 $("#js-evaluate-flag").on("click", evaluateFlag);
 $("#js-logout").on("click", logout);
 $("#js-toggle-trait").on("click", toggleTrait);
-$("#js-increment").on("click", function (){
-    increment(1)
-});
-$("#js-decrement").on("click", function (){
-    increment(-1)
-});
 
 //Intialise Flagsmith
 flagsmith.init({
