@@ -42,7 +42,6 @@ flagsmith.init({
         if (flagsmith.identity) {
             document.getElementById("logged-in").classList.remove("hidden")
             document.getElementById("logged-out").classList.add("hidden")
-            document.getElementById("js-button-clicks").innerText = flagsmith.getTrait("button_clicks");
             document.getElementById("js-example-trait").innerText = flagsmith.getTrait("example_trait") + "";
         } else {
             document.getElementById("logged-out").classList.remove("hidden")

@@ -44,7 +44,6 @@ flagsmith.init({
         if (flagsmith.identity) {
             $("#logged-in").removeClass("hidden")
             $("#logged-out").addClass("hidden")
-            $("#js-button-clicks").text(flagsmith.getTrait("button_clicks"));
             $("#js-example-trait").text(flagsmith.getTrait("example_trait") + "");
             if (flagsmith.getSegments()) {
                 $("#js-segments").text(Object.keys(flagsmith.getSegments() ).join(", "));
