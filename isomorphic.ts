@@ -7,3 +7,6 @@ if (typeof window !== "undefined") {
     window.flagsmith = flagsmith;
 }
 export default flagsmith;
+export const createFlagsmithInstance = (): IFlagsmith => {
+    return core({ AsyncStorage })
+}
