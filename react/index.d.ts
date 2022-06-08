@@ -5,6 +5,7 @@ export declare type FlagsmithContextType = {
     flagsmith: IFlagsmith;
     serverState?: IState;
     options: Parameters<IFlagsmith['init']>[0];
+    children: React.ReactElement[] | React.ReactElement;
 };
 export declare const FlagsmithProvider: FC<FlagsmithContextType>;
 export declare function useFlags<F extends string, T extends string>(_flags: readonly F[], _traits?: readonly T[]): {
