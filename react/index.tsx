@@ -21,6 +21,7 @@ export type FlagsmithContextType = {
     flagsmith: IFlagsmith // The flagsmith instance
     options?: Parameters<IFlagsmith['init']>[0] // Initialisation options, if you do not provide this you will have to call init manually
     serverState?: IState
+    children: React.ReactElement[] | React.ReactElement;
 }
 
 export const FlagsmithProvider: FC<FlagsmithContextType> = ({
