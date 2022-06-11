@@ -533,22 +533,18 @@ const Flagsmith = class {
             console.error("Expected object for flagsmith.setTraits");
         }
 
-        const body = Object.keys(traits).map((key) => (
-            {
-                "identity": {
-                    "identifier": identity
-                },
-                "trait_key": key,
-                "trait_value": traits[key]
+        return this.getJSON(api + 'identities/', "POST", JSON.stringify({
+            "identifier": identity,
+            traits: Object.keys(traits).map((k)=>({
+                "trait_key":k,
+                "trait_value": traits[k]
+            }))
+        })).then(() => {
+            if (this.initialised) {
+                this.getFlags()
             }
-        ))
+        })
 
-        return getJSON(`${api}traits/bulk/`, 'PUT', JSON.stringify(body))
-            .then(() => {
-                if (this.initialised) {
-                    this.getFlags()
-                }
-            })
     };
 
     hasFeature = (key) => {
