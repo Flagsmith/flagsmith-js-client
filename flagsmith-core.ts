@@ -53,7 +53,7 @@ const Flagsmith = class {
     getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
-        const handleResponse = ({ flags: features, traits }, segments) => {
+        const handleResponse = ({ flags: features, traits }) => {
             if (identity) {
                 this.withTraits = false;
             }
@@ -75,18 +75,38 @@ const Flagsmith = class {
             this.oldFlags = {
                 ...this.flags
             };
-            if (segments) {
-                let userSegments = {};
-                segments.map((s) => {
-                    userSegments[s.name] = s;
-                });
-                this.segments = userSegments;
-            }
             const flagsEqual = deepEqual(this.flags, flags);
             const traitsEqual = deepEqual(this.traits, userTraits);
             this.flags = flags;
             this.traits = userTraits;
             this.updateStorage();
+            if (this.dtrum) {
+                let traits: {
+                    "javaLongOrObject": Record<string, number>,
+                    "date": Record<string, Date>,
+                    "shortString": Record<string, string>,
+                    "javaDouble": Record<string, number>,
+                } = {
+                    javaDouble: {},
+                    date: {},
+                    shortString: {},
+                    javaLongOrObject: {},
+                }
+                Object.keys(this.flags).map((key)=>{
+                    setDynatraceValue(traits, "flagsmith_value_"+key, this.getValue(key) )
+                    setDynatraceValue(traits, "flagsmith_enabled_"+key, this.hasFeature(key) )
+                })
+                Object.keys(this.traits).map((key)=>{
+                    setDynatraceValue(traits, "flagsmith_trait_"+key, this.getTrait(key) )
+                })
+                this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
+                this.log("Sending date traits to dynatrace", traits.date)
+                this.log("Sending shortString traits to dynatrace", traits.shortString)
+                this.log("Sending javaDouble to dynatrace", traits.javaDouble)
+                this.dtrum.sendSessionProperties(
+                    traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
+                )
+            }
             if(this.trigger) {
                 this.trigger()
             }
@@ -114,7 +134,7 @@ const Flagsmith = class {
                 .then((res) => {
                     // @ts-ignore
                     this.withTraits = false
-                    handleResponse(res[0], res[1])
+                    handleResponse(res[0])
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -128,7 +148,7 @@ const Flagsmith = class {
             ])
                 .then((res) => {
                     // @ts-ignore
-                    handleResponse({ flags: res[0] }, null)
+                    handleResponse({ flags: res[0] })
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -176,10 +196,10 @@ const Flagsmith = class {
     onError= null
     trigger= null
     identity= null
-    segments= null
     ticks= null
     timer= null
     traits= null
+    dtrum= null
     withTraits= null
 
     init({
@@ -192,6 +212,7 @@ const Flagsmith = class {
         defaultFlags,
         preventFetch,
         enableLogs,
+        dtrum,
         enableAnalytics,
         AsyncStorage: _AsyncStorage,
         identity,
@@ -246,6 +267,10 @@ const Flagsmith = class {
             if (!environmentID) {
                 reject('Please specify a environment id')
                 throw ('Please specify a environment id');
+            }
+
+            if (dtrum) {
+                this.dtrum = dtrum;
             }
 
             if(angularHttpClient) {
@@ -424,7 +449,6 @@ const Flagsmith = class {
             environmentID: this.environmentID,
             flags: this.flags,
             identity: this.identity,
-            segments: this.segments,
             traits: this.traits,
             evaluationEvent: this.evaluationEvent,
         }
@@ -437,7 +461,6 @@ const Flagsmith = class {
             this.environmentID = state.environmentID || this.environmentID;
             this.flags = state.flags || this.flags;
             this.identity = state.identity || this.identity;
-            this.segments = state.segments || this.segments;
             this.traits = state.traits || this.traits;
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
         }
@@ -467,7 +490,6 @@ const Flagsmith = class {
 
     logout() {
         this.identity = null;
-        this.segments = null;
         this.traits = null;
         if (this.initialised) {
             return this.getFlags();
@@ -614,3 +636,16 @@ type Config= {fetch?:any, AsyncStorage?:any};
 export default function ({ fetch, AsyncStorage }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage }) as IFlagsmith;
 };
+
+// transforms any trait to match sendSessionProperties
+// https://www.dynatrace.com/support/doc/javascriptapi/interfaces/dtrum_types.DtrumApi.html#addActionProperties
+const setDynatraceValue = function (obj, trait, value) {
+    let key = 'shortString'
+    let convertToString = true
+    if (typeof value === 'number') {
+        key = 'javaDouble'
+        convertToString = false
+    }
+    obj[key] = obj[key] || {}
+    obj[key][trait] = convertToString ? value+"":value
+}
