@@ -39,7 +39,7 @@ flagsmith.init({
     enableLogs: true,
     enableAnalytics:true,
     //specifying dtrum tells flagsmith to set session properties (see console)
-    dtrum: typeof dtrum === 'undefined'? null: dtrum,
+    enableDynatrace: true,
     defaultFlags: {
         font_size: 10
     },

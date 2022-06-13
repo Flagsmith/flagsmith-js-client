@@ -212,7 +212,7 @@ const Flagsmith = class {
         defaultFlags,
         preventFetch,
         enableLogs,
-        dtrum,
+        enableDynatrace,
         enableAnalytics,
         AsyncStorage: _AsyncStorage,
         identity,
@@ -269,8 +269,14 @@ const Flagsmith = class {
                 throw ('Please specify a environment id');
             }
 
-            if (dtrum) {
-                this.dtrum = dtrum;
+            if (enableDynatrace) {
+                // @ts-ignore
+                if (typeof dtrum === 'undefined') {
+                    console.error("You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed.")
+                } else {
+                    // @ts-ignore
+                    this.dtrum = dtrum;
+                }
             }
 
             if(angularHttpClient) {
