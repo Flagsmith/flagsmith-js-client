@@ -32,6 +32,7 @@ export interface IInitConfig {
     api?: string;
     cacheFlags?: boolean;
     defaultFlags?: IFlags;
+    dtrum?: any;
     enableAnalytics?: boolean;
     enableLogs?: boolean;
     angularHttpClient?: any;

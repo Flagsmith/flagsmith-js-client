@@ -36,6 +36,7 @@ export interface IInitConfig {
     api?: string // the api you wish to use, important if self hosting
     cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
     defaultFlags?: IFlags //
+    dtrum?: any // Instance of RUM JavaScript API
     enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
     enableLogs?: boolean // whether to enable logs
     angularHttpClient?: any // an angular http client to support ssr
