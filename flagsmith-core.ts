@@ -54,7 +54,9 @@ const Flagsmith = class {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
         const handleResponse = ({ flags: features, traits }, segments) => {
-            this.withTraits = false;
+            if (identity) {
+                this.withTraits = false;
+            }
             // Handle server response
             let flags = {};
             let userTraits = {};
@@ -111,6 +113,7 @@ const Flagsmith = class {
             ])
                 .then((res) => {
                     // @ts-ignore
+                    this.withTraits = false
                     handleResponse(res[0], res[1])
                     if (resolve && !resolved) {
                         resolved = true;
@@ -215,6 +218,24 @@ const Flagsmith = class {
             this.initialised = true;
             this.ticks = 10000;
 
+            this.log("Initialising with properties",{
+                environmentID,
+                api,
+                headers,
+                onChange,
+                cacheFlags,
+                onError,
+                defaultFlags,
+                preventFetch,
+                enableLogs,
+                enableAnalytics,
+                AsyncStorage,
+                identity,
+                traits,
+                _trigger,
+                state,
+                angularHttpClient,
+            }, this)
 
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             if (_AsyncStorage) {
@@ -386,7 +407,10 @@ const Flagsmith = class {
     identify(userId, traits) {
         this.identity = userId;
         if(traits) {
-            this.withTraits = traits;
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...traits
+            };
         }
         if (this.initialised) {
             return this.getFlags();
@@ -504,6 +528,19 @@ const Flagsmith = class {
             console.error(initError("setTrait"))
             return
         }
+        const traits = {}
+        traits[key] = trait_value
+        if (!this.identity) {
+
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...traits
+            };
+            this.log("Set trait prior to identifying", this.withTraits);
+
+            return
+        }
+
 
         const body = {
             "identity": {
@@ -531,6 +568,16 @@ const Flagsmith = class {
 
         if (!traits || typeof traits !== 'object') {
             console.error("Expected object for flagsmith.setTraits");
+        }
+
+        if (!this.identity) {
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...traits
+            };
+
+            this.log("Set traits prior to identifying", this.withTraits);
+            return
         }
 
         return this.getJSON(api + 'identities/', "POST", JSON.stringify({
