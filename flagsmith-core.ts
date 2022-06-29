@@ -53,6 +53,7 @@ const Flagsmith = class {
     getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
+        this.log("Get Flags")
         const handleResponse = ({ flags: features, traits }) => {
             if (identity) {
                 this.withTraits = false;
@@ -183,6 +184,7 @@ const Flagsmith = class {
     analyticsInterval= null
     api= null
     cacheFlags= null
+    ts= null
     enableAnalytics= null
     enableLogs= null
     environmentID= null
@@ -201,7 +203,7 @@ const Flagsmith = class {
     traits= null
     dtrum= null
     withTraits= null
-
+    cacheOptions = {ttl:0, skipAPI: false}
     init({
         environmentID,
         api = defaultAPI,
@@ -219,6 +221,7 @@ const Flagsmith = class {
         traits,
         _trigger,
         state,
+        cacheOptions,
         angularHttpClient,
          }: IInitConfig) {
 
@@ -234,6 +237,7 @@ const Flagsmith = class {
             this.identity = identity;
             this.withTraits = traits;
             this.enableLogs = enableLogs;
+            this.cacheOptions = cacheOptions? {skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0} : this.cacheOptions;
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
@@ -369,12 +373,26 @@ const Flagsmith = class {
                         if (res) {
                             try {
                                 var json = JSON.parse(res);
+                                let cachePopulated = false;
                                 if (json && json.api === this.api && json.environmentID === this.environmentID) {
-                                    this.setState(json);
-                                    this.log("Retrieved flags from cache", json);
+                                    let setState = true;
+                                    if(this.cacheOptions.ttl){
+                                        if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
+                                            if (json.ts) {
+                                                this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                                setState = false;
+                                            }
+                                        }
+                                    }
+                                    if (setState) {
+                                        cachePopulated = true;
+                                        this.setState(json);
+                                        this.log("Retrieved flags from cache", json);
+                                    }
                                 }
 
                                 if (this.flags) { // retrieved flags from local storage
+
                                     if(this.trigger) {
                                         this.trigger()
                                     }
@@ -383,7 +401,10 @@ const Flagsmith = class {
                                     }
                                     this.oldFlags = this.flags;
                                     resolve(true);
-                                    if (!preventFetch) {
+                                    if (this.cacheOptions.skipAPI && cachePopulated) {
+                                        this.log("Skipping API, using cache")
+                                    }
+                                    if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
                                         this.getFlags();
                                     }
                                 } else {
@@ -437,6 +458,8 @@ const Flagsmith = class {
 
     identify(userId, traits) {
         this.identity = userId;
+        this.log("Identify: " + this.identity)
+
         if(traits) {
             this.withTraits = {
                 ...(this.withTraits||{}),
@@ -455,6 +478,7 @@ const Flagsmith = class {
             environmentID: this.environmentID,
             flags: this.flags,
             identity: this.identity,
+            ts: this.ts,
             traits: this.traits,
             evaluationEvent: this.evaluationEvent,
         }
@@ -480,6 +504,7 @@ const Flagsmith = class {
 
     updateStorage() {
         if (this.cacheFlags) {
+            this.ts = new Date().valueOf()
             const state = JSON.stringify(this.getState());
             this.log("Setting storage", state);
             AsyncStorage.setItem(FLAGSMITH_KEY, state);

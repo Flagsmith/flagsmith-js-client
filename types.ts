@@ -30,11 +30,19 @@ export interface IState {
     identity?: string
     traits: ITraits
 }
-
+type ICacheOptions = {
+    ttl?:number, // how long to persist the cache in ms (defaults to 0 which is infinite)
+    /*
+    If this is true and there's cache available, it will skip hitting the API as if preventFetch was true
+    Note: this is just for flagsmith.init(), Calls to identify, getFlags etc will still hit the API regardless
+    */
+    skipAPI?:boolean
+}
 export interface IInitConfig {
     AsyncStorage?: any // an AsyncStorage implementation
     api?: string // the api you wish to use, important if self hosting
     cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
+    cacheOptions?: ICacheOptions // whether to local storage flags, needs AsyncStorage defined
     defaultFlags?: IFlags //
     enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
     enableDynatrace?: boolean // Enables the Dynatrace RUM integration
@@ -135,4 +143,6 @@ export interface IFlagsmith {
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
     trigger?:()=>{}
+
+    cacheOptions: { ttl: number, skipAPI: boolean }
 }
