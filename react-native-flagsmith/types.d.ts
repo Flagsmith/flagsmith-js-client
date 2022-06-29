@@ -27,10 +27,15 @@ export interface IState {
     identity?: string;
     traits: ITraits;
 }
+declare type ICacheOptions = {
+    ttl?: number;
+    skipAPI?: boolean;
+};
 export interface IInitConfig {
     AsyncStorage?: any;
     api?: string;
     cacheFlags?: boolean;
+    cacheOptions?: ICacheOptions;
     defaultFlags?: IFlags;
     enableAnalytics?: boolean;
     enableDynatrace?: boolean;
@@ -113,4 +118,9 @@ export interface IFlagsmith {
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
     trigger?: () => {};
+    cacheOptions: {
+        ttl: number;
+        skipAPI: boolean;
+    };
 }
+export {};
