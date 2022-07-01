@@ -27,9 +27,6 @@ const plugins = (exclude)=>[
             comments: false
         },
     }),
-    // replace({
-    //     'Object.defineProperty(exports,"__esModule",{value:!0});': '',
-    // }),
 ];
 
 const pluginsES = (exclude)=>[
@@ -48,9 +45,6 @@ const pluginsES = (exclude)=>[
             comments: false
         },
     }),
-    // replace({
-    //     'Object.defineProperty(exports,"__esModule",{value:!0});': '',
-    // }),
 ];
 
 const generateES = (config, filePath, _plugins, input) => {
@@ -131,6 +125,36 @@ const isomorphicES = generateES(
 
 )
 
+const nextModule =  {
+    input: './next-middleware.ts',
+    output: [
+        {
+            file: path.join(__dirname, '/flagsmith/next-middleware.js'),
+            format: "umd",
+            name:"next-middleware",
+            sourcemap: true,
+        },
+    ],
+    plugins: plugins(
+        [
+            "./react/index.ts",
+            "./index.react-native.ts",
+        ]
+    ),
+    external: ["react", "react-dom"]
+};
+
+const nextES = generateES(
+    nextModule,
+    path.join(__dirname, '/flagsmith-es/next.js'),
+    [
+        "./react/index.ts",
+        "./index.react-native.ts",
+    ],
+    './next-middleware.ts',
+
+)
+
 const reactModule =     {
     input: './react/index.tsx',
     output: [
@@ -165,7 +189,7 @@ const reactModuleES = generateES(
 )
 
 
-export default [webModule, isomorphicModule, webES,isomorphicES, reactModule, reactModuleES].concat([
+export default [webModule, isomorphicModule,isomorphicES, nextModule, nextES, webES, reactModule, reactModuleES].concat([
     {
         input: './index.react-native.ts',
         output: [
