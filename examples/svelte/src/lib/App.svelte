@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { browser } from '$app/env';
+	import flagsmith from "flagsmith/isomorphic"
+	export let flagsmithState;
 
-	const updateFeatures = ()=> {
+	const updateFeatures = ()=> { // update the state when flags are changed
 		fontSize = flagsmith.getValue("font_size");
 		loggedIn = !!flagsmith.identity;
 	}
 
-	import flagsmith from "flagsmith/isomorphic"
-	export let flagsmithState;
+
 	if (browser && !flagsmith.initialised) {
 		console.log("Initialising clientside Flagsmith with server state", flagsmithState)
 		flagsmith.init({
 			environmentID: "QjgYur4LQTwe5HpvbvhpzK",
 			state: flagsmithState,
+			onChange: updateFeatures
 		})
 	}
 
@@ -21,12 +23,11 @@
 
 	function login () {
 		flagsmith.identify("flagsmith_sample_user")
-			.then(updateFeatures)
-	};
+	}
 
 	function logout () {
-		flagsmith.logout().then(updateFeatures)
-	};
+		flagsmith.logout()
+	}
 </script>
 
 <div class="counter">
