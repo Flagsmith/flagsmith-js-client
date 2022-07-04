@@ -30,7 +30,7 @@ $("#js-toggle-trait").on("click", toggleTrait);
 
 //Intialise Flagsmith
 flagsmith.init({
-    environmentID: environmentID,
+    environmentID: "QjgYur4LQTwe5HpvbvhpzK",
     cacheFlags: true,
     enableLogs: true,
     enableAnalytics:true,

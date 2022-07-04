@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useEffect } from 'react';
-import { useFlags, useFlagsmith } from 'flagsmith-es/react';
+import { useFlags, useFlagsmith } from 'flagsmith/react';
 
 const Home: NextPage = () => {
   const flags = useFlags(["font_size"],["example_trait"]) // only causes re-render if specified flag values / traits change

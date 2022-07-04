@@ -1,8 +1,8 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
-import { FlagsmithProvider } from 'flagsmith-es/react';
-import flagsmith from 'flagsmith-es/isomorphic';
-import { IState } from 'flagsmith-es/types';
+import { FlagsmithProvider } from 'flagsmith/react';
+import flagsmith from 'flagsmith/isomorphic';
+import { IState } from 'flagsmith/types';
 const environmentID = "QjgYur4LQTwe5HpvbvhpzK"
 function MyApp({ Component, pageProps, flagsmithState }: AppProps & {flagsmithState: IState}) {
     return (
