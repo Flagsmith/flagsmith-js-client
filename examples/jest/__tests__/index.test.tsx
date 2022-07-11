@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import Home from '@/pages/index'
 import flagsmith from 'flagsmith/isomorphic';
 import { FlagsmithProvider } from 'flagsmith/react';
+import { IFlagsmithFeature, IFlagsmithTrait } from 'flagsmith/types';
 const jestFn = jest.fn();
 jest.mock('flagsmith/react', () => {
     const actualModule = jest.requireActual('flagsmith/react')
@@ -20,13 +21,14 @@ jest.mock('flagsmith/react', () => {
 })
 describe('Home', () => {
     beforeEach(()=>{
-        jestFn.mockReturnValue({
+        const mock: Record<string, IFlagsmithTrait | IFlagsmithFeature > = {
             font_size: {
                 enabled: true,
                 value: 12
             },
             example_trait: "value"
-        })
+        }
+        jestFn.mockReturnValue(mock)
     })
     it('renders a heading', () => {
         render(
