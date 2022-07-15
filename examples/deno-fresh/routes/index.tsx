@@ -9,8 +9,6 @@ type Props = {
 }
 export const handler: Handlers<Props> = {
     async GET(_req, ctx) {
-        console.log(flagsmith)
-
         await flagsmith.init({ // fetches flags on the server
             environmentID,
         });
