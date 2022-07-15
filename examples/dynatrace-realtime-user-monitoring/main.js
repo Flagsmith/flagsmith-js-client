@@ -41,7 +41,7 @@ flagsmith.init({
     //specifying dtrum tells flagsmith to set session properties (see console)
     enableDynatrace: true,
     defaultFlags: {
-        font_size: 10
+        font_size: { value: 10, enabled: true }
     },
     onChange: function() {
         $("#loaded").removeClass("hidden")
