@@ -1,23 +1,24 @@
-// Deprecated
-export interface IBulletTrainFeature {
+export interface IFlagsmithFeature {
     enabled: boolean
     value?: string|number|boolean
 }
 
-export interface IFlagsmithFeature extends IBulletTrainFeature {}
 export type IFlagsmithTrait = string|number|boolean
+
+/*
+    example: {hero:{enabled:true, value:"blue"}, myCoolFeature:{enabled:true}}
+* */
 export interface IFlags {
     [key: string]: IFlagsmithFeature
 }
 
+/*
+    example: {favourite_color: "blue", age: 21}
+* */
 export interface ITraits {
     [key: string]: IFlagsmithTrait
 }
 
-export interface IUserIdentity {
-    flags: IFlagsmithFeature
-    traits: ITraits
-}
 export interface IRetrieveInfo {
     isFromServer: boolean
     flagsChanged: boolean

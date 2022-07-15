@@ -1,8 +1,6 @@
-export interface IBulletTrainFeature {
+export interface IFlagsmithFeature {
     enabled: boolean;
     value?: string | number | boolean;
-}
-export interface IFlagsmithFeature extends IBulletTrainFeature {
 }
 export declare type IFlagsmithTrait = string | number | boolean;
 export interface IFlags {
@@ -10,10 +8,6 @@ export interface IFlags {
 }
 export interface ITraits {
     [key: string]: IFlagsmithTrait;
-}
-export interface IUserIdentity {
-    flags: IFlagsmithFeature;
-    traits: ITraits;
 }
 export interface IRetrieveInfo {
     isFromServer: boolean;
