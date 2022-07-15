@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "$fresh/": "https://deno.land/x/fresh@1.0.1/",
+    "flagsmith": "https://cdn.jsdelivr.net/npm/flagsmith-es@3.3.2/isomorphic.js",
+    "preact": "https://esm.sh/preact@10.8.2",
+    "preact/": "https://esm.sh/preact@10.8.2/",
+    "preact-render-to-string": "https://esm.sh/preact-render-to-string@5.2.0?deps=preact@10.8.2"
+  }
+}
