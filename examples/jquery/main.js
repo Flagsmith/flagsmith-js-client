@@ -35,7 +35,7 @@ flagsmith.init({
     enableLogs: true,
     enableAnalytics:true,
     defaultFlags: {
-        font_size: 10
+        font_size: {value: 10, enabled:true}
     },
     onChange: function() {
         $("#loaded").removeClass("hidden")
