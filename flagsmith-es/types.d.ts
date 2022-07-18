@@ -27,6 +27,7 @@ declare type ICacheOptions = {
 };
 export interface IInitConfig {
     AsyncStorage?: any;
+    angularHttpClient?: any;
     api?: string;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
@@ -34,17 +35,18 @@ export interface IInitConfig {
     enableAnalytics?: boolean;
     enableDynatrace?: boolean;
     enableLogs?: boolean;
-    angularHttpClient?: any;
     environmentID: string;
+    eventSourceUrl?: string;
+    realtime?: boolean;
     headers?: object;
     identity?: string;
-    traits?: ITraits;
     onChange?: (previousFlags: IFlags, params: IRetrieveInfo) => void;
     onError?: (res: {
         message: string;
     }) => void;
     preventFetch?: boolean;
     state?: IState;
+    traits?: ITraits;
     _trigger?: () => void;
 }
 export interface IFlagsmith {

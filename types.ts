@@ -41,6 +41,7 @@ type ICacheOptions = {
 }
 export interface IInitConfig {
     AsyncStorage?: any // an AsyncStorage implementation
+    angularHttpClient?: any // an angular http client to support ssr
     api?: string // the api you wish to use, important if self hosting
     cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
     cacheOptions?: ICacheOptions // A ttl in ms (default to 0 which is infinite) and option to skip hitting the API in flagsmith.init if there's cache available.
@@ -48,15 +49,16 @@ export interface IInitConfig {
     enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
     enableDynatrace?: boolean // Enables the Dynatrace RUM integration
     enableLogs?: boolean // whether to enable logs
-    angularHttpClient?: any // an angular http client to support ssr
     environmentID: string // your Flagsmith environment id
+    eventSourceUrl?: string // an event source url to listen to in order to trigger getFlags
+    realtime?: boolean // an event source url to listen to in order to trigger getFlags
     headers?: object // pass custom headers for flagsmith api calls
     identity?: string // Initialise with a given identity
-    traits?: ITraits // Initialise with a given set of traits
     onChange?: (previousFlags:IFlags, params:IRetrieveInfo)=> void // triggered when the flags are retrieved
     onError?: (res:{message:string}) => void // triggered if there was an api error
     preventFetch?: boolean // whether to prevent fetching flags on init
     state?: IState // set a predefined state, useful for isomorphic applications
+    traits?: ITraits // Initialise with a given set of traits
     _trigger?: ()=>void // Used internally, this function will callback separately to onChange whenever flags are updated
 }
 export interface IFlagsmith {
