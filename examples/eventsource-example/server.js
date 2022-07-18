@@ -46,8 +46,8 @@ function sendEventsToAll(v) {
     clients.forEach(client => client.response.write(`data: ${JSON.stringify({})}\n\n`))
 }
 
-async function triggerEvent(request, respsonse, next) {
-    respsonse.send("1")
+async function triggerEvent(request, response, next) {
+    response.send("1")
     return sendEventsToAll("1");
 }
 
