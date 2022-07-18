@@ -261,7 +261,7 @@ const Flagsmith = class {
                     this.eventSource = new eventSource(connectionUrl)
                     this.eventSource.addEventListener("message", (e)=>{
                         this.log("Received eventsource message")
-                        // this.getFlags()
+                        this.getFlags()
                     })
                 }
             }
