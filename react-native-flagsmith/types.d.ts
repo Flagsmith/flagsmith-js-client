@@ -31,6 +31,7 @@ export interface IInitConfig {
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     defaultFlags?: IFlags;
+    fetch?: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
     enableAnalytics?: boolean;
     enableDynatrace?: boolean;
     enableLogs?: boolean;

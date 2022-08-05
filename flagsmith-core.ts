@@ -212,6 +212,7 @@ const Flagsmith = class {
         cacheFlags,
         onError,
         defaultFlags,
+        fetch:fetchImplementation,
         preventFetch,
         enableLogs,
         enableDynatrace,
@@ -240,6 +241,9 @@ const Flagsmith = class {
             this.cacheOptions = cacheOptions? {skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0} : this.cacheOptions;
             if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
                 console.warn("Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.")
+            }
+            if(fetchImplementation) {
+                _fetch = fetchImplementation;
             }
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};

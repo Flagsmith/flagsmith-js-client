@@ -39,12 +39,14 @@ type ICacheOptions = {
     */
     skipAPI?:boolean
 }
+
 export interface IInitConfig {
     AsyncStorage?: any // an AsyncStorage implementation
     api?: string // the api you wish to use, important if self hosting
     cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
     cacheOptions?: ICacheOptions // A ttl in ms (default to 0 which is infinite) and option to skip hitting the API in flagsmith.init if there's cache available.
     defaultFlags?: IFlags //
+    fetch?: any // A Custom fetch implementation. Note: this has to resolve with the same types as standard fetch
     enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
     enableDynatrace?: boolean // Enables the Dynatrace RUM integration
     enableLogs?: boolean // whether to enable logs
