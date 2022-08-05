@@ -1,23 +1,24 @@
-// Deprecated
-export interface IBulletTrainFeature {
+export interface IFlagsmithFeature {
     enabled: boolean
     value?: string|number|boolean
 }
 
-export interface IFlagsmithFeature extends IBulletTrainFeature {}
 export type IFlagsmithTrait = string|number|boolean
+
+/*
+    example: {hero:{enabled:true, value:"blue"}, myCoolFeature:{enabled:true}}
+* */
 export interface IFlags {
     [key: string]: IFlagsmithFeature
 }
 
+/*
+    example: {favourite_color: "blue", age: 21}
+* */
 export interface ITraits {
     [key: string]: IFlagsmithTrait
 }
 
-export interface IUserIdentity {
-    flags: IFlagsmithFeature
-    traits: ITraits
-}
 export interface IRetrieveInfo {
     isFromServer: boolean
     flagsChanged: boolean
@@ -30,13 +31,22 @@ export interface IState {
     identity?: string
     traits: ITraits
 }
-
+type ICacheOptions = {
+    ttl?:number, // how long to persist the cache in ms (defaults to 0 which is infinite)
+    /*
+    If this is true and there's cache available, it will skip hitting the API as if preventFetch was true
+    Note: this is just for flagsmith.init(), Calls to identify, getFlags etc will still hit the API regardless
+    */
+    skipAPI?:boolean
+}
 export interface IInitConfig {
     AsyncStorage?: any // an AsyncStorage implementation
     api?: string // the api you wish to use, important if self hosting
     cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
+    cacheOptions?: ICacheOptions // A ttl in ms (default to 0 which is infinite) and option to skip hitting the API in flagsmith.init if there's cache available.
     defaultFlags?: IFlags //
     enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
+    enableDynatrace?: boolean // Enables the Dynatrace RUM integration
     enableLogs?: boolean // whether to enable logs
     angularHttpClient?: any // an angular http client to support ssr
     environmentID: string // your Flagsmith environment id
@@ -134,4 +144,6 @@ export interface IFlagsmith {
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
     trigger?:()=>{}
+
+    cacheOptions: { ttl: number, skipAPI: boolean }
 }

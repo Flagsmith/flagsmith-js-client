@@ -53,8 +53,11 @@ const Flagsmith = class {
     getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
-        const handleResponse = ({ flags: features, traits }, segments) => {
-            this.withTraits = false;
+        this.log("Get Flags")
+        const handleResponse = ({ flags: features, traits }) => {
+            if (identity) {
+                this.withTraits = false;
+            }
             // Handle server response
             let flags = {};
             let userTraits = {};
@@ -73,18 +76,38 @@ const Flagsmith = class {
             this.oldFlags = {
                 ...this.flags
             };
-            if (segments) {
-                let userSegments = {};
-                segments.map((s) => {
-                    userSegments[s.name] = s;
-                });
-                this.segments = userSegments;
-            }
             const flagsEqual = deepEqual(this.flags, flags);
             const traitsEqual = deepEqual(this.traits, userTraits);
             this.flags = flags;
             this.traits = userTraits;
             this.updateStorage();
+            if (this.dtrum) {
+                let traits: {
+                    "javaLongOrObject": Record<string, number>,
+                    "date": Record<string, Date>,
+                    "shortString": Record<string, string>,
+                    "javaDouble": Record<string, number>,
+                } = {
+                    javaDouble: {},
+                    date: {},
+                    shortString: {},
+                    javaLongOrObject: {},
+                }
+                Object.keys(this.flags).map((key)=>{
+                    setDynatraceValue(traits, "flagsmith_value_"+key, this.getValue(key) )
+                    setDynatraceValue(traits, "flagsmith_enabled_"+key, this.hasFeature(key) )
+                })
+                Object.keys(this.traits).map((key)=>{
+                    setDynatraceValue(traits, "flagsmith_trait_"+key, this.getTrait(key) )
+                })
+                this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
+                this.log("Sending date traits to dynatrace", traits.date)
+                this.log("Sending shortString traits to dynatrace", traits.shortString)
+                this.log("Sending javaDouble to dynatrace", traits.javaDouble)
+                this.dtrum.sendSessionProperties(
+                    traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
+                )
+            }
             if(this.trigger) {
                 this.trigger()
             }
@@ -111,7 +134,8 @@ const Flagsmith = class {
             ])
                 .then((res) => {
                     // @ts-ignore
-                    handleResponse(res[0], res[1])
+                    this.withTraits = false
+                    handleResponse(res[0])
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -125,7 +149,7 @@ const Flagsmith = class {
             ])
                 .then((res) => {
                     // @ts-ignore
-                    handleResponse({ flags: res[0] }, null)
+                    handleResponse({ flags: res[0] })
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -160,6 +184,7 @@ const Flagsmith = class {
     analyticsInterval= null
     api= null
     cacheFlags= null
+    ts= null
     enableAnalytics= null
     enableLogs= null
     environmentID= null
@@ -173,12 +198,12 @@ const Flagsmith = class {
     onError= null
     trigger= null
     identity= null
-    segments= null
     ticks= null
     timer= null
     traits= null
+    dtrum= null
     withTraits= null
-
+    cacheOptions = {ttl:0, skipAPI: false}
     init({
         environmentID,
         api = defaultAPI,
@@ -189,12 +214,14 @@ const Flagsmith = class {
         defaultFlags,
         preventFetch,
         enableLogs,
+        enableDynatrace,
         enableAnalytics,
         AsyncStorage: _AsyncStorage,
         identity,
         traits,
         _trigger,
         state,
+        cacheOptions,
         angularHttpClient,
          }: IInitConfig) {
 
@@ -210,11 +237,33 @@ const Flagsmith = class {
             this.identity = identity;
             this.withTraits = traits;
             this.enableLogs = enableLogs;
+            this.cacheOptions = cacheOptions? {skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0} : this.cacheOptions;
+            if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
+                console.warn("Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.")
+            }
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
             this.ticks = 10000;
 
+            this.log("Initialising with properties",{
+                environmentID,
+                api,
+                headers,
+                onChange,
+                cacheFlags,
+                onError,
+                defaultFlags,
+                preventFetch,
+                enableLogs,
+                enableAnalytics,
+                AsyncStorage,
+                identity,
+                traits,
+                _trigger,
+                state,
+                angularHttpClient,
+            }, this)
 
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             if (_AsyncStorage) {
@@ -225,6 +274,16 @@ const Flagsmith = class {
             if (!environmentID) {
                 reject('Please specify a environment id')
                 throw ('Please specify a environment id');
+            }
+
+            if (enableDynatrace) {
+                // @ts-ignore
+                if (typeof dtrum === 'undefined') {
+                    console.error("You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed.")
+                } else {
+                    // @ts-ignore
+                    this.dtrum = dtrum;
+                }
             }
 
             if(angularHttpClient) {
@@ -317,12 +376,26 @@ const Flagsmith = class {
                         if (res) {
                             try {
                                 var json = JSON.parse(res);
+                                let cachePopulated = false;
                                 if (json && json.api === this.api && json.environmentID === this.environmentID) {
-                                    this.setState(json);
-                                    this.log("Retrieved flags from cache", json);
+                                    let setState = true;
+                                    if(this.cacheOptions.ttl){
+                                        if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
+                                            if (json.ts) {
+                                                this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                                setState = false;
+                                            }
+                                        }
+                                    }
+                                    if (setState) {
+                                        cachePopulated = true;
+                                        this.setState(json);
+                                        this.log("Retrieved flags from cache", json);
+                                    }
                                 }
 
                                 if (this.flags) { // retrieved flags from local storage
+
                                     if(this.trigger) {
                                         this.trigger()
                                     }
@@ -331,7 +404,10 @@ const Flagsmith = class {
                                     }
                                     this.oldFlags = this.flags;
                                     resolve(true);
-                                    if (!preventFetch) {
+                                    if (this.cacheOptions.skipAPI && cachePopulated) {
+                                        this.log("Skipping API, using cache")
+                                    }
+                                    if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
                                         this.getFlags();
                                     }
                                 } else {
@@ -385,8 +461,13 @@ const Flagsmith = class {
 
     identify(userId, traits) {
         this.identity = userId;
+        this.log("Identify: " + this.identity)
+
         if(traits) {
-            this.withTraits = traits;
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...traits
+            };
         }
         if (this.initialised) {
             return this.getFlags();
@@ -400,7 +481,7 @@ const Flagsmith = class {
             environmentID: this.environmentID,
             flags: this.flags,
             identity: this.identity,
-            segments: this.segments,
+            ts: this.ts,
             traits: this.traits,
             evaluationEvent: this.evaluationEvent,
         }
@@ -413,7 +494,6 @@ const Flagsmith = class {
             this.environmentID = state.environmentID || this.environmentID;
             this.flags = state.flags || this.flags;
             this.identity = state.identity || this.identity;
-            this.segments = state.segments || this.segments;
             this.traits = state.traits || this.traits;
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
         }
@@ -427,6 +507,7 @@ const Flagsmith = class {
 
     updateStorage() {
         if (this.cacheFlags) {
+            this.ts = new Date().valueOf()
             const state = JSON.stringify(this.getState());
             this.log("Setting storage", state);
             AsyncStorage.setItem(FLAGSMITH_KEY, state);
@@ -443,7 +524,6 @@ const Flagsmith = class {
 
     logout() {
         this.identity = null;
-        this.segments = null;
         this.traits = null;
         if (this.initialised) {
             return this.getFlags();
@@ -504,6 +584,19 @@ const Flagsmith = class {
             console.error(initError("setTrait"))
             return
         }
+        const traits = {}
+        traits[key] = trait_value
+        if (!this.identity) {
+
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...traits
+            };
+            this.log("Set trait prior to identifying", this.withTraits);
+
+            return
+        }
+
 
         const body = {
             "identity": {
@@ -533,22 +626,28 @@ const Flagsmith = class {
             console.error("Expected object for flagsmith.setTraits");
         }
 
-        const body = Object.keys(traits).map((key) => (
-            {
-                "identity": {
-                    "identifier": identity
-                },
-                "trait_key": key,
-                "trait_value": traits[key]
-            }
-        ))
+        if (!this.identity) {
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...traits
+            };
 
-        return getJSON(`${api}traits/bulk/`, 'PUT', JSON.stringify(body))
-            .then(() => {
-                if (this.initialised) {
-                    this.getFlags()
-                }
-            })
+            this.log("Set traits prior to identifying", this.withTraits);
+            return
+        }
+
+        return this.getJSON(api + 'identities/', "POST", JSON.stringify({
+            "identifier": identity,
+            traits: Object.keys(traits).map((k)=>({
+                "trait_key":k,
+                "trait_value": traits[k]
+            }))
+        })).then(() => {
+            if (this.initialised) {
+                this.getFlags()
+            }
+        })
+
     };
 
     hasFeature = (key) => {
@@ -571,3 +670,16 @@ type Config= {fetch?:any, AsyncStorage?:any};
 export default function ({ fetch, AsyncStorage }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage }) as IFlagsmith;
 };
+
+// transforms any trait to match sendSessionProperties
+// https://www.dynatrace.com/support/doc/javascriptapi/interfaces/dtrum_types.DtrumApi.html#addActionProperties
+const setDynatraceValue = function (obj, trait, value) {
+    let key = 'shortString'
+    let convertToString = true
+    if (typeof value === 'number') {
+        key = 'javaDouble'
+        convertToString = false
+    }
+    obj[key] = obj[key] || {}
+    obj[key][trait] = convertToString ? value+"":value
+}

@@ -11,7 +11,7 @@ $(document).ready(function () {
     flagsmith.init({
         environmentID: environmentID,
         defaultFlags: {
-            font_size: 10
+            font_size: { value:10, enabled:true }
         },
         onChange: function () {
             if (flagsmith.getValue('hero')) {

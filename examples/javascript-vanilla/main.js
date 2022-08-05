@@ -31,7 +31,7 @@ flagsmith.init({
     enableLogs: true,
     environmentID: environmentID,
     defaultFlags: {
-        font_size: 10
+        font_size: { value:10, enabled:true }
     },
     onChange: function() {
         document.getElementById("loaded").classList.remove("hidden")

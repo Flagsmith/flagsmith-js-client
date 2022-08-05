@@ -21,17 +21,20 @@ export type FlagsmithContextType = {
     flagsmith: IFlagsmith // The flagsmith instance
     options?: Parameters<IFlagsmith['init']>[0] // Initialisation options, if you do not provide this you will have to call init manually
     serverState?: IState
+    children: React.ReactElement[] | React.ReactElement;
 }
 
 export const FlagsmithProvider: FC<FlagsmithContextType> = ({
  flagsmith, options, serverState, children,
 }) => {
+    const firstRenderRef = useRef(true)
     // @ts-ignore
     if (serverState && !flagsmith.initialised) {
         // @ts-ignore
         flagsmith.setState(serverState)
     }
-    useEffect(() => {
+    if (firstRenderRef.current) {
+        firstRenderRef.current = false
         if (options) {
             flagsmith.init({
                 ...options,
@@ -46,9 +49,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
             // @ts-ignore
             flagsmith.trigger = ()=>events.trigger('event');
         }
-
-        // eslint-disable-next-line
-    }, [])
+    }
     return (
         <FlagsmithContext.Provider value={flagsmith}>
             {children}
