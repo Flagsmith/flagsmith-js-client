@@ -1,6 +1,6 @@
 <template>
   <div>
-    <pre>{{ $flagsmith.hasFeature('hero') }}</pre>
+    <pre>Hero enabled: {{ $flagsmith.hasFeature('hero') }}</pre>
   </div>
 </template>
 
