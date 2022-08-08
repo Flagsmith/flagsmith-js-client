@@ -5,7 +5,7 @@ import AsyncStorage from "@callstack/async-storage";
 import core from './flagsmith-core'
 const flagsmith = core({AsyncStorage, fetch});
 if (typeof window !== "undefined") {
-    // @ts-ignore
+    // @ts-expect-error, some people wish to use flagsmith globally
     window.flagsmith = flagsmith;
 }
 export default flagsmith;
