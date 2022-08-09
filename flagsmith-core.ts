@@ -133,7 +133,6 @@ const Flagsmith = class {
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
-                    // @ts-ignore
                     this.withTraits = false
                     handleResponse(res[0])
                     if (resolve && !resolved) {
@@ -148,8 +147,7 @@ const Flagsmith = class {
                 this.getJSON(api + "flags/")
             ])
                 .then((res) => {
-                    // @ts-ignore
-                    handleResponse({ flags: res[0] })
+                    handleResponse({ flags: res[0], traits:null })
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -281,11 +279,11 @@ const Flagsmith = class {
             }
 
             if (enableDynatrace) {
-                // @ts-ignore
+                // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                 if (typeof dtrum === 'undefined') {
                     console.error("You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed.")
                 } else {
-                    // @ts-ignore
+                    // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                     this.dtrum = dtrum;
                 }
             }

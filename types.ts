@@ -88,6 +88,11 @@ export interface IFlagsmith {
     getState:()=> IState
 
     /**
+     * Set the current state of flagsmith
+     */
+    setState:(state:IState)=> void
+
+    /**
      * Clears the identity, triggers a call to getFlags
      */
     logout:()=> Promise<null>
