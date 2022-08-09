@@ -3,34 +3,33 @@ export interface IFlagsmithFeature {
     value?: string | number | boolean;
 }
 export declare type IFlagsmithTrait = string | number | boolean;
-export interface IFlags {
-    [key: string]: IFlagsmithFeature;
-}
-export interface ITraits {
-    [key: string]: IFlagsmithTrait;
-}
+
+export type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
+
+export type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
+
 export interface IRetrieveInfo {
     isFromServer: boolean;
     flagsChanged: boolean;
     traitsChanged: boolean;
 }
-export interface IState {
+export interface IState<F extends string = string, T extends string = string> {
     api: string;
     environmentID: string;
-    flags?: IFlags;
+    flags?: IFlags<F>;
     identity?: string;
-    traits: ITraits;
+    traits: ITraits<T>;
 }
 declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
 };
-export interface IInitConfig {
+export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
-    defaultFlags?: IFlags;
+    defaultFlags?: Partial<IFlags<F>>;
     fetch?: any;
     enableAnalytics?: boolean;
     enableDynatrace?: boolean;
@@ -39,8 +38,8 @@ export interface IInitConfig {
     environmentID: string;
     headers?: object;
     identity?: string;
-    traits?: ITraits;
-    onChange?: (previousFlags: IFlags, params: IRetrieveInfo) => void;
+    traits?: ITraits<T>;
+    onChange?: (previousFlags: IFlags<F>, params: IRetrieveInfo) => void;
     onError?: (res: {
         message: string;
     }) => void;
@@ -48,11 +47,11 @@ export interface IInitConfig {
     state?: IState;
     _trigger?: () => void;
 }
-export interface IFlagsmith {
+export interface IFlagsmith<F extends string = string, T extends string = string> {
     /**
      * Initialise the sdk against a particular environment
      */
-    init: (config: IInitConfig) => Promise<void>;
+    init: (config: IInitConfig<F, T>) => Promise<void>;
     /**
      * Trigger a manual fetch of the environment features
      */
@@ -60,7 +59,7 @@ export interface IFlagsmith {
     /**
      * Returns the current flags
      */
-    getAllFlags: () => IFlags;
+    getAllFlags: () => IFlags<F>;
     /**
      * Identify user, triggers a call to get flags if flagsmith.init has been called
      */
@@ -88,23 +87,23 @@ export interface IFlagsmith {
     /**
      * Get the whether a flag is enabled e.g. flagsmith.hasFeature("powerUserFeature")
      */
-    hasFeature: (key: string) => boolean;
+    hasFeature: (key: F) => boolean;
     /**
      * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
-    getValue: (key: string) => string | number | boolean;
+    getValue: (key: F) => string | number | boolean;
     /**
      * Get the value of a particular trait for the identified user
      */
-    getTrait: (key: string) => string | number | boolean;
+    getTrait: (key: T) => string | number | boolean;
     /**
      * Set a specific trait for a given user id, triggers a call to get flags
      */
-    setTrait: (key: string, value: string | number | boolean) => Promise<null>;
+    setTrait: (key: T, value: string | number | boolean) => Promise<null>;
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
-    setTraits: (traits: Record<string, string | number | boolean>) => Promise<null>;
+    setTraits: (traits: Record<T, string | number | boolean>) => Promise<null>;
     /**
      * The stored identity of the user
      */
