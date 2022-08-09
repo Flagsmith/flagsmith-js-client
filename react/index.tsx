@@ -83,7 +83,7 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
         .join(',')
 }
 
-export function useFlags<F extends string, T extends string>(_flags: readonly F[], _traits: readonly T[] = []): {
+export function useFlags<F extends string=string, T extends string=string>(_flags: readonly F[], _traits: readonly T[] = []): {
     [K in F]: IFlagsmithFeature
 } & {
     [K in T]: IFlagsmithTrait
@@ -124,12 +124,12 @@ export function useFlags<F extends string, T extends string>(_flags: readonly F[
     return res
 }
 
-export const useFlagsmith = () => {
-    const context = useContext<IFlagsmith>(FlagsmithContext)
+export function useFlagsmith<F extends string=string, T extends string=string>() {
+    const context = useContext<IFlagsmith<F,T>>(FlagsmithContext)
 
     if (!context) {
         throw new Error('useFlagsmith must be used with in a FlagsmithProvider')
     }
 
-    return context as IFlagsmith
+    return context as IFlagsmith<F,T>
 }

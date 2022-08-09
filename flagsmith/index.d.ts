@@ -1,7 +1,4 @@
 import { IFlagsmith } from './types';
-declare const flagsmith: IFlagsmith;
+declare const flagsmith: IFlagsmith<string, string>;
 export default flagsmith;
-export declare const createFlagsmithInstance: <
-    F extends string = string,
-    T extends string = string,
->() => IFlagsmith<F, T>;
+export declare const createFlagsmithInstance: () => IFlagsmith;

@@ -3,11 +3,8 @@ export interface IFlagsmithFeature {
     value?: string | number | boolean;
 }
 export declare type IFlagsmithTrait = string | number | boolean;
-
-export type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
-
-export type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
-
+export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
+export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
 export interface IRetrieveInfo {
     isFromServer: boolean;
     flagsChanged: boolean;
@@ -116,6 +113,9 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
     trigger?: () => {};
+    /**
+     * Used internally, this is the cache options provided in flagsmith.init
+     */
     cacheOptions: {
         ttl: number;
         skipAPI: boolean;

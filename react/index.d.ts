@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState } from '../types';
 export declare const FlagsmithContext: React.Context<IFlagsmith>;
-export declare type FlagsmithContextType = {
-    flagsmith: IFlagsmith;
-    serverState?: IState;
-    options: Parameters<IFlagsmith['init']>[0];
+export declare type FlagsmithContextType<F extends string = string, T extends string = string> = {
+    flagsmith: IFlagsmith<F, T>;
+    options?: Parameters<IFlagsmith<F, T>['init']>[0];
+    serverState?: IState<F, T>;
     children: React.ReactElement[] | React.ReactElement;
 };
 export declare const FlagsmithProvider: FC<FlagsmithContextType>;
