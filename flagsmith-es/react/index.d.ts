@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState } from '../types';
-export declare const FlagsmithContext: React.Context<IFlagsmith>;
+export declare const FlagsmithContext: React.Context<IFlagsmith<string, string>>;
 export declare type FlagsmithContextType = {
     flagsmith: IFlagsmith;
     options?: Parameters<IFlagsmith['init']>[0];
@@ -8,9 +8,9 @@ export declare type FlagsmithContextType = {
     children: React.ReactElement[] | React.ReactElement;
 };
 export declare const FlagsmithProvider: FC<FlagsmithContextType>;
-export declare function useFlags<F extends string, T extends string>(_flags: readonly F[], _traits?: readonly T[]): {
+export declare function useFlags<F extends string = string, T extends string = string>(_flags: readonly F[], _traits?: readonly T[]): {
     [K in F]: IFlagsmithFeature;
 } & {
     [K in T]: IFlagsmithTrait;
 };
-export declare const useFlagsmith: () => IFlagsmith;
+export declare function useFlagsmith<F extends string = string, T extends string = string>(): IFlagsmith<F, T>;
