@@ -39,6 +39,7 @@ const Flagsmith = class {
         }
         return _fetch(url, options)
             .then(res => {
+                this.log("Fetch response: "+ res.status + " " + (method||"GET") +  + " " + url)
                 return res.text()
                     .then((text) => {
                         let err = text;
@@ -47,6 +48,8 @@ const Flagsmith = class {
                         } catch (e) {}
                         return res.ok ? err : Promise.reject(err);
                     })
+            }).catch((e)=>{
+                this.log("Fetch error: "+ e)
             })
     };
 
