@@ -37,6 +37,11 @@ const Flagsmith = class {
         if (headers) {
             Object.assign(options.headers, headers)
         }
+
+        if (!_fetch) {
+            console.error("Flagsmith: fetch is undefined, please specify a fetch implementation into flagsmith.init to support SSR.");
+        }
+
         return _fetch(url, options)
             .then(res => {
                 this.log("Fetch response: "+ res.status + " " + (method||"GET") +  + " " + url)
@@ -49,7 +54,7 @@ const Flagsmith = class {
                         return res.ok ? err : Promise.reject(err);
                     })
             }).catch((e)=>{
-                this.log("Fetch error: "+ e)
+                console.error("Flagsmith: Fetch error: " + e)
             })
     };
 
