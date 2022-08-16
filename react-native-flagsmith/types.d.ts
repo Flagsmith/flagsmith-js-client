@@ -28,6 +28,8 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     cacheOptions?: ICacheOptions;
     defaultFlags?: Partial<IFlags<F>>;
     fetch?: any;
+    realtime?: boolean;
+    eventSourceUrl?: string;
     enableAnalytics?: boolean;
     enableDynatrace?: boolean;
     enableLogs?: boolean;

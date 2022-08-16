@@ -1,4 +1,4 @@
-var environmentID = 'QjgYur4LQTwe5HpvbvhpzK'
+var environmentID = 'AbXqsQqLLAzmfj5SGCm8Ng'
 
 function identify() {
     flagsmith.identify("flagsmith_sample_user")
@@ -30,12 +30,12 @@ $("#js-toggle-trait").on("click", toggleTrait);
 
 //Intialise Flagsmith
 flagsmith.init({
+    api: "https://edge.bullet-train-staging.win/api/v1/",
     environmentID: environmentID,
     cacheFlags: true,
     enableLogs: true,
     enableAnalytics:true,
     realtime: true,
-    eventSourceUrl: "http://localhost:3001/", // would default to https://edge.api.flagsmith.com/api/v1/
     defaultFlags: {
         font_size: {value: 10, enabled:true}
     },

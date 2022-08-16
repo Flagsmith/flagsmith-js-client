@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "flagsmith-es": "3.7.2",
+    "flagsmith-es": "3.8.0-beta.1",
     "lodash-es": "^4.17.21",
     "next": "12.1.0",
     "next-transpile-modules": "^9.0.0",

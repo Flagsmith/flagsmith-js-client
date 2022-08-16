@@ -43,6 +43,8 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     cacheOptions?: ICacheOptions // A ttl in ms (default to 0 which is infinite) and option to skip hitting the API in flagsmith.init if there's cache available.
     defaultFlags?: Partial<IFlags<F>>; // Default flags to provide { font_size: { enabled: true, value: 12 } }
     fetch?: any // A Custom fetch implementation. Note: this has to resolve with the same types as standard fetch
+    realtime?: boolean // Enable event source realtime flags.
+    eventSourceUrl?: string // The event source url to connect realtime flags to, replaces $ENVIRONMENT with your key.
     enableAnalytics?: boolean // Enable sending flag analytics for getValue and hasFeature evaluations.
     enableDynatrace?: boolean // Enables the Dynatrace RUM integration
     enableLogs?: boolean // whether to enable logs
