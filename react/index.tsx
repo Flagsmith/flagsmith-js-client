@@ -7,8 +7,8 @@ import React, {
     useRef,
     useState,
 } from 'react'
-import EventTrigger from './event-trigger';
-const events = new EventTrigger();
+import Emitter from 'tiny-emitter';
+const events = new Emitter.TinyEmitter();
 
 import {IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState} from '../types'
 
@@ -36,11 +36,11 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
                     if (options.onChange) {
                         options.onChange(...args)
                     }
-                    events.trigger('event')
+                    events.emit('event')
                 },
             })
         } else {
-            flagsmith.trigger = ()=>events.trigger('event');
+            flagsmith.trigger = ()=>events.emit('event');
         }
     }
     return (

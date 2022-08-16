@@ -6,18 +6,22 @@ const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
 const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
 import deepEqual from 'fast-deep-equal';
-
+let eventSource:typeof EventSource;
 const initError = function (caller) {
     return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
 }
 
 const Flagsmith = class {
-
+    eventSource:EventSource = null
     constructor(props) {
         if (props.fetch) {
             _fetch = props.fetch;
         } else {
             _fetch = typeof fetch !== 'undefined'? fetch : global.fetch;
+        }
+        this.log("Constructing flagsmith instance " + props)
+        if (props.eventSource) {
+            eventSource = props.eventSource;
         }
         AsyncStorage = props.AsyncStorage;
     }
@@ -223,6 +227,8 @@ const Flagsmith = class {
         enableLogs,
         enableDynatrace,
         enableAnalytics,
+        realtime,
+        eventSourceUrl= "http://sse-lb-eu-west-2-7ba834a-1075512661.eu-west-2.elb.amazonaws.com.global.prod.fastly.net/sse/environments/$ENVIRONMENT/stream",
         AsyncStorage: _AsyncStorage,
         identity,
         traits,
@@ -255,6 +261,20 @@ const Flagsmith = class {
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
             this.ticks = 10000;
+
+            if (realtime) {
+                const connectionUrl = eventSourceUrl.replace("$ENVIRONMENT", environmentID);
+                if(!eventSource) {
+                    this.log("Error, EventSource is undefined");
+                } else if (!this.eventSource) {
+                    this.log("Creating event source with url " + connectionUrl)
+                    this.eventSource = new eventSource(connectionUrl)
+                    this.eventSource.addEventListener("environment_updated", (e)=>{
+                        this.log("Received eventsource message")
+                        this.getFlags()
+                    })
+                }
+            }
 
             this.log("Initialising with properties",{
                 environmentID,
@@ -675,10 +695,10 @@ const Flagsmith = class {
 
 };
 
-type Config= {fetch?:any, AsyncStorage?:any};
+type Config= {fetch?:any, AsyncStorage?:any, eventSource?:any};
 
-export default function ({ fetch, AsyncStorage }:Config):IFlagsmith {
-    return new Flagsmith({ fetch, AsyncStorage }) as IFlagsmith;
+export default function ({ fetch, AsyncStorage, eventSource }:Config):IFlagsmith {
+    return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
 };
 
 // transforms any trait to match sendSessionProperties

@@ -1,6 +1,13 @@
 
 import core  from './flagsmith-core'
-export default core({});
+import RNEventSource from 'react-native-event-source'
+
+export default core({
+    eventSource: RNEventSource
+});
+
 export const createFlagsmithInstance = ()=>{
-    return core({})
+    return core({
+        eventSource: RNEventSource
+    })
 }
