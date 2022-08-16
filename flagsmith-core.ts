@@ -269,7 +269,7 @@ const Flagsmith = class {
                 } else if (!this.eventSource) {
                     this.log("Creating event source with url " + connectionUrl)
                     this.eventSource = new eventSource(connectionUrl)
-                    this.eventSource.addEventListener("message", (e)=>{
+                    this.eventSource.addEventListener("environment_updated", (e)=>{
                         this.log("Received eventsource message")
                         this.getFlags()
                     })

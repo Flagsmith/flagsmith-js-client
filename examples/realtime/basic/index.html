@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="../../../flagsmith/index.js"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loaded" class="hidden">
+    <h3>Flagsmith Data</h3>
+    <div id="js-data"></div>
+</div>
+<div id="loading">
+    Loading
+</div>
+<script>
+    var environmentID = 'AbXqsQqLLAzmfj5SGCm8Ng'
+    //Intialise Flagsmith
+    flagsmith.init({
+        api: "https://edge.bullet-train-staging.win/api/v1/",
+        environmentID: environmentID,
+        enableLogs: true,
+        realtime: true,
+        onChange: function() {
+            $("#loaded").removeClass("hidden")
+            $("#loading").addClass("hidden")
+            $("#js-data").text(JSON.stringify(flagsmith.getAllFlags(), null, 2));
+        }
+    });
+</script>
+
+</body>
+</html>
