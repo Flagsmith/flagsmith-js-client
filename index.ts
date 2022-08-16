@@ -6,7 +6,7 @@ import core from './flagsmith-core'
 import EventSource from 'reconnecting-eventsource'
 const flagsmith = core({AsyncStorage, fetch, eventSource:EventSource});
 if (typeof window !== "undefined") {
-    // @ts-ignore
+    // @ts-expect-error, some people wish to use flagsmith globally
     window.flagsmith = flagsmith;
 }
 export default flagsmith;

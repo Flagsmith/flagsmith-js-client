@@ -41,8 +41,14 @@ const Flagsmith = class {
         if (headers) {
             Object.assign(options.headers, headers)
         }
+
+        if (!_fetch) {
+            console.error("Flagsmith: fetch is undefined, please specify a fetch implementation into flagsmith.init to support SSR.");
+        }
+
         return _fetch(url, options)
             .then(res => {
+                this.log("Fetch response: "+ res.status + " " + (method||"GET") +  + " " + url)
                 return res.text()
                     .then((text) => {
                         let err = text;
@@ -51,6 +57,8 @@ const Flagsmith = class {
                         } catch (e) {}
                         return res.ok ? err : Promise.reject(err);
                     })
+            }).catch((e)=>{
+                console.error("Flagsmith: Fetch error: " + e)
             })
     };
 
@@ -137,7 +145,6 @@ const Flagsmith = class {
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
-                    // @ts-ignore
                     this.withTraits = false
                     handleResponse(res[0])
                     if (resolve && !resolved) {
@@ -152,8 +159,7 @@ const Flagsmith = class {
                 this.getJSON(api + "flags/")
             ])
                 .then((res) => {
-                    // @ts-ignore
-                    handleResponse({ flags: res[0] })
+                    handleResponse({ flags: res[0], traits:null })
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -216,6 +222,7 @@ const Flagsmith = class {
         cacheFlags,
         onError,
         defaultFlags,
+        fetch:fetchImplementation,
         preventFetch,
         enableLogs,
         enableDynatrace,
@@ -246,6 +253,9 @@ const Flagsmith = class {
             this.cacheOptions = cacheOptions? {skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0} : this.cacheOptions;
             if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
                 console.warn("Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.")
+            }
+            if(fetchImplementation) {
+                _fetch = fetchImplementation;
             }
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};
@@ -297,11 +307,11 @@ const Flagsmith = class {
             }
 
             if (enableDynatrace) {
-                // @ts-ignore
+                // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                 if (typeof dtrum === 'undefined') {
                     console.error("You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed.")
                 } else {
-                    // @ts-ignore
+                    // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                     this.dtrum = dtrum;
                 }
             }
