@@ -2,7 +2,7 @@ import AsyncStorage from "@callstack/async-storage";
 import {IFlagsmith} from "./types";
 import core from './flagsmith-core'
 
-const eventSource = typeof window === 'undefined'? null: require('reconnecting-eventsource')
+import eventSource from 'reconnecting-eventsource'
 
 const flagsmith: IFlagsmith = core({AsyncStorage, eventSource});
 

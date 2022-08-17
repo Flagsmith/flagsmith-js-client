@@ -262,7 +262,7 @@ const Flagsmith = class {
             this.initialised = true;
             this.ticks = 10000;
 
-            if (realtime) {
+            if (realtime && typeof window !== 'undefined') {
                 const connectionUrl = eventSourceUrl.replace("$ENVIRONMENT", environmentID);
                 if(!eventSource) {
                     this.log("Error, EventSource is undefined");
