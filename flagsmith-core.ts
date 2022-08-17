@@ -482,7 +482,10 @@ const Flagsmith = class {
                 resolve(true);
             }
         })
-        .catch(error => onError && onError(error));
+        .catch(error => {
+            this.log("Error during initialisation ", error)
+            onError && onError(error)
+        });
     }
 
     getAllFlags() {

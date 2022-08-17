@@ -9,7 +9,7 @@ export default function () {
       options={{
         api: 'https://edge.bullet-train-staging.win/api/v1/',
         environmentID: 'AbXqsQqLLAzmfj5SGCm8Ng',
-        // enableLogs: true,
+        enableLogs: true,
         realtime: true,
       }}
       flagsmith={flagsmith}>

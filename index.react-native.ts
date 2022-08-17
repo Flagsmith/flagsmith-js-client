@@ -1,13 +1,15 @@
 
 import core  from './flagsmith-core'
-import RNEventSource from 'react-native-event-source'
+import RNEventSource from 'react-native-sse'
 
 export default core({
-    eventSource: RNEventSource
+    // @ts-expect-error - this is due to the library being incorrect
+    eventSource: RNEventSource.default
 });
 
 export const createFlagsmithInstance = ()=>{
     return core({
-        eventSource: RNEventSource
+        // @ts-expect-error - this is due to the library being incorrect
+        eventSource: RNEventSource.default
     })
 }
