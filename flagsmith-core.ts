@@ -356,23 +356,21 @@ const Flagsmith = class {
                 }
             }
 
-            if (AsyncStorage && typeof window!=='undefined') {
-                AsyncStorage.getItem(FLAGSMITH_EVENT)
-                    .then((res)=>{
-                        if (res){
-                            try {
-                                this.evaluationEvent = JSON.parse(res)
+            AsyncStorage?.getItem(FLAGSMITH_EVENT)
+                .then((res)=>{
+                    if (res){
+                        try {
+                            this.evaluationEvent = JSON.parse(res)
 
-                            } catch (e){
-                                this.evaluationEvent = {};
-                            }
-                        } else {
+                        } catch (e){
                             this.evaluationEvent = {};
                         }
-                        this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
-                        return true
-                    })
-            }
+                    } else {
+                        this.evaluationEvent = {};
+                    }
+                    this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
+                    return true
+                })
 
 
             if (this.enableAnalytics) {
@@ -380,94 +378,90 @@ const Flagsmith = class {
                     clearInterval(this.analyticsInterval);
                 }
 
-                if (AsyncStorage && typeof window!=='undefined') {
-                    AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
-                        if (res) {
-                            var json = JSON.parse(res);
-                            if (json) {
-                                state = this.getState();
-                                this.log("Retrieved events from cache", res);
-                                this.setState({
-                                    ...state,
-                                    evaluationEvent: json,
-                                });
-                            }
+                AsyncStorage?.getItem(FLAGSMITH_EVENT, (err, res) => {
+                    if (res) {
+                        var json = JSON.parse(res);
+                        if (json) {
+                            state = this.getState();
+                            this.log("Retrieved events from cache", res);
+                            this.setState({
+                                ...state,
+                                evaluationEvent: json,
+                            });
                         }
-                        return true
-                    });
-                }
+                    }
+                    return true
+                });
 
             }
 
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
-                if (AsyncStorage && typeof window!=='undefined') {
-                    AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
-                        if (res) {
-                            try {
-                                var json = JSON.parse(res);
-                                let cachePopulated = false;
-                                if (json && json.api === this.api && json.environmentID === this.environmentID) {
-                                    let setState = true;
-                                    if(this.cacheOptions.ttl){
-                                        if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
-                                            if (json.ts) {
-                                                this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
-                                                setState = false;
-                                            }
+                AsyncStorage?.getItem(FLAGSMITH_KEY, (err, res) => {
+                    if (res) {
+                        try {
+                            var json = JSON.parse(res);
+                            let cachePopulated = false;
+                            if (json && json.api === this.api && json.environmentID === this.environmentID) {
+                                let setState = true;
+                                if(this.cacheOptions.ttl){
+                                    if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
+                                        if (json.ts) {
+                                            this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                            setState = false;
                                         }
                                     }
-                                    if (setState) {
-                                        cachePopulated = true;
-                                        this.setState(json);
-                                        this.log("Retrieved flags from cache", json);
-                                    }
                                 }
-
-                                if (this.flags) { // retrieved flags from local storage
-
-                                    if(this.trigger) {
-                                        this.trigger()
-                                    }
-                                    if (this.onChange) {
-                                        this.onChange(null, { isFromServer: false });
-                                    }
-                                    this.oldFlags = this.flags;
-                                    resolve(true);
-                                    if (this.cacheOptions.skipAPI && cachePopulated) {
-                                        this.log("Skipping API, using cache")
-                                    }
-                                    if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
-                                        this.getFlags();
-                                    }
-                                } else {
-                                    if (!preventFetch) {
-                                        this.getFlags(resolve, reject);
-                                    } else {
-                                        resolve(true);
-                                    }
+                                if (setState) {
+                                    cachePopulated = true;
+                                    this.setState(json);
+                                    this.log("Retrieved flags from cache", json);
                                 }
-                            } catch (e) {
-                                this.log("Exception fetching cached logs", e);
                             }
-                        } else {
-                            if (!preventFetch) {
-                                this.getFlags(resolve, reject)
-                            } else {
-                                if (defaultFlags) {
-                                    if(this.trigger) {
-                                        this.trigger()
-                                    }
-                                    if (this.onChange) {
-                                        this.onChange(null, { isFromServer: false });
-                                    }
+
+                            if (this.flags) { // retrieved flags from local storage
+
+                                if(this.trigger) {
+                                    this.trigger()
                                 }
+                                if (this.onChange) {
+                                    this.onChange(null, { isFromServer: false });
+                                }
+                                this.oldFlags = this.flags;
                                 resolve(true);
+                                if (this.cacheOptions.skipAPI && cachePopulated) {
+                                    this.log("Skipping API, using cache")
+                                }
+                                if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
+                                    this.getFlags();
+                                }
+                            } else {
+                                if (!preventFetch) {
+                                    this.getFlags(resolve, reject);
+                                } else {
+                                    resolve(true);
+                                }
                             }
+                        } catch (e) {
+                            this.log("Exception fetching cached logs", e);
                         }
-                        return true
-                    });
-                }
+                    } else {
+                        if (!preventFetch) {
+                            this.getFlags(resolve, reject)
+                        } else {
+                            if (defaultFlags) {
+                                if(this.trigger) {
+                                    this.trigger()
+                                }
+                                if (this.onChange) {
+                                    this.onChange(null, { isFromServer: false });
+                                }
+                            }
+                            resolve(true);
+                        }
+                    }
+                    return true
+                });
             } else if (!preventFetch) {
                 this.getFlags(resolve, reject);
             } else {
