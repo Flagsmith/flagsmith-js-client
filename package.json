@@ -37,6 +37,7 @@
     "rollup-plugin-dts": "^4.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-terser": "^7.0.2",
+    "tiny-replace-files": "^1.0.2",
     "ts-loader": "^9.2.7",
     "typescript": "^4.6.2"
   },
