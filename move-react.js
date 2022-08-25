@@ -22,9 +22,6 @@ fs.renameSync(path.join(__dirname,"flagsmith-es/react/react/index.d.ts"), path.j
 
 fs.rmdirSync(path.join(__dirname,"flagsmith/react/react"), {recursive:true})
 fs.rmdirSync(path.join(__dirname,"flagsmith-es/react/react"), {recursive:true})
-fs.rmSync(path.join(__dirname,"flagsmith/react/event-trigger.d.ts"))
-fs.rmSync(path.join(__dirname,"flagsmith-es/react/event-trigger.d.ts"))
-
 
 fs.rmSync(path.join(__dirname,"flagsmith/index-es.d.ts"))
 fs.rmSync(path.join(__dirname,"flagsmith-es/index-es.d.ts"))

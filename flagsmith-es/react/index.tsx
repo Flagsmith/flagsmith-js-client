@@ -12,7 +12,7 @@ const events = new Emitter.TinyEmitter();
 
 import {IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState} from '../types'
 
-export const FlagsmithContext = createContext<IFlagsmith | null>(null)
+export const FlagsmithContext = createContext<IFlagsmith<string,string> | null>(null)
 export type FlagsmithContextType = {
     flagsmith: IFlagsmith // The flagsmith instance
     options?: Parameters<IFlagsmith['init']>[0] // Initialisation options, if you do not provide this you will have to call init manually
@@ -92,11 +92,11 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
     const traits = useConstant<string[]>(flagsAsArray(_traits))
     const flagsmith = useContext(FlagsmithContext)
     const [renderKey, setRenderKey] = useState<string>(
-        getRenderKey(flagsmith, flags),
+        getRenderKey(flagsmith as IFlagsmith, flags),
     )
     const renderRef = useRef<string>(renderKey)
     const eventListener = useCallback(() => {
-        const newRenderKey = getRenderKey(flagsmith, flags, traits)
+        const newRenderKey = getRenderKey(flagsmith as IFlagsmith, flags, traits)
         if (newRenderKey !== renderRef.current) {
             renderRef.current = newRenderKey
             setRenderKey(newRenderKey)
@@ -116,7 +116,7 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
                 value: flagsmith!.getValue(k),
             }
         }).concat(traits?.map((v) => {
-            res[v] = flagsmith.getTrait(v)
+            res[v] = flagsmith!.getTrait(v)
         }))
         return res
     }, [renderKey])
@@ -125,7 +125,7 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
 }
 
 export function useFlagsmith<F extends string=string, T extends string=string>() {
-    const context = useContext<IFlagsmith<F,T>>(FlagsmithContext)
+    const context = useContext(FlagsmithContext)
 
     if (!context) {
         throw new Error('useFlagsmith must be used with in a FlagsmithProvider')

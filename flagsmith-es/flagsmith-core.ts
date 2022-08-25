@@ -1,38 +1,59 @@
-import {IFlagsmith, IInitConfig} from "./types";
-var global = typeof global != "undefined" ? global: typeof window != 'undefined' ? window : {}
-let _fetch: typeof global.fetch;
-let AsyncStorage;
+import { IFlags, IFlagsmith, IFlagsmithResponse, IInitConfig, IState, ITraits } from './types';
+export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
+let _fetch: LikeFetch;
+type RequestOptions = {
+    method: "GET"|"PUT"|"DELETE"|"POST",
+    headers: Record<string, string>
+    body?:string
+}
+type DynatraceObject = {
+    "javaLongOrObject": Record<string, number>,
+    "date": Record<string, Date>,
+    "shortString": Record<string, string>,
+    "javaDouble": Record<string, number>,
+}
+type AsyncStorageType = {
+    getItem: (key:string, cb?:(err:string|null, res:string|null)=>void)=>Promise<string|null>
+    setItem: (key:string, value: string)=>Promise<string|null>
+    deleteItem: (key:string)=>Promise<string|null>
+} | null
+let AsyncStorage: AsyncStorageType = null;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
 const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
+// @ts-ignore
 import deepEqual from 'fast-deep-equal';
 let eventSource:typeof EventSource;
-const initError = function (caller) {
+const initError = function (caller:string) {
     return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
 }
 
+type Config= {fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
+
 const Flagsmith = class {
-    eventSource:EventSource = null
-    constructor(props) {
+    eventSource:EventSource|null = null
+    constructor(props: Config) {
         if (props.fetch) {
-            _fetch = props.fetch;
+            _fetch = props.fetch as LikeFetch;
         } else {
-            _fetch = typeof fetch !== 'undefined'? fetch : global.fetch;
+            _fetch = (typeof fetch !== 'undefined'? fetch : global?.fetch) as LikeFetch;
         }
         this.log("Constructing flagsmith instance " + props)
         if (props.eventSource) {
             eventSource = props.eventSource;
         }
-        AsyncStorage = props.AsyncStorage;
+        if (props.AsyncStorage) {
+            AsyncStorage = props.AsyncStorage;
+        }
     }
 
-    getJSON = (url:string, method?:"GET"|"POST"|"PUT", body?:BodyInit) => {
+    getJSON = (url:string, method?:"GET"|"POST"|"PUT", body?:string) => {
         const { environmentID, headers } = this;
-        const options = {
+        const options: RequestOptions = {
             method: method || 'GET',
             body,
             headers: {
-                'x-environment-key': environmentID
+                'x-environment-key': `${environmentID}`
             }
         };
         if (method && method !== "GET")
@@ -49,7 +70,7 @@ const Flagsmith = class {
         return _fetch(url, options)
             .then(res => {
                 this.log("Fetch response: "+ res.status + " " + (method||"GET") +  + " " + url)
-                return res.text()
+                return res.text!()
                     .then((text) => {
                         let err = text;
                         try {
@@ -66,13 +87,13 @@ const Flagsmith = class {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
         this.log("Get Flags")
-        const handleResponse = ({ flags: features, traits }) => {
+        const handleResponse = ({ flags: features, traits }:IFlagsmithResponse) => {
             if (identity) {
-                this.withTraits = false;
+                this.withTraits = null;
             }
             // Handle server response
-            let flags = {};
-            let userTraits = {};
+            let flags:IFlags = {};
+            let userTraits: ITraits = {};
             features = features || [];
             traits = traits || [];
             features.forEach(feature => {
@@ -94,12 +115,7 @@ const Flagsmith = class {
             this.traits = userTraits;
             this.updateStorage();
             if (this.dtrum) {
-                let traits: {
-                    "javaLongOrObject": Record<string, number>,
-                    "date": Record<string, Date>,
-                    "shortString": Record<string, string>,
-                    "javaDouble": Record<string, number>,
-                } = {
+                let traits: DynatraceObject = {
                     javaDouble: {},
                     date: {},
                     shortString: {},
@@ -116,6 +132,7 @@ const Flagsmith = class {
                 this.log("Sending date traits to dynatrace", traits.date)
                 this.log("Sending shortString traits to dynatrace", traits.shortString)
                 this.log("Sending javaDouble to dynatrace", traits.javaDouble)
+                // @ts-expect-error
                 this.dtrum.sendSessionProperties(
                     traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
                 )
@@ -139,14 +156,14 @@ const Flagsmith = class {
                         "identifier": identity,
                         traits: Object.keys(this.withTraits).map((k)=>({
                             "trait_key":k,
-                            "trait_value": this.withTraits[k]
+                            "trait_value": this.withTraits![k]
                         }))
                     })):
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
-                    this.withTraits = false
-                    handleResponse(res[0])
+                    this.withTraits = null
+                    handleResponse(res[0] as IFlagsmithResponse)
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -159,7 +176,7 @@ const Flagsmith = class {
                 this.getJSON(api + "flags/")
             ])
                 .then((res) => {
-                    handleResponse({ flags: res[0], traits:null })
+                    handleResponse({ flags: res[0] as IFlagsmithResponse['flags'], traits:undefined })
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -191,28 +208,28 @@ const Flagsmith = class {
         }
     };
 
-    analyticsInterval= null
-    api= null
-    cacheFlags= null
-    ts= null
-    enableAnalytics= null
-    enableLogs= null
-    environmentID= null
-    evaluationEvent= null
-    flags= null
-    getFlagInterval= null
-    headers= null
-    initialised= null
-    oldFlags= null
-    onChange= null
-    onError= null
-    trigger= null
-    identity= null
-    ticks= null
-    timer= null
-    traits= null
+    analyticsInterval: NodeJS.Timer | null= null
+    api: string|null= null
+    cacheFlags= false
+    ts: number|null= null
+    enableAnalytics= false
+    enableLogs= false
+    environmentID: string|null= null
+    evaluationEvent: Record<string, number> | null= null
+    flags:IFlags|null= null
+    getFlagInterval: NodeJS.Timer|null= null
+    headers?: object | null= null
+    initialised= false
+    oldFlags:IFlags|null= null
+    onChange:IInitConfig['onChange']|null= null
+    onError:IInitConfig['onError']|null = null
+    trigger?:(()=>void)|null= null
+    identity?: string|null= null
+    ticks: number|null= null
+    timer: number|null= null
+    traits:ITraits|null= null
     dtrum= null
-    withTraits= null
+    withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false}
     init({
         environmentID,
@@ -249,7 +266,7 @@ const Flagsmith = class {
             this.onError = onError;
             this.identity = identity;
             this.withTraits = traits;
-            this.enableLogs = enableLogs;
+            this.enableLogs = enableLogs|| false;
             this.cacheOptions = cacheOptions? {skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0} : this.cacheOptions;
             if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
                 console.warn("Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.")
@@ -299,8 +316,8 @@ const Flagsmith = class {
             if (_AsyncStorage) {
                 AsyncStorage = _AsyncStorage;
             }
-            this.cacheFlags = typeof AsyncStorage !== 'undefined' && cacheFlags;
-            this.setState(state)
+            this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
+            this.setState(state as IState)
             if (!environmentID) {
                 reject('Please specify a environment id')
                 throw ('Please specify a environment id');
@@ -317,6 +334,7 @@ const Flagsmith = class {
             }
 
             if(angularHttpClient) {
+                // @ts-expect-error
                 _fetch = (url: string, params: { headers: Record<string, string>, method: "GET" | "POST" | "PUT", body: string }) => {
                     const {headers, method, body} = params
                     return new Promise((resolve) => {
@@ -324,9 +342,9 @@ const Flagsmith = class {
                             case "GET": {
                                 return angularHttpClient.get(url, {
                                     headers,
-                                }).subscribe((v) => {
+                                }).subscribe((v:string) => {
                                     resolve({
-                                        ok: 1,
+                                        ok: true,
                                         text: () => Promise.resolve(v)
                                     })
                                 })
@@ -334,9 +352,9 @@ const Flagsmith = class {
                             case "POST": {
                                 return angularHttpClient.post(url, body, {
                                     headers,
-                                }).subscribe((v) => {
+                                }).subscribe((v:string) => {
                                     resolve({
-                                        ok: 1,
+                                        ok: true,
                                         text: () => Promise.resolve(v)
                                     })
                                 })
@@ -344,9 +362,9 @@ const Flagsmith = class {
                             case "PUT": {
                                 return angularHttpClient.post(url, body, {
                                     headers,
-                                }).subscribe((v) => {
+                                }).subscribe((v:string) => {
                                     resolve({
-                                        ok: 1,
+                                        ok: true,
                                         text: () => Promise.resolve(v)
                                     })
                                 })
@@ -369,7 +387,7 @@ const Flagsmith = class {
                         } else {
                             this.evaluationEvent = {};
                         }
-                        this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks);
+                        this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks!);
                         return true
                     })
             }
@@ -430,7 +448,7 @@ const Flagsmith = class {
                                         this.trigger()
                                     }
                                     if (this.onChange) {
-                                        this.onChange(null, { isFromServer: false });
+                                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
                                     }
                                     this.oldFlags = this.flags;
                                     resolve(true);
@@ -459,7 +477,7 @@ const Flagsmith = class {
                                         this.trigger()
                                     }
                                     if (this.onChange) {
-                                        this.onChange(null, { isFromServer: false });
+                                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
                                     }
                                 }
                                 resolve(true);
@@ -476,7 +494,7 @@ const Flagsmith = class {
                         this.trigger()
                     }
                     if (this.onChange) {
-                        this.onChange(null, { isFromServer: false });
+                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits });
                     }
                 }
                 resolve(true);
@@ -492,7 +510,7 @@ const Flagsmith = class {
         return this.flags;
     }
 
-    identify(userId, traits) {
+    identify(userId: string, traits?:ITraits) {
         this.identity = userId;
         this.log("Identify: " + this.identity)
 
@@ -517,10 +535,10 @@ const Flagsmith = class {
             ts: this.ts,
             traits: this.traits,
             evaluationEvent: this.evaluationEvent,
-        }
+        } as IState
     }
 
-    setState(state) {
+    setState(state: IState) {
         if (state) {
             this.initialised = true;
             this.api = state.api || this.api || defaultAPI;
@@ -532,9 +550,9 @@ const Flagsmith = class {
         }
     }
 
-    log(...args) {
+    log(...args: (unknown)[]) {
         if (this.enableLogs) {
-            console.log.apply(this, ["FLAGSMITH:", new Date().valueOf() - this.timer, "ms", ...args]);
+            console.log.apply(this, ["FLAGSMITH:", new Date().valueOf() - (this.timer||0), "ms", ...args]);
         }
     }
 
@@ -543,7 +561,7 @@ const Flagsmith = class {
             this.ts = new Date().valueOf()
             const state = JSON.stringify(this.getState());
             this.log("Setting storage", state);
-            AsyncStorage.setItem(FLAGSMITH_KEY, state);
+            AsyncStorage!.setItem(FLAGSMITH_KEY, state);
         }
     }
 
@@ -551,7 +569,7 @@ const Flagsmith = class {
         if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
             this.log("Setting event storage", events);
-            AsyncStorage.setItem(FLAGSMITH_EVENT, events);
+            AsyncStorage!.setItem(FLAGSMITH_EVENT, events);
         }
     }
 
@@ -572,8 +590,10 @@ const Flagsmith = class {
     }
 
     stopListening() {
-        clearInterval(this.getFlagInterval);
-        this.getFlagInterval = null;
+        if (this.getFlagInterval) {
+            clearInterval(this.getFlagInterval);
+            this.getFlagInterval = null;
+        }
     }
 
     getSegments() {
@@ -581,7 +601,7 @@ const Flagsmith = class {
         // return this.segments;
     }
 
-    evaluateFlag = (key) => {
+    evaluateFlag = (key:string) => {
         if (this.enableAnalytics) {
             if (!this.evaluationEvent) return;
             if (this.evaluationEvent[key] === undefined) {
@@ -592,7 +612,7 @@ const Flagsmith = class {
         this.updateEventStorage();
     }
 
-    getValue = (key) => {
+    getValue = (key:string) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = null;
         if (flag) {
@@ -605,19 +625,19 @@ const Flagsmith = class {
         return res;
     }
 
-    getTrait = (key) => {
+    getTrait = (key:string) => {
         const trait = this.traits && this.traits[key.toLowerCase().replace(/ /g, '_')];
         return trait;
     }
 
-    setTrait = (key, trait_value) => {
+    setTrait = (key:string, trait_value:string|number|boolean) => {
         const { getJSON, identity, api } = this;
 
         if (!api) {
             console.error(initError("setTrait"))
             return
         }
-        const traits = {}
+        const traits: ITraits = {}
         traits[key] = trait_value
         if (!this.identity) {
 
@@ -647,7 +667,7 @@ const Flagsmith = class {
             })
     };
 
-    setTraits = (traits) => {
+    setTraits = (traits:ITraits) => {
         const { getJSON, identity, api } = this;
 
         if (!api) {
@@ -683,7 +703,7 @@ const Flagsmith = class {
 
     };
 
-    hasFeature = (key) => {
+    hasFeature = (key:string) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = false;
         if (flag && flag.enabled) {
@@ -698,21 +718,21 @@ const Flagsmith = class {
 
 };
 
-type Config= {fetch?:any, AsyncStorage?:any, eventSource?:any};
-
 export default function ({ fetch, AsyncStorage, eventSource }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
 };
 
 // transforms any trait to match sendSessionProperties
 // https://www.dynatrace.com/support/doc/javascriptapi/interfaces/dtrum_types.DtrumApi.html#addActionProperties
-const setDynatraceValue = function (obj, trait, value) {
-    let key = 'shortString'
+const setDynatraceValue = function (obj: DynatraceObject, trait: string, value: string|number|boolean|null|undefined) {
+    let key: keyof DynatraceObject= 'shortString'
     let convertToString = true
     if (typeof value === 'number') {
         key = 'javaDouble'
         convertToString = false
     }
+    // @ts-expect-error
     obj[key] = obj[key] || {}
+    // @ts-expect-error
     obj[key][trait] = convertToString ? value+"":value
 }

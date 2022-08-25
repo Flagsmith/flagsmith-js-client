@@ -1,4 +1,7 @@
+import * as stream from 'stream';
+
 export interface IFlagsmithFeature {
+    id: string
     enabled: boolean;
     value?: string | number | boolean;
 }
@@ -24,6 +27,7 @@ export interface IState<F extends string = string, T extends string = string> {
     api: string;
     environmentID: string;
     flags?: IFlags<F>;
+    evaluationEvent?: Record<string, number>
     identity?: string;
     traits: ITraits<T>;
 }
@@ -41,7 +45,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     api?: string; // the api you wish to use, important if self hosting
     cacheFlags?: boolean // whether to local storage flags, needs AsyncStorage defined
     cacheOptions?: ICacheOptions // A ttl in ms (default to 0 which is infinite) and option to skip hitting the API in flagsmith.init if there's cache available.
-    defaultFlags?: Partial<IFlags<F>>; // Default flags to provide { font_size: { enabled: true, value: 12 } }
+    defaultFlags?: IFlags<F>; // Default flags to provide { font_size: { enabled: true, value: 12 } }
     fetch?: any // A Custom fetch implementation. Note: this has to resolve with the same types as standard fetch
     realtime?: boolean // Upcoming: not in production - Enable event source realtime flags.
     eventSourceUrl?: string // Upcoming: not in production - The event source url to connect realtime flags to, replaces $ENVIRONMENT with your key.
@@ -53,13 +57,28 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     headers?: object // pass custom headers for flagsmith api calls
     identity?: string // Initialise with a given identity
     traits?: ITraits<T>; // Initialise with a given set of traits
-    onChange?: (previousFlags: IFlags<F>, params: IRetrieveInfo) => void; // triggered when the flags are retrieved
+    onChange?: (previousFlags: IFlags<F>|null, params: IRetrieveInfo) => void; // triggered when the flags are retrieved
     onError?: (res: {
         message: string;
     }) => void; // triggered if there was an api error
     preventFetch?: boolean // whether to prevent fetching flags on init
     state?: IState // set a predefined state, useful for isomorphic applications
     _trigger?: ()=>void // Used internally, this function will callback separately to onChange whenever flags are updated
+}
+
+export interface IFlagsmithResponse {
+    traits?: {
+        trait_key: string
+        trait_value: string | number | boolean
+    }[]
+    flags?: {
+        enabled: boolean
+        feature_state_value: string | number | boolean
+        feature: {
+            id: string
+            name:string
+        }
+    }[]
 }
 export interface IFlagsmith<F extends string = string, T extends string = string> {
     /**
@@ -69,7 +88,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Trigger a manual fetch of the environment features
      */
-    getFlags: () => Promise<null>;
+    getFlags: () => Promise<void>;
     /**
      * Returns the current flags
      */
@@ -89,7 +108,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Clears the identity, triggers a call to getFlags
      */
-    logout: () => Promise<null>;
+    logout: () => Promise<void>;
     /**
      * Polls the flagsmith API, specify interval in ms
      */
@@ -113,11 +132,11 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Set a specific trait for a given user id, triggers a call to get flags
      */
-    setTrait: (key: T, value: string | number | boolean) => Promise<null>;
+    setTrait: (key: T, value: string | number | boolean) => Promise<void>;
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
-    setTraits: (traits: Record<T, string | number | boolean>) => Promise<null>;
+    setTraits: (traits: Record<T, string | number | boolean>) => Promise<void>;
     /**
      * The stored identity of the user
      */

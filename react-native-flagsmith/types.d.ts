@@ -1,4 +1,5 @@
 export interface IFlagsmithFeature {
+    id: string;
     enabled: boolean;
     value?: string | number | boolean;
 }
@@ -14,6 +15,7 @@ export interface IState<F extends string = string, T extends string = string> {
     api: string;
     environmentID: string;
     flags?: IFlags<F>;
+    evaluationEvent?: Record<string, number>;
     identity?: string;
     traits: ITraits<T>;
 }
@@ -26,7 +28,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     api?: string;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
-    defaultFlags?: Partial<IFlags<F>>;
+    defaultFlags?: IFlags<F>;
     fetch?: any;
     realtime?: boolean;
     eventSourceUrl?: string;
@@ -38,13 +40,27 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     headers?: object;
     identity?: string;
     traits?: ITraits<T>;
-    onChange?: (previousFlags: IFlags<F>, params: IRetrieveInfo) => void;
+    onChange?: (previousFlags: IFlags<F> | null, params: IRetrieveInfo) => void;
     onError?: (res: {
         message: string;
     }) => void;
     preventFetch?: boolean;
     state?: IState;
     _trigger?: () => void;
+}
+export interface IFlagsmithResponse {
+    traits?: {
+        trait_key: string;
+        trait_value: string | number | boolean;
+    }[];
+    flags?: {
+        enabled: boolean;
+        feature_state_value: string | number | boolean;
+        feature: {
+            id: string;
+            name: string;
+        };
+    }[];
 }
 export interface IFlagsmith<F extends string = string, T extends string = string> {
     /**
@@ -54,7 +70,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Trigger a manual fetch of the environment features
      */
-    getFlags: () => Promise<null>;
+    getFlags: () => Promise<void>;
     /**
      * Returns the current flags
      */
@@ -74,7 +90,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Clears the identity, triggers a call to getFlags
      */
-    logout: () => Promise<null>;
+    logout: () => Promise<void>;
     /**
      * Polls the flagsmith API, specify interval in ms
      */
@@ -98,11 +114,11 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Set a specific trait for a given user id, triggers a call to get flags
      */
-    setTrait: (key: T, value: string | number | boolean) => Promise<null>;
+    setTrait: (key: T, value: string | number | boolean) => Promise<void>;
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
-    setTraits: (traits: Record<T, string | number | boolean>) => Promise<null>;
+    setTraits: (traits: Record<T, string | number | boolean>) => Promise<void>;
     /**
      * The stored identity of the user
      */

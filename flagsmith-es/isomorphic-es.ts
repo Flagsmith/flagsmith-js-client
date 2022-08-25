@@ -1,5 +1,7 @@
+// @ts-expect-error
 import AsyncStorage from "@callstack/async-storage";
 import {IFlagsmith} from "./types";
+// @ts-expect-error
 import eventSource from 'reconnecting-eventsource'
 
 import core from './flagsmith-core'

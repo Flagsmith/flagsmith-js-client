@@ -6,6 +6,7 @@
     "jsx": "react",
     "module": "ESNext",
     "declaration": true,
+    "strict": true,
     "declarationDir": ".",
     "sourceMap": true,
     "moduleResolution": "node",
