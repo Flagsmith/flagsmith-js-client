@@ -66,7 +66,7 @@ const webModule = {
     input: './index.ts',
     output: [
         {
-            file: path.join(__dirname, '/flagsmith/index.js'),
+            file: path.join(__dirname, '/lib/flagsmith/index.js'),
             format: "umd",
             name:"flagsmith",
             sourcemap: true,
@@ -84,7 +84,7 @@ const webModule = {
 
 const webES = generateES(
     webModule,
-    path.join(__dirname, '/flagsmith-es/index.js'),
+    path.join(__dirname, '/lib/flagsmith-es/index.js'),
     [
         "./react/**",
         "./isomorphic.ts",
@@ -99,7 +99,7 @@ const isomorphicModule =  {
     input: './isomorphic.ts',
     output: [
         {
-            file: path.join(__dirname, '/flagsmith/isomorphic.js'),
+            file: path.join(__dirname, '/lib/flagsmith/isomorphic.js'),
             format: "umd",
             name:"isomorphic",
             sourcemap: true,
@@ -116,7 +116,7 @@ const isomorphicModule =  {
 
 const isomorphicES = generateES(
     isomorphicModule,
-    path.join(__dirname, '/flagsmith-es/isomorphic.js'),
+    path.join(__dirname, '/lib/flagsmith-es/isomorphic.js'),
     [
         "./react/index.ts",
         "./index.react-native.ts",
@@ -129,7 +129,7 @@ const nextModule =  {
     input: './next-middleware.ts',
     output: [
         {
-            file: path.join(__dirname, '/flagsmith/next-middleware.js'),
+            file: path.join(__dirname, '/lib/flagsmith/next-middleware.js'),
             format: "umd",
             name:"next-middleware",
             sourcemap: true,
@@ -146,7 +146,7 @@ const nextModule =  {
 
 const nextES = generateES(
     nextModule,
-    path.join(__dirname, '/flagsmith-es/next.js'),
+    path.join(__dirname, '/lib/lagsmith-es/next.js'),
     [
         "./react/index.ts",
         "./index.react-native.ts",
@@ -159,7 +159,7 @@ const reactModule =     {
     input: './react/index.tsx',
     output: [
         {
-            file: path.join(__dirname, '/flagsmith/react/index.js'),
+            file: path.join(__dirname, '/lib/lagsmith/react/index.js'),
             format: "umd",
             name:"flagsmith/react",
             sourcemap: true,
@@ -178,7 +178,7 @@ const reactModule =     {
 
 const reactModuleES = generateES(
     reactModule,
-    path.join(__dirname, '/flagsmith-es/react/index.js'),
+    path.join(__dirname, '/lib/flagsmith-es/react/index.js'),
     [
         "./index.ts",
         "./types.ts",
