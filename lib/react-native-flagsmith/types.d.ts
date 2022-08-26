@@ -58,7 +58,7 @@ export interface IFlagsmithResponse {
         enabled: boolean;
         feature_state_value: IFlagsmithValue;
         feature: {
-            id: string;
+            id: number;
             name: string;
         };
     }[];

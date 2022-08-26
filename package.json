@@ -4,8 +4,8 @@
   "main": "./flagsmith/index.js",
   "scripts": {
     "prepublish": "npx in-publish && npm run build || echo",
-    "deploy": "npm run build && cd ./flagsmith/ && npm publish && cd ../react-native-flagsmith && npm publish && cd ../flagsmith-es && npm publish",
-    "deploy:beta": "npm run build && cd ./flagsmith/ && npm publish --tag beta && cd ../react-native-flagsmith && npm publish --tag beta && cd ../flagsmith-es && npm publish --tag beta",
+    "deploy": "npm run build && cd ./lib/flagsmith/ && npm publish && cd ../../lib/react-native-flagsmith && npm publish && cd ../../lib/flagsmith-es && npm publish",
+    "deploy:beta": "npm run build && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta && cd ../../libflagsmith-es && npm publish --tag beta",
     "build": "rollup -c && node ./move-react.js"
   },
   "repository": {

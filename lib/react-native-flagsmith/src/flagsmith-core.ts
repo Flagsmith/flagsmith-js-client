@@ -28,7 +28,7 @@ const initError = function (caller:string) {
     return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
 }
 
-type Config= {fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
+type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
 
 const Flagsmith = class {
     eventSource:EventSource|null = null
@@ -38,6 +38,9 @@ const Flagsmith = class {
         } else {
             _fetch = (typeof fetch !== 'undefined'? fetch : global?.fetch) as LikeFetch;
         }
+
+        this.canUseStorage = typeof window!=='undefined' || !!props.browserlessStorage;
+
         this.log("Constructing flagsmith instance " + props)
         if (props.eventSource) {
             eventSource = props.eventSource;
@@ -208,6 +211,7 @@ const Flagsmith = class {
         }
     };
 
+    canUseStorage = false
     analyticsInterval: NodeJS.Timer | null= null
     api: string|null= null
     cacheFlags= false
@@ -278,7 +282,6 @@ const Flagsmith = class {
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
             this.ticks = 10000;
-
             if (realtime && typeof window !== 'undefined') {
                 const connectionUrl = eventSourceUrl.replace("$ENVIRONMENT", environmentID);
                 if(!eventSource) {
@@ -374,7 +377,7 @@ const Flagsmith = class {
                 }
             }
 
-            if (AsyncStorage && typeof window!=='undefined') {
+            if (AsyncStorage && this.canUseStorage) {
                 AsyncStorage.getItem(FLAGSMITH_EVENT)
                     .then((res)=>{
                         if (res){
@@ -398,7 +401,7 @@ const Flagsmith = class {
                     clearInterval(this.analyticsInterval);
                 }
 
-                if (AsyncStorage && typeof window!=='undefined') {
+                if (AsyncStorage && this.canUseStorage) {
                     AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
                         if (res) {
                             var json = JSON.parse(res);
@@ -419,7 +422,7 @@ const Flagsmith = class {
 
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
-                if (AsyncStorage && typeof window!=='undefined') {
+                if (AsyncStorage && this.canUseStorage) {
                     AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
                         if (res) {
                             try {
@@ -718,7 +721,7 @@ const Flagsmith = class {
 
 };
 
-export default function ({ fetch, AsyncStorage, eventSource }:Config):IFlagsmith {
+export default function ({ fetch, browserlessStorage, AsyncStorage, eventSource }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
 };
 

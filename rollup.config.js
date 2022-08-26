@@ -147,7 +147,7 @@ const nextModule =  {
 
 const nextES = generateES(
     nextModule,
-    path.join(__dirname, 'lib/flagsmith-es/next.js'),
+    path.join(__dirname, 'lib/flagsmith-es/next-middleware.js'),
     [
         "./react.tsx",
         "./index.react-native.ts",
@@ -179,7 +179,7 @@ const reactModule =     {
 
 const reactModuleES = generateES(
     reactModule,
-    path.join(__dirname, 'lib/flagsmith-es/react/index.js'),
+    path.join(__dirname, 'lib/flagsmith-es/react.js'),
     [
         "./index.ts",
         "./types.ts",
