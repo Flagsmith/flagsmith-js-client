@@ -10,7 +10,7 @@ import React, {
 import Emitter from 'tiny-emitter';
 const events = new Emitter.TinyEmitter();
 
-import {IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState} from '../types'
+import {IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState} from './types'
 
 export const FlagsmithContext = createContext<IFlagsmith<string,string> | null>(null)
 export type FlagsmithContextType = {
