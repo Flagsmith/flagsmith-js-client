@@ -1,11 +1,9 @@
-
-type IFlagsmithValue = string | number | boolean | null
+declare type IFlagsmithValue = string | number | boolean | null;
 export interface IFlagsmithFeature {
     id: number;
     enabled: boolean;
     value?: IFlagsmithValue;
 }
-
 export declare type IFlagsmithTrait = IFlagsmithValue;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
