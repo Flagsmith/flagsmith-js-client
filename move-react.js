@@ -96,3 +96,6 @@ try {
 try {
     fs.rmdirSync(path.join(__dirname,"lib/react-native-flagsmith/lib"), {recursive:true})
 } catch (e){}
+
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flagsmith-es/src/types.d.ts"))
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/src/types.d.ts"))

@@ -4,7 +4,6 @@ import {FlagsmithProvider} from 'flagsmith/react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppComponent from './ExampleComponent';
 
-
 export default function () {
   return (
     <FlagsmithProvider

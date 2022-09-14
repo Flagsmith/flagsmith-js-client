@@ -24,11 +24,21 @@ declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
 };
+export declare type IDatadogRum = {
+    setUser: (newUser: {
+        [x: string]: unknown;
+    }) => void;
+    getUser: () => {
+        [x: string]: unknown;
+    };
+    [extraProps: string]: any;
+};
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
+    datadogRum?: IDatadogRum;
     defaultFlags?: IFlags<F>;
     fetch?: any;
     realtime?: boolean;

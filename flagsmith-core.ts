@@ -1,4 +1,4 @@
-import { IFlags, IFlagsmith, IFlagsmithResponse, IInitConfig, IState, ITraits } from './types';
+import { IDatadogRum, IFlags, IFlagsmith, IFlagsmithResponse, IInitConfig, IState, ITraits } from './types';
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
 let _fetch: LikeFetch;
 type RequestOptions = {
@@ -29,6 +29,10 @@ const initError = function (caller:string) {
 }
 
 type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
+
+const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_"
+const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_"
+const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_"
 
 const Flagsmith = class {
     eventSource:EventSource|null = null
@@ -117,6 +121,22 @@ const Flagsmith = class {
             this.flags = flags;
             this.traits = userTraits;
             this.updateStorage();
+            if (this.datadogRum) {
+                let traits: Parameters<IDatadogRum['setUser']>['0'] = {
+
+                }
+                Object.keys(this.flags).map((key)=>{
+                    traits[FLAGSMITH_CONFIG_ANALYTICS_KEY+key] = this.getValue(key)
+                    traits[FLAGSMITH_FLAG_ANALYTICS_KEY+key] = this.hasFeature(key)
+                })
+                Object.keys(this.traits).map((key)=>{
+                    traits[FLAGSMITH_TRAIT_ANALYTICS_KEY+key] = this.getTrait(key)
+                })
+                this.datadogRum.setUser(({
+                    ...this.datadogRum.getUser(),
+                    ...traits
+                }))
+            }
             if (this.dtrum) {
                 let traits: DynatraceObject = {
                     javaDouble: {},
@@ -125,8 +145,8 @@ const Flagsmith = class {
                     javaLongOrObject: {},
                 }
                 Object.keys(this.flags).map((key)=>{
-                    setDynatraceValue(traits, "flagsmith_value_"+key, this.getValue(key) )
-                    setDynatraceValue(traits, "flagsmith_enabled_"+key, this.hasFeature(key) )
+                    setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY+key, this.getValue(key) )
+                    setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY+key, this.hasFeature(key) )
                 })
                 Object.keys(this.traits).map((key)=>{
                     setDynatraceValue(traits, "flagsmith_trait_"+key, this.getTrait(key) )
@@ -211,6 +231,7 @@ const Flagsmith = class {
         }
     };
 
+    datadogRum:IDatadogRum|null = null
     canUseStorage = false
     analyticsInterval: NodeJS.Timer | null= null
     api: string|null= null
@@ -236,27 +257,28 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false}
     init({
-        environmentID,
-        api = defaultAPI,
-        headers,
-        onChange,
-        cacheFlags,
-        onError,
-        defaultFlags,
-        fetch:fetchImplementation,
-        preventFetch,
-        enableLogs,
-        enableDynatrace,
-        enableAnalytics,
-        realtime,
-        eventSourceUrl= "http://sse-lb-eu-west-2-7ba834a-1075512661.eu-west-2.elb.amazonaws.com.global.prod.fastly.net/sse/environments/$ENVIRONMENT/stream",
         AsyncStorage: _AsyncStorage,
-        identity,
-        traits,
         _trigger,
-        state,
-        cacheOptions,
         angularHttpClient,
+        api = defaultAPI,
+        cacheFlags,
+        cacheOptions,
+        datadogRum,
+        defaultFlags,
+        enableAnalytics,
+        enableDynatrace,
+        enableLogs,
+        environmentID,
+        eventSourceUrl= "http://sse-lb-eu-west-2-7ba834a-1075512661.eu-west-2.elb.amazonaws.com.global.prod.fastly.net/sse/environments/$ENVIRONMENT/stream",
+        fetch:fetchImplementation,
+        headers,
+        identity,
+        onChange,
+        onError,
+        preventFetch,
+        realtime,
+        state,
+        traits,
          }: IInitConfig) {
 
         return new Promise((resolve, reject) => {
@@ -326,6 +348,9 @@ const Flagsmith = class {
                 throw ('Please specify a environment id');
             }
 
+            if(datadogRum) {
+                this.datadogRum = datadogRum;
+            }
             if (enableDynatrace) {
                 // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                 if (typeof dtrum === 'undefined') {
