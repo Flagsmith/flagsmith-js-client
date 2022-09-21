@@ -249,7 +249,7 @@ const Flagsmith = class {
         enableDynatrace,
         enableAnalytics,
         realtime,
-        eventSourceUrl= "http://sse-lb-eu-west-2-7ba834a-1075512661.eu-west-2.elb.amazonaws.com.global.prod.fastly.net/sse/environments/$ENVIRONMENT/stream",
+        eventSourceUrl= "https://realtime.flagsmith.com/",
         AsyncStorage: _AsyncStorage,
         identity,
         traits,
@@ -283,7 +283,7 @@ const Flagsmith = class {
             this.initialised = true;
             this.ticks = 10000;
             if (realtime && typeof window !== 'undefined') {
-                const connectionUrl = eventSourceUrl.replace("$ENVIRONMENT", environmentID);
+                const connectionUrl = eventSourceUrl + "sse/environments/" +  environmentID + "/stream";
                 if(!eventSource) {
                     this.log("Error, EventSource is undefined");
                 } else if (!this.eventSource) {
