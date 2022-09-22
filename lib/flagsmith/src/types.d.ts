@@ -16,7 +16,7 @@ export interface IState<F extends string = string, T extends string = string> {
     api: string;
     environmentID: string;
     flags?: IFlags<F>;
-    evaluationEvent?: Record<string, number> | null;
+    evaluationEvent?: Record<string, Record<string, number>> | null;
     identity?: string;
     traits: ITraits<T>;
 }
