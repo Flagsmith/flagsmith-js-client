@@ -200,9 +200,13 @@ const Flagsmith = class {
             return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.environmentID]))
                 .then((res) => {
                     const state = this.getState();
+                    if(!this.evaluationEvent) {
+                        this.evaluationEvent = {}
+                    }
+                    this.evaluationEvent[this.environmentID] = {}
                     this.setState({
                         ...state,
-                        evaluationEvent: {},
+                        evaluationEvent: this.evaluationEvent,
                     });
                     this.updateEventStorage();
                 }).catch((err) => {
