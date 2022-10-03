@@ -629,6 +629,8 @@ const Flagsmith = class {
             res = flag.value;
         }
 
+        this.evaluateFlag(key);
+
         if (options?.json) {
             try {
                 return JSON.parse(res as string)
@@ -636,9 +638,6 @@ const Flagsmith = class {
                 return options.fallback
             }
         }
-
-        this.evaluateFlag(key);
-
         //todo record check for value
         return res;
     }
