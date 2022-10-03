@@ -24,6 +24,8 @@ fs.copyFileSync(path.join(__dirname,"flagsmith-core.ts"),path.join(__dirname,"li
 fs.copyFileSync(path.join(__dirname,"next-middleware.ts"),path.join(__dirname,"lib/flagsmith/src/next-middleware.ts"))
 fs.copyFileSync(path.join(__dirname,"isomorphic.ts"),path.join(__dirname,"lib/flagsmith/src/isomorphic.ts"))
 fs.copyFileSync(path.join(__dirname,"react.tsx"),path.join(__dirname,"lib/flagsmith/src/react.tsx"))
+fs.copyFileSync(path.join(__dirname,"react.tsx"),path.join(__dirname,"lib/react-native-flagsmith/src/react.tsx"))
+fs.copyFileSync(path.join(__dirname,"react.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/src/react.d.ts"))
 //Remove not needed flagsmith-core.d.ts
 fs.rmSync(path.join(__dirname,"lib/flagsmith/flagsmith-core.d.ts"))
 fs.rmSync(path.join(__dirname,"lib/react-native-flagsmith/flagsmith-core.d.ts"))
@@ -82,6 +84,7 @@ replaceInFileSync(path.join(__dirname, "lib/react-native-flagsmith/index.js.map"
 
 // fix paths in flagsmith/react.js sourcemaps
 replaceInFileSync(path.join(__dirname, "lib/flagsmith/react.js.map"),"../../../react.tsx","./src/react.tsx"  )
+replaceInFileSync(path.join(__dirname, "lib/react-native-flagsmith/react.js.map"),"../../../react.tsx","./src/react.tsx"  )
 
 // fix paths in flagsmith-es/react.js sourcemaps
 replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/react.js.map"),"../../../react.tsx","./src/react.tsx"  )
