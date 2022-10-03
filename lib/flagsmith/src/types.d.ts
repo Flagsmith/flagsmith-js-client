@@ -7,6 +7,10 @@ export interface IFlagsmithFeature {
 export declare type IFlagsmithTrait = IFlagsmithValue;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
+export declare type IFlagsmithJSONValue = {
+    json: boolean;
+    fallback: Array<any> | object;
+};
 export interface IRetrieveInfo {
     isFromServer: boolean;
     flagsChanged: boolean;

@@ -1,4 +1,4 @@
-import { IFlags, IFlagsmith, IFlagsmithResponse, IInitConfig, IState, ITraits } from './types';
+import { IFlags, IFlagsmith, IFlagsmithJSONValue, IFlagsmithResponse, IInitConfig, IState, ITraits } from './types';
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
 let _fetch: LikeFetch;
 type RequestOptions = {
@@ -622,16 +622,24 @@ const Flagsmith = class {
         this.updateEventStorage();
     }
 
-    getValue = (key:string) => {
+    getValue = (key:string, options?: IFlagsmithJSONValue) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = null;
         if (flag) {
             res = flag.value;
         }
+
+        if (options?.json) {
+            try {
+                return JSON.parse(res as string)
+            } catch (e) {
+                return options.fallback
+            }
+        }
+
         this.evaluateFlag(key);
 
         //todo record check for value
-
         return res;
     }
 
