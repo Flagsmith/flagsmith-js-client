@@ -9,6 +9,13 @@ export interface IFlagsmithFeature {
 export declare type IFlagsmithTrait = IFlagsmithValue;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
+
+export declare type GetValueOptions<T = Array<any> | object> =  {
+    json: boolean;
+    fallback?: T
+}
+
+
 export interface IRetrieveInfo {
     isFromServer: boolean;
     flagsChanged: boolean;
@@ -109,7 +116,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
-    getValue: (key: F) => IFlagsmithValue;
+    getValue<T>(key: F, options?: GetValueOptions<T>): T | IFlagsmithValue;
     /**
      * Get the value of a particular trait for the identified user
      */
