@@ -1,5 +1,5 @@
 
-type IFlagsmithValue = string | number | boolean | null
+type IFlagsmithValue<T=string | number | boolean | null> = T
 export interface IFlagsmithFeature {
     id: number;
     enabled: boolean;
@@ -11,7 +11,7 @@ export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeat
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
 
 export declare type GetValueOptions<T = Array<any> | object> =  {
-    json: boolean;
+    json?: boolean;
     fallback?: T
 }
 
@@ -116,7 +116,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
-    getValue<T>(key: F, options?: GetValueOptions<T>): T | IFlagsmithValue;
+    getValue<T=IFlagsmithValue>(key: F, options?: GetValueOptions<T>): IFlagsmithValue<T>;
     /**
      * Get the value of a particular trait for the identified user
      */

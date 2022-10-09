@@ -89,6 +89,18 @@ replaceInFileSync(path.join(__dirname, "lib/react-native-flagsmith/react.js.map"
 // fix paths in flagsmith-es/react.js sourcemaps
 replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/react.js.map"),"../../../react.tsx","./src/react.tsx"  )
 
+
+// copy types.d
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flagsmith/src/types.d.ts"))
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flagsmith-es/src/types.d.ts"))
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/src/types.d.ts"))
+
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flagsmith/types.d.ts"))
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flagsmith-es/types.d.ts"))
+fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/types.d.ts"))
+
+
+
 //Rollup can't ignore lib d.ts files
 try {
     fs.rmdirSync(path.join(__dirname,"lib/flagsmith-es/lib"), {recursive:true})
