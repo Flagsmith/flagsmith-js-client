@@ -12,6 +12,9 @@ export default function () {
         cacheFlags: true,
         enableLogs: true,
         AsyncStorage: AsyncStorage,
+        onError: error => {
+          console.warn(error);
+        },
       }}
       flagsmith={flagsmith}>
       <AppComponent />
