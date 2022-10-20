@@ -196,6 +196,11 @@ const Flagsmith = class {
 
     analyticsFlags = () => {
         const { api } = this;
+
+        if (!this.evaluationEvent|| !this.evaluationEvent[this.environmentID]) {
+            return
+        }
+
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
             return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.environmentID]))
                 .then((res) => {
