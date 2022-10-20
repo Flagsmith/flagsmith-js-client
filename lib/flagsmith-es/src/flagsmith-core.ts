@@ -79,10 +79,11 @@ const Flagsmith = class {
                         try {
                             err = JSON.parse(text);
                         } catch (e) {}
-                        return res.ok ? err : Promise.reject(err);
+                        return res.status >= 200 && res.status ? err : Promise.reject(err);
                     })
             }).catch((e)=>{
                 console.error("Flagsmith: Fetch error: " + e)
+                throw new Error("Flagsmith: Fetch error:" + e)
             })
     };
 
