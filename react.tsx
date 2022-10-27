@@ -24,10 +24,14 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
  flagsmith, options, serverState, children,
 }) => {
     const firstRenderRef = useRef(true)
-    flagsmith?.trigger = ()=>{
-        flagsmith.log("React - trigger event received")
-        events.emit('event');
+    if (flagsmith && !flagsmith?.trigger) {
+        // @ts-expect-error
+        flagsmith.trigger = ()=>{
+            flagsmith.log("React - trigger event received")
+            events.emit('event');
+        }
     }
+
     if (serverState && !flagsmith.initialised) {
         flagsmith.setState(serverState)
     }
