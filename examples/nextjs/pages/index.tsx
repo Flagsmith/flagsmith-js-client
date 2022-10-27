@@ -13,6 +13,7 @@ const Home: NextPage = () => {
       json: true,
       fallback: {foo:null,bar:null}
   });
+  console.log(json)
 
   const font_size = flagsmith.getValue("font_size", {fallback:null})
 
@@ -20,7 +21,6 @@ const Home: NextPage = () => {
       <div className="App">
         font_size: {flags.font_size?.value}
         example_trait: {flags.example_trait}
-        example_json_trait: {`foo ${json.foo}, bar ${json.bar}`}
         {
           flagsmith.identity? (
               <button onClick={()=>flagsmith.logout()}>

@@ -639,6 +639,10 @@ const Flagsmith = class {
 
         if (options?.json) {
             try {
+                if (res === null) {
+                    this.log("Tried to parse null flag as JSON: " + key)
+                    return options.fallback;
+                }
                 return JSON.parse(res as string)
             } catch (e) {
                 return options.fallback

@@ -29,6 +29,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
     }
     if (firstRenderRef.current) {
         firstRenderRef.current = false
+        flagsmith.trigger = ()=>events.emit('event');
         if (options) {
             flagsmith.init({
                 ...options,
@@ -39,8 +40,6 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
                     events.emit('event')
                 },
             })
-        } else {
-            flagsmith.trigger = ()=>events.emit('event');
         }
     }
     return (
