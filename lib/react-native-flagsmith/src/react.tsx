@@ -114,9 +114,10 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
     }
     useEffect(()=>{
         return () => {
+            flagsmith?.log("React - Removing event listeners")
             events.off('event', eventListener)
         }
-    })
+    }, [])
     const res = useMemo(() => {
         flagsmith?.log("React - Render key has changed")
         const res: any = {}
