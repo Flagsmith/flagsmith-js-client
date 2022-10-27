@@ -22,11 +22,11 @@ const plugins = (exclude)=>[
         }
     }),
     typescript({ tsconfig: "./tsconfig.json",exclude }),
-    terser({
-        format: {
-            comments: false
-        },
-    }),
+    // terser({
+    //     format: {
+    //         comments: false
+    //     },
+    // }),
 ];
 
 const pluginsES = (exclude)=>[
@@ -40,11 +40,11 @@ const pluginsES = (exclude)=>[
         }
     }),
     typescript({ tsconfig: "./tsconfig.json",exclude }),
-    terser({
-        format: {
-            comments: false
-        },
-    }),
+    // terser({
+    //     format: {
+    //         comments: false
+    //     },
+    // }),
 ];
 
 const generateES = (config, filePath, _plugins, input) => {

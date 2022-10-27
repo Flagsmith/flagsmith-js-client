@@ -142,6 +142,10 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     trigger?: () => {};
     /**
+     * Used internally, this function will console log if enableLogs is being set within flagsmith.init
+     */
+    log: (message?: any, ...optionalParams: any[]) =>void;
+    /**
      * Used internally, this is the cache options provided in flagsmith.init
      */
     cacheOptions: {
