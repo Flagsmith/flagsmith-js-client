@@ -1,7 +1,7 @@
 
 type IFlagsmithValue<T=string | number | boolean | null> = T
 export interface IFlagsmithFeature {
-    id: number;
+    id?: number;
     enabled: boolean;
     value?: IFlagsmithValue;
 }
