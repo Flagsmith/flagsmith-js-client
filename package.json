@@ -3,6 +3,7 @@
   "description": "Feature flagging to support continuous development",
   "main": "./flagsmith/index.js",
   "scripts": {
+    "postinstall": "patch-package",
     "prepublish": "npx in-publish && npm run build || echo",
     "deploy": "npm run build && cd ./lib/flagsmith/ && npm publish && cd ../../lib/react-native-flagsmith && npm publish && cd ../../lib/flagsmith-es && npm publish",
     "deploy:beta": "npm run build && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta && cd ../../libflagsmith-es && npm publish --tag beta",
@@ -31,6 +32,7 @@
     "@types/react": "^17.0.39",
     "fork-ts-checker-webpack-plugin": "^7.2.1",
     "in-publish": "^2.0.1",
+    "patch-package": "^6.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "rollup": "^2.77.0",
@@ -46,7 +48,7 @@
     "react-dom": "^17.0.2"
   },
   "dependencies": {
-    "@callstack/async-storage": "^1.1.0",
+    "@callstack/async-storage": "1.1.0",
     "encoding": "^0.1.12",
     "fast-deep-equal": "^3.1.3",
     "isomorphic-unfetch": "^3.0.0",

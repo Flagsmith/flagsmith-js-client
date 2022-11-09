@@ -15,7 +15,6 @@ type DynatraceObject = {
 type AsyncStorageType = {
     getItem: (key:string, cb?:(err:string|null, res:string|null)=>void)=>Promise<string|null>
     setItem: (key:string, value: string)=>Promise<string|null>
-    deleteItem: (key:string)=>Promise<string|null>
 } | null
 let AsyncStorage: AsyncStorageType = null;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
