@@ -1,4 +1,6 @@
-# Angular
+<img width="100%" src="https://raw.githubusercontent.com/Flagsmith/flagsmith/main/static-files/hero.png"/>
+
+## Flagsmith with Angular
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.17.
 
