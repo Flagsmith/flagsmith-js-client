@@ -1,8 +1,8 @@
 <img width="100%" src="https://raw.githubusercontent.com/Flagsmith/flagsmith/main/static-files/hero.png"/>
 
-# Flagsmith with jQuery
+# Flagsmith with Dynatrace's Realtime User Monitoring
 
-This repository contains basic integration with just jQuery.
+This repository contains basic integration with Dynatrace's Realtime User Monitoring.
 
 ## Installation
 
