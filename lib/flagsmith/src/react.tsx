@@ -40,6 +40,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
         if (options) {
             flagsmith.init({
                 ...options,
+                state: options.state || serverState,
                 onChange: (...args) => {
                     if (options.onChange) {
                         options.onChange(...args)
