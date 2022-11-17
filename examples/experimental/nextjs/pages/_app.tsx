@@ -25,12 +25,15 @@ function MyApp({ Component, pageProps, flagsmithState }: AppProps & {flagsmithSt
 
 MyApp.getInitialProps = async () => {
   // calls page's `getInitialProps` and fills `appProps.pageProps`
-  await flagsmith.init({ // fetches flags on the server
-      api: 'https://edge.bullet-train-staging.win/api/v1/',
-      environmentID,
-      enableLogs: true,
-      realtime: true,
-  });
+    if(!flagsmith.initialised) {
+        await flagsmith.init({ // fetches flags on the server
+            api: 'https://edge.bullet-train-staging.win/api/v1/',
+            environmentID,
+            enableLogs: true,
+            realtime: true,
+        });
+    }
+
   return { flagsmithState: flagsmith.getState() }
 }
 

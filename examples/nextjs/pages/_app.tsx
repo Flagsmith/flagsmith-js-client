@@ -18,10 +18,13 @@ function MyApp({ Component, pageProps, flagsmithState }: AppProps & {flagsmithSt
 
 
 MyApp.getInitialProps = async () => {
-  // calls page's `getInitialProps` and fills `appProps.pageProps`
-  await flagsmith.init({ // fetches flags on the server
-      environmentID,
-  });
+    if(!flagsmith.initialised) {
+        // Initialise flagsmith if it hasn't been already in memory.
+        await flagsmith.init({ // fetches flags on the server
+            environmentID,
+        });
+    }
+
   return { flagsmithState: flagsmith.getState() }
 }
 
