@@ -15,7 +15,6 @@ type DynatraceObject = {
 type AsyncStorageType = {
     getItem: (key:string, cb?:(err:string|null, res:string|null)=>void)=>Promise<string|null>
     setItem: (key:string, value: string)=>Promise<string|null>
-    deleteItem: (key:string)=>Promise<string|null>
 } | null
 let AsyncStorage: AsyncStorageType = null;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
@@ -142,6 +141,7 @@ const Flagsmith = class {
                 )
             }
             if(this.trigger) {
+                this.log("trigger called")
                 this.trigger()
             }
             if (onChange) {
@@ -276,7 +276,7 @@ const Flagsmith = class {
             this.getFlagInterval = null;
             this.analyticsInterval = null;
             this.onChange = onChange;
-            this.trigger = _trigger;
+            this.trigger = _trigger || this.trigger;
             this.onError = onError;
             this.identity = identity;
             this.withTraits = traits;
@@ -458,9 +458,11 @@ const Flagsmith = class {
                                 if (this.flags) { // retrieved flags from local storage
 
                                     if(this.trigger) {
+                                        this.log("trigger called")
                                         this.trigger()
                                     }
                                     if (this.onChange) {
+                                        this.log("onChange called")
                                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
                                     }
                                     this.oldFlags = this.flags;
@@ -487,9 +489,11 @@ const Flagsmith = class {
                             } else {
                                 if (defaultFlags) {
                                     if(this.trigger) {
+                                        this.log("trigger called")
                                         this.trigger()
                                     }
                                     if (this.onChange) {
+                                        this.log("onChange called")
                                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
                                     }
                                 }
@@ -504,9 +508,11 @@ const Flagsmith = class {
             } else {
                 if (defaultFlags) {
                     if(this.trigger) {
+                        this.log("trigger called")
                         this.trigger()
                     }
                     if (this.onChange) {
+                        this.log("onChange called")
                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits });
                     }
                 }
@@ -560,6 +566,7 @@ const Flagsmith = class {
             this.identity = state.identity || this.identity;
             this.traits = state.traits || this.traits;
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
+            this.log("setState called", this)
         }
     }
 
@@ -639,6 +646,10 @@ const Flagsmith = class {
 
         if (options?.json) {
             try {
+                if (res === null) {
+                    this.log("Tried to parse null flag as JSON: " + key)
+                    return options.fallback;
+                }
                 return JSON.parse(res as string)
             } catch (e) {
                 return options.fallback

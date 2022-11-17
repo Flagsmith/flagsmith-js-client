@@ -1,6 +1,6 @@
 {
   "name": "flagsmith-es",
-  "version": "3.11.0",
+  "version": "3.14.1",
   "description": "Feature flagging to support continuous development. This is an esm equivalent of the standard flagsmith npm module.",
   "main": "./index.js",
   "type": "module",

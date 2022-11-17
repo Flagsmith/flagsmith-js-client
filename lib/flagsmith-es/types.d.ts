@@ -1,7 +1,7 @@
 
 type IFlagsmithValue<T=string | number | boolean | null> = T
 export interface IFlagsmithFeature {
-    id: number;
+    id?: number;
     enabled: boolean;
     value?: IFlagsmithValue;
 }
@@ -141,6 +141,10 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
     trigger?: () => {};
+    /**
+     * Used internally, this function will console log if enableLogs is being set within flagsmith.init
+     */
+    log: (message?: any, ...optionalParams: any[]) =>void;
     /**
      * Used internally, this is the cache options provided in flagsmith.init
      */

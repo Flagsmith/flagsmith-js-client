@@ -9,6 +9,12 @@ const environmentID = "QjgYur4LQTwe5HpvbvhpzK"
 function MyApp({ Component, pageProps, flagsmithState }: AppProps & {flagsmithState: IState}) {
     return (
         <FlagsmithProvider flagsmith={flagsmith}
+                           options={{
+                               environmentID,
+                               enableLogs: true,
+                               cacheFlags: true,
+                               cacheOptions: {skipAPI:true,ttl:5000}
+                           }}
                            serverState={flagsmithState as IState}
 >
             <Component {...pageProps} />
