@@ -440,6 +440,10 @@ const Flagsmith = class {
                                 let cachePopulated = false;
                                 if (json && json.api === this.api && json.environmentID === this.environmentID) {
                                     let setState = true;
+                                    if(this.identity && (json.identity!==this.identity)) {
+                                        this.log("Ignoring cache,  identity has changed from " + json.identity + " to " + this.identity )
+                                        setState = false;
+                                    }
                                     if(this.cacheOptions.ttl){
                                         if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
                                             if (json.ts) {
