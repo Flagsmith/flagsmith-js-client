@@ -668,6 +668,10 @@ const Flagsmith = class {
         return trait;
     }
 
+    getAllTraits = () => {
+        return this.traits
+    }
+
     setTrait = (key:string, trait_value:string|number|boolean) => {
         const { getJSON, identity, api } = this;
 

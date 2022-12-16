@@ -122,6 +122,10 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     getTrait: (key: T) => IFlagsmithValue;
     /**
+     * Get the values of all traits for the identified user
+     */
+    getAllTraits: () => Record<string, IFlagsmithValue>;
+    /**
      * Set a specific trait for a given user id, triggers a call to get flags
      */
     setTrait: (key: T, value: IFlagsmithValue) => Promise<void>;
