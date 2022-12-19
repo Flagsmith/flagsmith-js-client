@@ -682,7 +682,7 @@ const Flagsmith = class {
     }
 
     setTrait = (key:string, trait_value:IFlagsmithTrait) => {
-        const { getJSON, identity, api } = this;
+        const { api } = this;
 
         if (!api) {
             console.error(initError("setTrait"))
@@ -714,7 +714,7 @@ const Flagsmith = class {
             return
         }
         if (this.initialised) {
-            this.getFlags()
+            return this.getFlags()
         }
     };
 
