@@ -694,9 +694,8 @@ const Flagsmith = class {
     };
 
     setTraits = (traits:ITraits) => {
-        const { getJSON, identity, api } = this;
 
-        if (!api) {
+        if (!this.api) {
             console.error(initError("setTraits"))
             return
         }
@@ -704,10 +703,12 @@ const Flagsmith = class {
         if (!traits || typeof traits !== 'object') {
             console.error("Expected object for flagsmith.setTraits");
         }
+
         this.withTraits = {
             ...(this.withTraits||{}),
             ...traits
         };
+
         if (!this.identity) {
             this.log("Set traits prior to identifying", this.withTraits);
             return
