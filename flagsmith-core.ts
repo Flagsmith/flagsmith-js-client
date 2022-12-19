@@ -1,4 +1,13 @@
-import { IFlags, IFlagsmith, GetValueOptions, IFlagsmithResponse, IInitConfig, IState, ITraits } from './types';
+import {
+    IFlags,
+    IFlagsmith,
+    GetValueOptions,
+    IFlagsmithResponse,
+    IInitConfig,
+    IState,
+    ITraits,
+    IFlagsmithTrait,
+} from './types';
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
 let _fetch: LikeFetch;
 type RequestOptions = {
@@ -672,47 +681,21 @@ const Flagsmith = class {
         return this.traits
     }
 
-    setTrait = (key:string, trait_value:string|number|boolean) => {
+    setTrait = (key:string, trait_value:IFlagsmithTrait) => {
         const { getJSON, identity, api } = this;
 
         if (!api) {
             console.error(initError("setTrait"))
             return
         }
-        const traits: ITraits = {}
-        traits[key] = trait_value
-        if (!this.identity) {
-
-            this.withTraits = {
-                ...(this.withTraits||{}),
-                ...traits
-            };
-            this.log("Set trait prior to identifying", this.withTraits);
-
-            return
-        }
-
-
-        const body = {
-            "identity": {
-                "identifier": identity
-            },
-            "trait_key": key,
-            "trait_value": trait_value
-        }
-
-        return getJSON(`${api}traits/`, 'POST', JSON.stringify(body))
-            .then(() => {
-                if (this.initialised) {
-                    this.getFlags()
-                }
-            })
+        const traits:ITraits<string> = {};
+        traits[key] = trait_value;
+        return this.setTraits(traits)
     };
 
     setTraits = (traits:ITraits) => {
-        const { getJSON, identity, api } = this;
 
-        if (!api) {
+        if (!this.api) {
             console.error(initError("setTraits"))
             return
         }
@@ -721,28 +704,18 @@ const Flagsmith = class {
             console.error("Expected object for flagsmith.setTraits");
         }
 
-        if (!this.identity) {
-            this.withTraits = {
-                ...(this.withTraits||{}),
-                ...traits
-            };
+        this.withTraits = {
+            ...(this.withTraits||{}),
+            ...traits
+        };
 
+        if (!this.identity) {
             this.log("Set traits prior to identifying", this.withTraits);
             return
         }
-
-        return this.getJSON(api + 'identities/', "POST", JSON.stringify({
-            "identifier": identity,
-            traits: Object.keys(traits).map((k)=>({
-                "trait_key":k,
-                "trait_value": traits[k]
-            }))
-        })).then(() => {
-            if (this.initialised) {
-                this.getFlags()
-            }
-        })
-
+        if (this.initialised) {
+            this.getFlags()
+        }
     };
 
     hasFeature = (key:string) => {
