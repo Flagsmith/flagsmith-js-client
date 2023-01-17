@@ -29,6 +29,7 @@ document.getElementById("js-toggle-trait").addEventListener("click", toggleTrait
 flagsmith.init({
     cacheFlags: true,
     enableLogs: true,
+    enableAnalytics:true,
     environmentID: environmentID,
     defaultFlags: {
         font_size: { value:10, enabled:true }

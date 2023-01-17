@@ -24,6 +24,14 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
  flagsmith, options, serverState, children,
 }) => {
     const firstRenderRef = useRef(true)
+    if (flagsmith && !flagsmith?.trigger) {
+        // @ts-expect-error
+        flagsmith.trigger = ()=>{
+            flagsmith.log("React - trigger event received")
+            events.emit('event');
+        }
+    }
+
     if (serverState && !flagsmith.initialised) {
         flagsmith.setState(serverState)
     }
@@ -32,6 +40,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
         if (options) {
             flagsmith.init({
                 ...options,
+                state: options.state || serverState,
                 onChange: (...args) => {
                     if (options.onChange) {
                         options.onChange(...args)
@@ -39,8 +48,6 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
                     events.emit('event')
                 },
             })
-        } else {
-            flagsmith.trigger = ()=>events.emit('event');
         }
     }
     return (
@@ -88,6 +95,8 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
 } & {
     [K in T]: IFlagsmithTrait
 } {
+    const firstRender = useRef(true)
+
     const flags = useConstant<string[]>(flagsAsArray(_flags))
     const traits = useConstant<string[]>(flagsAsArray(_traits))
     const flagsmith = useContext(FlagsmithContext)
@@ -96,19 +105,26 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
     )
     const renderRef = useRef<string>(renderKey)
     const eventListener = useCallback(() => {
+        flagsmith?.log("React - Event listener triggered")
         const newRenderKey = getRenderKey(flagsmith as IFlagsmith, flags, traits)
         if (newRenderKey !== renderRef.current) {
             renderRef.current = newRenderKey
             setRenderKey(newRenderKey)
         }
     }, [])
-    useEffect(() => {
+    if (firstRender.current) {
+        firstRender.current = false;
+        flagsmith?.log("React - Initialising event listeners")
         events.on('event', eventListener)
+    }
+    useEffect(()=>{
         return () => {
+            flagsmith?.log("React - Removing event listeners")
             events.off('event', eventListener)
         }
     }, [])
     const res = useMemo(() => {
+        flagsmith?.log("React - Render key has changed")
         const res: any = {}
         flags.map((k) => {
             res[k] = {

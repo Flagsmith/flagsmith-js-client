@@ -177,6 +177,27 @@ const reactModule =     {
     external: ["react", "react-dom"]
 }
 
+const reactReactNativeModule =     {
+    input: './react.tsx',
+    output: [
+        {
+            file: path.join(__dirname, 'lib/react-native-flagsmith/react.js'),
+            format: "umd",
+            name:"react-native-flagsmith/react",
+            sourcemap: true,
+        },
+    ],
+    plugins: plugins(
+        [
+            "./index.ts",
+            "./types.ts",
+            "./isomorphic.ts",
+            "./index.react-native.ts",
+        ]
+    ),
+    external: ["react", "react-dom"]
+}
+
 const reactModuleES = generateES(
     reactModule,
     path.join(__dirname, 'lib/flagsmith-es/react.js'),
@@ -191,7 +212,7 @@ const reactModuleES = generateES(
 
 
 export default [webModule, reactModule,
-    isomorphicModule,isomorphicES, nextModule, nextES, webES,  reactModuleES
+    isomorphicModule,isomorphicES, nextModule, nextES, webES, reactReactNativeModule,  reactModuleES
 ].concat([
     {
         input: './index.react-native.ts',

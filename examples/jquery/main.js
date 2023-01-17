@@ -34,6 +34,7 @@ flagsmith.init({
     cacheFlags: true,
     enableLogs: true,
     enableAnalytics:true,
+    cacheOptions: {skipAPI:true,ttl:5000},
     defaultFlags: {
         font_size: {value: 10, enabled:true}
     },

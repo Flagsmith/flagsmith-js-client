@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect} from 'react';
-import {useFlags, useFlagsmith} from 'flagsmith/react';
+import React, {useCallback} from 'react';
+import {useFlags, useFlagsmith} from 'react-native-flagsmith/react';
 import {Text, TouchableOpacity, View} from 'react-native';
 function ExampleComponent() {
   const flags = useFlags(['font_size'], ['example_trait']); // only causes re-render if specified flag values / traits change

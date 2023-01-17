@@ -9,6 +9,14 @@ const Home: NextPage = () => {
   const identify = ()=>{
     flagsmith.identify("flagsmith_sample_user")
   }
+  const json = flagsmith.getValue<{foo: string|null, bar: string|null}>("json_value", {
+      json: true,
+      fallback: {foo:null,bar:null}
+  });
+  console.log(json)
+
+  const font_size = flagsmith.getValue("font_size", {fallback:null})
+
   return (
       <div className="App">
         font_size: {flags.font_size?.value}

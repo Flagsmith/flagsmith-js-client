@@ -1,0 +1,75 @@
+diff --git a/node_modules/@callstack/async-storage/lib/index.js b/node_modules/@callstack/async-storage/lib/index.js
+index f757b4b..87f919e 100644
+--- a/node_modules/@callstack/async-storage/lib/index.js
++++ b/node_modules/@callstack/async-storage/lib/index.js
+@@ -14,9 +14,6 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           * 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           */
+ 
+-var _lodash = require('lodash.merge');
+-
+-var _lodash2 = _interopRequireDefault(_lodash);
+ 
+ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+ 
+@@ -63,9 +60,6 @@ var API = {
+       resolve();
+     });
+   },
+-  mergeItem: function mergeItem(key, value) {
+-    return API.multiMerge([[key, value]]);
+-  },
+   multiGet: function multiGet(keys) {
+     return new Promise(function (resolve) {
+       var keyValues = keys.reduce(function (acc, key) {
+@@ -93,31 +87,6 @@ var API = {
+       return errors.length > 0 ? reject(errors) : resolve();
+     });
+   },
+-  multiMerge: function multiMerge(kvPairs) {
+-    return new Promise(function (resolve, reject) {
+-      var errors = [];
+-
+-      kvPairs.forEach(function (_ref3) {
+-        var _ref4 = _slicedToArray(_ref3, 2),
+-            key = _ref4[0],
+-            value = _ref4[1];
+-
+-        var rawValue = localStorage.getItem(key);
+-
+-        if (!rawValue) {
+-          return;
+-        }
+-
+-        try {
+-          localStorage.setItem(key, JSON.stringify((0, _lodash2.default)(JSON.parse(rawValue), JSON.parse(value))));
+-        } catch (error) {
+-          errors.push(error);
+-        }
+-      });
+-
+-      return errors.length > 0 ? reject(errors) : resolve();
+-    });
+-  },
+   multiRemove: function multiRemove(keys) {
+     return new Promise(function (resolve) {
+       keys.forEach(function (key) {
+diff --git a/node_modules/@callstack/async-storage/lib/types.js b/node_modules/@callstack/async-storage/lib/types.js
+index 1b1a6df..b941c97 100644
+--- a/node_modules/@callstack/async-storage/lib/types.js
++++ b/node_modules/@callstack/async-storage/lib/types.js
+@@ -16,14 +16,4 @@ export type Callback = (err: ?Error, value: any) => void;
+ export type TAsyncStorage = {|
+   setItem: (key: string, value: string, cb?: Callback) => Promise<void>,
+   getItem: (key: string, cb?: Callback) => Promise<?string>,
+-  getAllKeys: (cb?: Callback) => Promise<Array<string>>,
+-  removeItem: (key: string, cb?: Callback) => Promise<void>,
+-
+-  clear: () => Promise<void>,
+-  multiGet: (keys: Array<string>) => Promise<Array<[string, ?string]>>,
+-  multiSet: (kvPairs: Array<[string, string]>) => Promise<void>,
+-  multiMerge: (kvPairs: Array<[string, string]>) => Promise<void>,
+-  multiRemove: (keys: Array<string>) => Promise<void>,
+-  mergeItem: (key: string, value: string) => Promise<void>,
+-  flushGetRequests: () => void,
+ |};
