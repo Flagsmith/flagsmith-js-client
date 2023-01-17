@@ -282,8 +282,8 @@ const Flagsmith = class {
         headers,
         onChange,
         cacheFlags,
-         datadogRum,
-         onError,
+        datadogRum,
+        onError,
         defaultFlags,
         fetch:fetchImplementation,
         preventFetch,
@@ -371,6 +371,7 @@ const Flagsmith = class {
             if(datadogRum) {
                 this.datadogRum = datadogRum;
             }
+
             if (enableDynatrace) {
                 // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                 if (typeof dtrum === 'undefined') {
