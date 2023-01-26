@@ -27,6 +27,7 @@ datadogRum.init({
     sampleRate: 100,
     premiumSampleRate: 100,
     trackInteractions: true,
+    enableExperimentalFeatures: ["feature_flags"],
     defaultPrivacyLevel:'mask-user-input'
 });
 

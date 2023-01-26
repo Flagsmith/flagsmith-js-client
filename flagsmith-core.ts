@@ -127,7 +127,7 @@ const Flagsmith = class {
                 }
                 Object.keys(this.flags).map((key)=>{
                     traits[FLAGSMITH_CONFIG_ANALYTICS_KEY+key] = this.getValue(key)
-                    traits[FLAGSMITH_FLAG_ANALYTICS_KEY+key] = this.hasFeature(key)
+                    this.datadogRum!.addFeatureFlagEvaluation([FLAGSMITH_FLAG_ANALYTICS_KEY+key], this.hasFeature(key));
                 })
                 Object.keys(this.traits).map((key)=>{
                     traits[FLAGSMITH_TRAIT_ANALYTICS_KEY+key] = this.getTrait(key)
