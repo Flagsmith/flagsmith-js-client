@@ -1,12 +1,21 @@
-declare type IFlagsmithValue = string | number | boolean | null;
+
+type IFlagsmithValue<T=string | number | boolean | null> = T
 export interface IFlagsmithFeature {
-    id: number;
+    id?: number;
     enabled: boolean;
     value?: IFlagsmithValue;
 }
+
 export declare type IFlagsmithTrait = IFlagsmithValue;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
+
+export declare type GetValueOptions<T = Array<any> | object> =  {
+    json?: boolean;
+    fallback?: T
+}
+
+
 export interface IRetrieveInfo {
     isFromServer: boolean;
     flagsChanged: boolean;
@@ -16,7 +25,7 @@ export interface IState<F extends string = string, T extends string = string> {
     api: string;
     environmentID: string;
     flags?: IFlags<F>;
-    evaluationEvent?: Record<string, number> | null;
+    evaluationEvent?: Record<string, Record<string, number>> | null;
     identity?: string;
     traits: ITraits<T>;
 }
@@ -24,21 +33,23 @@ declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
 };
+
 export declare type IDatadogRum = {
     setUser: (newUser: {
-        [x: string]: unknown;
+        [x: string]: unknown
     }) => void;
     getUser: () => {
-        [x: string]: unknown;
+        [x: string]: unknown
     };
-    [extraProps: string]: any;
-};
+    [extraProps: string]: any
+}
+
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
-    datadogRum?: IDatadogRum;
+    datadogRum?: IDatadogRum
     defaultFlags?: IFlags<F>;
     fetch?: any;
     realtime?: boolean;
@@ -117,11 +128,15 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
-    getValue: (key: F) => IFlagsmithValue;
+    getValue<T=IFlagsmithValue>(key: F, options?: GetValueOptions<T>): IFlagsmithValue<T>;
     /**
      * Get the value of a particular trait for the identified user
      */
     getTrait: (key: T) => IFlagsmithValue;
+    /**
+     * Get the values of all traits for the identified user
+     */
+    getAllTraits: () => Record<string, IFlagsmithValue>;
     /**
      * Set a specific trait for a given user id, triggers a call to get flags
      */
@@ -142,6 +157,10 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
     trigger?: () => {};
+    /**
+     * Used internally, this function will console log if enableLogs is being set within flagsmith.init
+     */
+    log: (message?: any, ...optionalParams: any[]) =>void;
     /**
      * Used internally, this is the cache options provided in flagsmith.init
      */

@@ -1,7 +1,11 @@
 var environmentID = 'QjgYur4LQTwe5HpvbvhpzK'
+var flagsmithIdentity = "flagsmith_sample_user2"
+
+//Identify the user
+dtrum.identifyUser(flagsmithIdentity)
 
 function identify() {
-    flagsmith.identify("flagsmith_sample_user")
+    flagsmith.identify(flagsmithIdentity)
 }
 
 function toggleTrait () {
@@ -9,7 +13,7 @@ function toggleTrait () {
 }
 
 function login () {
-    flagsmith.identify("flagsmith_sample_user");
+    flagsmith.identify(flagsmithIdentity);
 };
 
 function logout () {
@@ -34,9 +38,10 @@ flagsmith.init({
     cacheFlags: true,
     enableLogs: true,
     enableAnalytics:true,
-    cacheOptions: {skipAPI:true,ttl:5000},
+    //specifying dtrum tells flagsmith to set session properties (see console)
+    enableDynatrace: true,
     defaultFlags: {
-        font_size: {value: 10, enabled:true}
+        font_size: { value: 10, enabled: true }
     },
     onChange: function() {
         $("#loaded").removeClass("hidden")
@@ -45,14 +50,17 @@ flagsmith.init({
         if (flagsmith.identity) {
             $("#logged-in").removeClass("hidden")
             $("#logged-out").addClass("hidden")
-            $("#js-example-trait").text(flagsmith.getTrait("example_trait") + "");
-            if (flagsmith.getSegments()) {
-                $("#js-segments").text(Object.keys(flagsmith.getSegments() ).join(", "));
-            }
+            $("#js-example-trait").text(flagsmith.getTrait("favourite_color") + "");
         } else {
             $("#logged-out").removeClass("hidden")
             $("#logged-in").addClass("hidden")
         }
-        $("#js-data").text(JSON.stringify(flagsmith.getAllFlags(), null, 2));
+        $("#js-data").html(Object.keys(flagsmith.getAllFlags()).map((key)=>{
+            return `<h3>${key}</h3>
+${flagsmith.hasFeature(key)?`<span class="text-success">Enabled</span>`: `<span class="text-danger">Disabled</span>`}
+${flagsmith.getValue(key) ? `<strong><br/>${flagsmith.getValue(key)}</strong><br/>` : ''}
+
+`
+        }).join("<br/>"), null, 2);
     }
 });

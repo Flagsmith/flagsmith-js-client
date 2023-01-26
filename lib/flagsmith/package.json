@@ -1,6 +1,6 @@
 {
   "name": "flagsmith",
-  "version": "3.9.3-beta.1",
+  "version": "3.15.1",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "repository": {

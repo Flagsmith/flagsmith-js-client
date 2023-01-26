@@ -1,1 +1,1 @@
-export type FlagOptions = "font_size" | "hero"
+export type FlagOptions = "font_size" | "hero" | "json_value"
