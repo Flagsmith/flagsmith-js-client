@@ -8,7 +8,6 @@ const plugin: Plugin = async ({beforeNuxtRender, app, nuxtState}, inject) => {
         environmentID: 'QjgYur4LQTwe5HpvbvhpzK',
         fetch: nodeFetch,
         enableLogs: true,
-        api: 'https://api.flagsmith.com/api/v1/'
       })
       nuxtState.flagsmith = flagsmith.getState()
     })
@@ -16,7 +15,7 @@ const plugin: Plugin = async ({beforeNuxtRender, app, nuxtState}, inject) => {
 
   if (process.client) {
     if (nuxtState.flagsmith) {
-// @ts-expect-error
+      // @ts-expect-error
       flagsmith.setState(nuxtState.flagsmith)
     }
   }

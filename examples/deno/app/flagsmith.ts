@@ -6,7 +6,6 @@ export default flagsmith;
 export const init  = async function (){
     return await flagsmith.init({
         environmentID: Deno.env("FLAGSMITH"),
-        api: "https://api.flagsmith.com/api/v1/",
         onError: (err) => {},
         onChange: (err) => {},
         cacheFlags: false,
