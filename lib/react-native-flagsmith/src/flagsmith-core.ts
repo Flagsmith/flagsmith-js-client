@@ -136,24 +136,27 @@ const Flagsmith = class {
             this.traits = userTraits;
             this.updateStorage();
             if (this.datadogRum) {
-
-                Object.keys(this.flags).map((key) => {
-                    if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
-                        console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
-                    } else {
+                if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
+                    console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
+                } else {
+                    this.log("Sending feature flag evaluations to Datadog")
+                    Object.keys(this.flags).map((key) => {
                         this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key));
                         this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key));
-                    }
-                });
+                    });
+                }
                 if (this.datadogRum!.trackTraits) {
                     let traits: Parameters<IDatadogRum['client']['setUser']>['0'] = {};
                     Object.keys(this.traits).map((key) => {
                         traits[FLAGSMITH_TRAIT_ANALYTICS_KEY + key] = this.getTrait(key);
                     });
-                    this.datadogRum.client.setUser(({
+                    const datadogRumData = {
                         ...this.datadogRum.client.getUser(),
+                        id: this.datadogRum.client.getUser().id || this.identity,
                         ...traits,
-                    }));
+                    };
+                    this.log('Setting Datadog user', datadogRumData);
+                    this.datadogRum.client.setUser(datadogRumData);
                 }
 
             }

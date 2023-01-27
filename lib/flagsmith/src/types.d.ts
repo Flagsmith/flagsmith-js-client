@@ -39,7 +39,6 @@ declare type ICacheOptions = {
 export declare type IDatadogRum = {
     trackTraits: boolean
     client: {
-        addFeatureFlagEvaluation: (key: string, value: boolean) => void
         setUser: (newUser: {
             [x: string]: unknown
         }) => void;

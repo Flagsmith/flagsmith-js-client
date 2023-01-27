@@ -10,6 +10,7 @@ ReactDOM.render(
   <FlagsmithProvider options={{
       environmentID: "QjgYur4LQTwe5HpvbvhpzK",
       cacheFlags:true,
+      enableLogs: true,
       datadogRum: {
           client: datadogRum,
           trackTraits: true,
