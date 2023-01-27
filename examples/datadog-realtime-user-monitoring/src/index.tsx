@@ -10,7 +10,10 @@ ReactDOM.render(
   <FlagsmithProvider options={{
       environmentID: "QjgYur4LQTwe5HpvbvhpzK",
       cacheFlags:true,
-      datadogRum // configure flagsmith with the datadogRum instance to track traits, remote config and flag enabled states
+      datadogRum: {
+          client: datadogRum,
+          trackTraits: true,
+      }// configure flagsmith with the datadogRum instance to track traits, remote config and flag enabled states
   }} flagsmith={flagsmith}>
     <App />
   </FlagsmithProvider>,
@@ -20,15 +23,20 @@ ReactDOM.render(
 
 
 datadogRum.init({
-    applicationId: '2001f533-0533-4184-a3f9-234abbe428f9',
-    clientToken: 'pub433eff9c5c546ac6ed3c5ea7cc20dff8',
+    applicationId: '8da85c94-0794-41bf-b61f-55a55e35aa26',
+    clientToken: 'pubf451c95b6177b6fbda096322beb85d4f',
     site: 'datadoghq.eu',
-    service:'flagsmith-test',
-    sampleRate: 100,
-    premiumSampleRate: 100,
-    trackInteractions: true,
+    service:'rum-test',
+
+    // Specify a version number to identify the deployed version of your application in Datadog
+    // version: '1.0.0',
+    sessionSampleRate: 100,
+    sessionReplaySampleRate: 20,
+    trackUserInteractions: true,
+    trackResources: true,
+    trackLongTasks: true,
+    defaultPrivacyLevel:'mask-user-input',
     enableExperimentalFeatures: ["feature_flags"],
-    defaultPrivacyLevel:'mask-user-input'
 });
 
 datadogRum.startSessionReplayRecording();

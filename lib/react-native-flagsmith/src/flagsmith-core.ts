@@ -9,52 +9,55 @@ import {
     ITraits,
     IFlagsmithTrait,
 } from './types';
+
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
 let _fetch: LikeFetch;
 type RequestOptions = {
-    method: "GET"|"PUT"|"DELETE"|"POST",
+    method: 'GET' | 'PUT' | 'DELETE' | 'POST',
     headers: Record<string, string>
-    body?:string
+    body?: string
 }
 type DynatraceObject = {
-    "javaLongOrObject": Record<string, number>,
-    "date": Record<string, Date>,
-    "shortString": Record<string, string>,
-    "javaDouble": Record<string, number>,
+    'javaLongOrObject': Record<string, number>,
+    'date': Record<string, Date>,
+    'shortString': Record<string, string>,
+    'javaDouble': Record<string, number>,
 }
 type AsyncStorageType = {
-    getItem: (key:string, cb?:(err:string|null, res:string|null)=>void)=>Promise<string|null>
-    setItem: (key:string, value: string)=>Promise<string|null>
+    getItem: (key: string, cb?: (err: string | null, res: string | null) => void) => Promise<string | null>
+    setItem: (key: string, value: string) => Promise<string | null>
 } | null
 let AsyncStorage: AsyncStorageType = null;
-const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
-const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
+const FLAGSMITH_KEY = 'BULLET_TRAIN_DB';
+const FLAGSMITH_EVENT = 'BULLET_TRAIN_EVENT';
 const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
-let eventSource:typeof EventSource;
-const initError = function (caller:string) {
-    return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
-}
 
-type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
+let eventSource: typeof EventSource;
+const initError = function(caller: string) {
+    return 'Attempted to ' + caller + ' a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true.';
+};
 
-const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_"
-const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_"
-const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_"
+type Config = { browserlessStorage?: boolean, fetch?: LikeFetch, AsyncStorage?: AsyncStorageType, eventSource?: any };
+
+const FLAGSMITH_CONFIG_ANALYTICS_KEY = 'flagsmith_value_';
+const FLAGSMITH_FLAG_ANALYTICS_KEY = 'flagsmith_enabled_';
+const FLAGSMITH_TRAIT_ANALYTICS_KEY = 'flagsmith_trait_';
 
 const Flagsmith = class {
-    eventSource:EventSource|null = null
+    eventSource: EventSource | null = null;
+
     constructor(props: Config) {
         if (props.fetch) {
             _fetch = props.fetch as LikeFetch;
         } else {
-            _fetch = (typeof fetch !== 'undefined'? fetch : global?.fetch) as LikeFetch;
+            _fetch = (typeof fetch !== 'undefined' ? fetch : global?.fetch) as LikeFetch;
         }
 
-        this.canUseStorage = typeof window!=='undefined' || !!props.browserlessStorage;
+        this.canUseStorage = typeof window !== 'undefined' || !!props.browserlessStorage;
 
-        this.log("Constructing flagsmith instance " + props)
+        this.log('Constructing flagsmith instance ' + props);
         if (props.eventSource) {
             eventSource = props.eventSource;
         }
@@ -63,53 +66,54 @@ const Flagsmith = class {
         }
     }
 
-    getJSON = (url:string, method?:"GET"|"POST"|"PUT", body?:string) => {
+    getJSON = (url: string, method?: 'GET' | 'POST' | 'PUT', body?: string) => {
         const { environmentID, headers } = this;
         const options: RequestOptions = {
             method: method || 'GET',
             body,
             headers: {
-                'x-environment-key': `${environmentID}`
-            }
+                'x-environment-key': `${environmentID}`,
+            },
         };
-        if (method && method !== "GET")
-            options.headers['Content-Type'] = 'application/json; charset=utf-8'
+        if (method && method !== 'GET')
+            options.headers['Content-Type'] = 'application/json; charset=utf-8';
 
         if (headers) {
-            Object.assign(options.headers, headers)
+            Object.assign(options.headers, headers);
         }
 
         if (!_fetch) {
-            console.error("Flagsmith: fetch is undefined, please specify a fetch implementation into flagsmith.init to support SSR.");
+            console.error('Flagsmith: fetch is undefined, please specify a fetch implementation into flagsmith.init to support SSR.');
         }
 
         return _fetch(url, options)
             .then(res => {
-                this.log("Fetch response: "+ res.status + " " + (method||"GET") +  + " " + url)
+                this.log('Fetch response: ' + res.status + ' ' + (method || 'GET') + +' ' + url);
                 return res.text!()
                     .then((text) => {
                         let err = text;
                         try {
                             err = JSON.parse(text);
-                        } catch (e) {}
+                        } catch (e) {
+                        }
                         return res.status >= 200 && res.status ? err : Promise.reject(err);
-                    })
-            }).catch((e)=>{
-                console.error("Flagsmith: Fetch error: " + e)
-                throw new Error("Flagsmith: Fetch error:" + e)
-            })
+                    });
+            }).catch((e) => {
+                console.error('Flagsmith: Fetch error: ' + e);
+                throw new Error('Flagsmith: Fetch error:' + e);
+            });
     };
 
-    getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
+    getFlags = (resolve?: (v?: any) => any, reject?: (v?: any) => any) => {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
-        this.log("Get Flags")
-        const handleResponse = ({ flags: features, traits }:IFlagsmithResponse) => {
+        this.log('Get Flags');
+        const handleResponse = ({ flags: features, traits }: IFlagsmithResponse) => {
             if (identity) {
                 this.withTraits = null;
             }
             // Handle server response
-            let flags:IFlags = {};
+            let flags: IFlags = {};
             let userTraits: ITraits = {};
             features = features || [];
             traits = traits || [];
@@ -117,14 +121,14 @@ const Flagsmith = class {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     id: feature.feature.id,
                     enabled: feature.enabled,
-                    value: feature.feature_state_value
+                    value: feature.feature_state_value,
                 };
             });
             traits.forEach(trait => {
-                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value
+                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value;
             });
             this.oldFlags = {
-                ...this.flags
+                ...this.flags,
             };
             const flagsEqual = deepEqual(this.flags, flags);
             const traitsEqual = deepEqual(this.traits, userTraits);
@@ -132,20 +136,26 @@ const Flagsmith = class {
             this.traits = userTraits;
             this.updateStorage();
             if (this.datadogRum) {
-                let traits: Parameters<IDatadogRum['setUser']>['0'] = {
 
+                Object.keys(this.flags).map((key) => {
+                    if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
+                        console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
+                    } else {
+                        this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key));
+                        this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key));
+                    }
+                });
+                if (this.datadogRum!.trackTraits) {
+                    let traits: Parameters<IDatadogRum['client']['setUser']>['0'] = {};
+                    Object.keys(this.traits).map((key) => {
+                        traits[FLAGSMITH_TRAIT_ANALYTICS_KEY + key] = this.getTrait(key);
+                    });
+                    this.datadogRum.client.setUser(({
+                        ...this.datadogRum.client.getUser(),
+                        ...traits,
+                    }));
                 }
-                Object.keys(this.flags).map((key)=>{
-                    traits[FLAGSMITH_CONFIG_ANALYTICS_KEY+key] = this.getValue(key)
-                    traits[FLAGSMITH_FLAG_ANALYTICS_KEY+key] = this.hasFeature(key)
-                })
-                Object.keys(this.traits).map((key)=>{
-                    traits[FLAGSMITH_TRAIT_ANALYTICS_KEY+key] = this.getTrait(key)
-                })
-                this.datadogRum.setUser(({
-                    ...this.datadogRum.getUser(),
-                    ...traits
-                }))
+
             }
             if (this.dtrum) {
                 let traits: DynatraceObject = {
@@ -153,64 +163,64 @@ const Flagsmith = class {
                     date: {},
                     shortString: {},
                     javaLongOrObject: {},
-                }
-                Object.keys(this.flags).map((key)=>{
-                    setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY+key, this.getValue(key) )
-                    setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY+key, this.hasFeature(key) )
-                })
-                Object.keys(this.traits).map((key)=>{
-                    setDynatraceValue(traits, "flagsmith_trait_"+key, this.getTrait(key) )
-                })
-                this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
-                this.log("Sending date traits to dynatrace", traits.date)
-                this.log("Sending shortString traits to dynatrace", traits.shortString)
-                this.log("Sending javaDouble to dynatrace", traits.javaDouble)
+                };
+                Object.keys(this.flags).map((key) => {
+                    setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key));
+                    setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key));
+                });
+                Object.keys(this.traits).map((key) => {
+                    setDynatraceValue(traits, 'flagsmith_trait_' + key, this.getTrait(key));
+                });
+                this.log('Sending javaLongOrObject traits to dynatrace', traits.javaLongOrObject);
+                this.log('Sending date traits to dynatrace', traits.date);
+                this.log('Sending shortString traits to dynatrace', traits.shortString);
+                this.log('Sending javaDouble to dynatrace', traits.javaDouble);
                 // @ts-expect-error
                 this.dtrum.sendSessionProperties(
-                    traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
-                )
+                    traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble,
+                );
             }
-            if(this.trigger) {
-                this.log("trigger called")
-                this.trigger()
+            if (this.trigger) {
+                this.log('trigger called');
+                this.trigger();
             }
             if (onChange) {
                 onChange(this.oldFlags, {
                     isFromServer: true,
                     flagsChanged: !flagsEqual,
-                    traitsChanged: !traitsEqual
+                    traitsChanged: !traitsEqual,
                 });
             }
         };
 
         if (identity) {
             return Promise.all([
-                this.withTraits?
-                    this.getJSON(api + 'identities/', "POST", JSON.stringify({
-                        "identifier": identity,
-                        traits: Object.keys(this.withTraits).map((k)=>({
-                            "trait_key":k,
-                            "trait_value": this.withTraits![k]
-                        }))
-                    })):
-                this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
+                this.withTraits ?
+                    this.getJSON(api + 'identities/', 'POST', JSON.stringify({
+                        'identifier': identity,
+                        traits: Object.keys(this.withTraits).map((k) => ({
+                            'trait_key': k,
+                            'trait_value': this.withTraits![k],
+                        })),
+                    })) :
+                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
-                    this.withTraits = null
-                    handleResponse(res[0] as IFlagsmithResponse)
+                    this.withTraits = null;
+                    handleResponse(res[0] as IFlagsmithResponse);
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
                     }
                 }).catch(({ message }) => {
-                    onError && onError({ message })
+                    onError && onError({ message });
                 });
         } else {
             return Promise.all([
-                this.getJSON(api + "flags/")
+                this.getJSON(api + 'flags/'),
             ])
                 .then((res) => {
-                    handleResponse({ flags: res[0] as IFlagsmithResponse['flags'], traits:undefined })
+                    handleResponse({ flags: res[0] as IFlagsmithResponse['flags'], traits: undefined });
                     if (resolve && !resolved) {
                         resolved = true;
                         resolve();
@@ -220,7 +230,7 @@ const Flagsmith = class {
                         resolved = true;
                         reject(err);
                     }
-                    onError && onError(err)
+                    onError && onError(err);
                 });
         }
     };
@@ -228,77 +238,78 @@ const Flagsmith = class {
     analyticsFlags = () => {
         const { api } = this;
 
-        if (!this.evaluationEvent|| !this.evaluationEvent[this.environmentID]) {
-            return
+        if (!this.evaluationEvent || !this.evaluationEvent[this.environmentID]) {
+            return;
         }
 
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
             return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.environmentID]))
                 .then((res) => {
                     const state = this.getState();
-                    if(!this.evaluationEvent) {
-                        this.evaluationEvent = {}
+                    if (!this.evaluationEvent) {
+                        this.evaluationEvent = {};
                     }
-                    this.evaluationEvent[this.environmentID] = {}
+                    this.evaluationEvent[this.environmentID] = {};
                     this.setState({
                         ...state,
                         evaluationEvent: this.evaluationEvent,
                     });
                     this.updateEventStorage();
                 }).catch((err) => {
-                    this.log("Exception fetching evaluationEvent", err);
+                    this.log('Exception fetching evaluationEvent', err);
                 });
         }
     };
 
-    datadogRum:IDatadogRum|null = null
-    canUseStorage = false
-    analyticsInterval: NodeJS.Timer | null= null
-    api: string|null= null
-    cacheFlags= false
-    ts: number|null= null
-    enableAnalytics= false
-    enableLogs= false
-    environmentID: string = ""
-    evaluationEvent: Record<string, Record<string, number>> | null= null
-    flags:IFlags|null= null
-    getFlagInterval: NodeJS.Timer|null= null
-    headers?: object | null= null
-    initialised= false
-    oldFlags:IFlags|null= null
-    onChange:IInitConfig['onChange']|null= null
-    onError:IInitConfig['onError']|null = null
-    trigger?:(()=>void)|null= null
-    identity?: string|null= null
-    ticks: number|null= null
-    timer: number|null= null
-    traits:ITraits|null= null
-    dtrum= null
-    withTraits?: ITraits|null= null
-    cacheOptions = {ttl:0, skipAPI: false}
+    datadogRum: IDatadogRum | null = null;
+    canUseStorage = false;
+    analyticsInterval: NodeJS.Timer | null = null;
+    api: string | null = null;
+    cacheFlags = false;
+    ts: number | null = null;
+    enableAnalytics = false;
+    enableLogs = false;
+    environmentID: string = '';
+    evaluationEvent: Record<string, Record<string, number>> | null = null;
+    flags: IFlags | null = null;
+    getFlagInterval: NodeJS.Timer | null = null;
+    headers?: object | null = null;
+    initialised = false;
+    oldFlags: IFlags | null = null;
+    onChange: IInitConfig['onChange'] | null = null;
+    onError: IInitConfig['onError'] | null = null;
+    trigger?: (() => void) | null = null;
+    identity?: string | null = null;
+    ticks: number | null = null;
+    timer: number | null = null;
+    traits: ITraits | null = null;
+    dtrum = null;
+    withTraits?: ITraits | null = null;
+    cacheOptions = { ttl: 0, skipAPI: false };
+
     init({
-        environmentID,
-        api = defaultAPI,
-        headers,
-        onChange,
-        cacheFlags,
-         datadogRum,
-         onError,
-        defaultFlags,
-        fetch:fetchImplementation,
-        preventFetch,
-        enableLogs,
-        enableDynatrace,
-        enableAnalytics,
-        realtime,
-        eventSourceUrl= "https://realtime.flagsmith.com/",
-        AsyncStorage: _AsyncStorage,
-        identity,
-        traits,
-        _trigger,
-        state,
-        cacheOptions,
-        angularHttpClient,
+             environmentID,
+             api = defaultAPI,
+             headers,
+             onChange,
+             cacheFlags,
+             datadogRum,
+             onError,
+             defaultFlags,
+             fetch: fetchImplementation,
+             preventFetch,
+             enableLogs,
+             enableDynatrace,
+             enableAnalytics,
+             realtime,
+             eventSourceUrl = 'https://realtime.flagsmith.com/',
+             AsyncStorage: _AsyncStorage,
+             identity,
+             traits,
+             _trigger,
+             state,
+             cacheOptions,
+             angularHttpClient,
          }: IInitConfig) {
 
         return new Promise((resolve, reject) => {
@@ -312,12 +323,15 @@ const Flagsmith = class {
             this.onError = onError;
             this.identity = identity;
             this.withTraits = traits;
-            this.enableLogs = enableLogs|| false;
-            this.cacheOptions = cacheOptions? {skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0} : this.cacheOptions;
+            this.enableLogs = enableLogs || false;
+            this.cacheOptions = cacheOptions ? {
+                skipAPI: !!cacheOptions.skipAPI,
+                ttl: cacheOptions.ttl || 0,
+            } : this.cacheOptions;
             if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
-                console.warn("Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.")
+                console.warn('Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.');
             }
-            if(fetchImplementation) {
+            if (fetchImplementation) {
                 _fetch = fetchImplementation;
             }
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
@@ -325,20 +339,20 @@ const Flagsmith = class {
             this.initialised = true;
             this.ticks = 10000;
             if (realtime && typeof window !== 'undefined') {
-                const connectionUrl = eventSourceUrl + "sse/environments/" +  environmentID + "/stream";
-                if(!eventSource) {
-                    this.log("Error, EventSource is undefined");
+                const connectionUrl = eventSourceUrl + 'sse/environments/' + environmentID + '/stream';
+                if (!eventSource) {
+                    this.log('Error, EventSource is undefined');
                 } else if (!this.eventSource) {
-                    this.log("Creating event source with url " + connectionUrl)
-                    this.eventSource = new eventSource(connectionUrl)
-                    this.eventSource.addEventListener("environment_updated", (e)=>{
-                        this.log("Received eventsource message")
-                        this.getFlags()
-                    })
+                    this.log('Creating event source with url ' + connectionUrl);
+                    this.eventSource = new eventSource(connectionUrl);
+                    this.eventSource.addEventListener('environment_updated', (e) => {
+                        this.log('Received eventsource message');
+                        this.getFlags();
+                    });
                 }
             }
 
-            this.log("Initialising with properties",{
+            this.log('Initialising with properties', {
                 environmentID,
                 api,
                 headers,
@@ -355,89 +369,90 @@ const Flagsmith = class {
                 _trigger,
                 state,
                 angularHttpClient,
-            }, this)
+            }, this);
 
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             if (_AsyncStorage) {
                 AsyncStorage = _AsyncStorage;
             }
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
-            this.setState(state as IState)
+            this.setState(state as IState);
             if (!environmentID) {
-                reject('Please specify a environment id')
+                reject('Please specify a environment id');
                 throw ('Please specify a environment id');
             }
 
-            if(datadogRum) {
+            if (datadogRum) {
                 this.datadogRum = datadogRum;
             }
+
             if (enableDynatrace) {
                 // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                 if (typeof dtrum === 'undefined') {
-                    console.error("You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed.")
+                    console.error('You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed.');
                 } else {
                     // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                     this.dtrum = dtrum;
                 }
             }
 
-            if(angularHttpClient) {
+            if (angularHttpClient) {
                 // @ts-expect-error
-                _fetch = (url: string, params: { headers: Record<string, string>, method: "GET" | "POST" | "PUT", body: string }) => {
-                    const {headers, method, body} = params
+                _fetch = (url: string, params: { headers: Record<string, string>, method: 'GET' | 'POST' | 'PUT', body: string }) => {
+                    const { headers, method, body } = params;
                     return new Promise((resolve) => {
                         switch (method) {
-                            case "GET": {
+                            case 'GET': {
                                 return angularHttpClient.get(url, {
                                     headers,
-                                }).subscribe((v:string) => {
+                                }).subscribe((v: string) => {
                                     resolve({
                                         ok: true,
-                                        text: () => Promise.resolve(v)
-                                    })
-                                })
+                                        text: () => Promise.resolve(v),
+                                    });
+                                });
                             }
-                            case "POST": {
+                            case 'POST': {
                                 return angularHttpClient.post(url, body, {
                                     headers,
-                                }).subscribe((v:string) => {
+                                }).subscribe((v: string) => {
                                     resolve({
                                         ok: true,
-                                        text: () => Promise.resolve(v)
-                                    })
-                                })
+                                        text: () => Promise.resolve(v),
+                                    });
+                                });
                             }
-                            case "PUT": {
+                            case 'PUT': {
                                 return angularHttpClient.post(url, body, {
                                     headers,
-                                }).subscribe((v:string) => {
+                                }).subscribe((v: string) => {
                                     resolve({
                                         ok: true,
-                                        text: () => Promise.resolve(v)
-                                    })
-                                })
+                                        text: () => Promise.resolve(v),
+                                    });
+                                });
                             }
                         }
-                    })
-                }
+                    });
+                };
             }
 
             if (AsyncStorage && this.canUseStorage) {
                 AsyncStorage.getItem(FLAGSMITH_EVENT)
-                    .then((res)=>{
-                        if (res){
+                    .then((res) => {
+                        if (res) {
                             try {
-                                this.evaluationEvent = JSON.parse(res)
+                                this.evaluationEvent = JSON.parse(res);
 
-                            } catch (e){
+                            } catch (e) {
                                 this.evaluationEvent = {};
                             }
                         } else {
                             this.evaluationEvent = {};
                         }
                         this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks!);
-                        return true
-                    })
+                        return true;
+                    });
             }
 
 
@@ -452,14 +467,14 @@ const Flagsmith = class {
                             var json = JSON.parse(res);
                             if (json[this.environmentID]) {
                                 state = this.getState();
-                                this.log("Retrieved events from cache", res);
+                                this.log('Retrieved events from cache', res);
                                 this.setState({
                                     ...state,
                                     evaluationEvent: json[this.environmentID],
                                 });
                             }
                         }
-                        return true
+                        return true;
                     });
                 }
 
@@ -475,14 +490,14 @@ const Flagsmith = class {
                                 let cachePopulated = false;
                                 if (json && json.api === this.api && json.environmentID === this.environmentID) {
                                     let setState = true;
-                                    if(this.identity && (json.identity!==this.identity)) {
-                                        this.log("Ignoring cache,  identity has changed from " + json.identity + " to " + this.identity )
+                                    if (this.identity && (json.identity !== this.identity)) {
+                                        this.log('Ignoring cache,  identity has changed from ' + json.identity + ' to ' + this.identity);
                                         setState = false;
                                     }
-                                    if(this.cacheOptions.ttl){
+                                    if (this.cacheOptions.ttl) {
                                         if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
                                             if (json.ts) {
-                                                this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                                this.log('Ignoring cache, timestamp is too old ts:' + json.ts + ' ttl: ' + this.cacheOptions.ttl + ' time elapsed since cache: ' + (new Date().valueOf() - json.ts) + 'ms');
                                                 setState = false;
                                             }
                                         }
@@ -490,26 +505,30 @@ const Flagsmith = class {
                                     if (setState) {
                                         cachePopulated = true;
                                         this.setState(json);
-                                        this.log("Retrieved flags from cache", json);
+                                        this.log('Retrieved flags from cache', json);
                                     }
                                 }
 
                                 if (this.flags) { // retrieved flags from local storage
 
-                                    if(this.trigger) {
-                                        this.log("trigger called")
-                                        this.trigger()
+                                    if (this.trigger) {
+                                        this.log('trigger called');
+                                        this.trigger();
                                     }
                                     if (this.onChange) {
-                                        this.log("onChange called")
-                                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
+                                        this.log('onChange called');
+                                        this.onChange(null, {
+                                            isFromServer: false,
+                                            flagsChanged: true,
+                                            traitsChanged: !!this.traits,
+                                        });
                                     }
                                     this.oldFlags = this.flags;
                                     resolve(true);
                                     if (this.cacheOptions.skipAPI && cachePopulated) {
-                                        this.log("Skipping API, using cache")
+                                        this.log('Skipping API, using cache');
                                     }
-                                    if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
+                                    if (!preventFetch && (!this.cacheOptions.skipAPI || !cachePopulated)) {
                                         this.getFlags();
                                     }
                                 } else {
@@ -520,62 +539,66 @@ const Flagsmith = class {
                                     }
                                 }
                             } catch (e) {
-                                this.log("Exception fetching cached logs", e);
+                                this.log('Exception fetching cached logs', e);
                             }
                         } else {
                             if (!preventFetch) {
-                                this.getFlags(resolve, reject)
+                                this.getFlags(resolve, reject);
                             } else {
                                 if (defaultFlags) {
-                                    if(this.trigger) {
-                                        this.log("trigger called")
-                                        this.trigger()
+                                    if (this.trigger) {
+                                        this.log('trigger called');
+                                        this.trigger();
                                     }
                                     if (this.onChange) {
-                                        this.log("onChange called")
-                                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
+                                        this.log('onChange called');
+                                        this.onChange(null, {
+                                            isFromServer: false,
+                                            flagsChanged: true,
+                                            traitsChanged: !!this.traits,
+                                        });
                                     }
                                 }
                                 resolve(true);
                             }
                         }
-                        return true
+                        return true;
                     });
                 }
             } else if (!preventFetch) {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
-                    if(this.trigger) {
-                        this.log("trigger called")
-                        this.trigger()
+                    if (this.trigger) {
+                        this.log('trigger called');
+                        this.trigger();
                     }
                     if (this.onChange) {
-                        this.log("onChange called")
-                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits });
+                        this.log('onChange called');
+                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
                     }
                 }
                 resolve(true);
             }
         })
-        .catch(error => {
-            this.log("Error during initialisation ", error)
-            onError && onError(error)
-        });
+            .catch(error => {
+                this.log('Error during initialisation ', error);
+                onError && onError(error);
+            });
     }
 
     getAllFlags() {
         return this.flags;
     }
 
-    identify(userId: string, traits?:ITraits) {
+    identify(userId: string, traits?: ITraits) {
         this.identity = userId;
-        this.log("Identify: " + this.identity)
+        this.log('Identify: ' + this.identity);
 
-        if(traits) {
+        if (traits) {
             this.withTraits = {
-                ...(this.withTraits||{}),
-                ...traits
+                ...(this.withTraits || {}),
+                ...traits,
             };
         }
         if (this.initialised) {
@@ -593,7 +616,7 @@ const Flagsmith = class {
             ts: this.ts,
             traits: this.traits,
             evaluationEvent: this.evaluationEvent,
-        } as IState
+        } as IState;
     }
 
     setState(state: IState) {
@@ -605,21 +628,21 @@ const Flagsmith = class {
             this.identity = state.identity || this.identity;
             this.traits = state.traits || this.traits;
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
-            this.log("setState called", this)
+            this.log('setState called', this);
         }
     }
 
     log(...args: (unknown)[]) {
         if (this.enableLogs) {
-            console.log.apply(this, ["FLAGSMITH:", new Date().valueOf() - (this.timer||0), "ms", ...args]);
+            console.log.apply(this, ['FLAGSMITH:', new Date().valueOf() - (this.timer || 0), 'ms', ...args]);
         }
     }
 
     updateStorage() {
         if (this.cacheFlags) {
-            this.ts = new Date().valueOf()
+            this.ts = new Date().valueOf();
             const state = JSON.stringify(this.getState());
-            this.log("Setting storage", state);
+            this.log('Setting storage', state);
             AsyncStorage!.setItem(FLAGSMITH_KEY, state);
         }
     }
@@ -627,7 +650,7 @@ const Flagsmith = class {
     updateEventStorage() {
         if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
-            this.log("Setting event storage", events);
+            this.log('Setting event storage', events);
             AsyncStorage!.setItem(FLAGSMITH_EVENT, events);
         }
     }
@@ -660,10 +683,10 @@ const Flagsmith = class {
         // return this.segments;
     }
 
-    evaluateFlag = (key:string) => {
+    evaluateFlag = (key: string) => {
         if (this.enableAnalytics) {
             if (!this.evaluationEvent) return;
-            if(!this.evaluationEvent[this.environmentID]) {
+            if (!this.evaluationEvent[this.environmentID]) {
                 this.evaluationEvent[this.environmentID] = {};
             }
             if (this.evaluationEvent[this.environmentID][key] === undefined) {
@@ -672,9 +695,9 @@ const Flagsmith = class {
             this.evaluationEvent[this.environmentID][key] += 1;
         }
         this.updateEventStorage();
-    }
+    };
 
-    getValue = (key:string, options?: GetValueOptions) => {
+    getValue = (key: string, options?: GetValueOptions) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = null;
         if (flag) {
@@ -686,65 +709,65 @@ const Flagsmith = class {
         if (options?.json) {
             try {
                 if (res === null) {
-                    this.log("Tried to parse null flag as JSON: " + key)
+                    this.log('Tried to parse null flag as JSON: ' + key);
                     return options.fallback;
                 }
-                return JSON.parse(res as string)
+                return JSON.parse(res as string);
             } catch (e) {
-                return options.fallback
+                return options.fallback;
             }
         }
         //todo record check for value
         return res;
-    }
+    };
 
-    getTrait = (key:string) => {
+    getTrait = (key: string) => {
         const trait = this.traits && this.traits[key.toLowerCase().replace(/ /g, '_')];
         return trait;
-    }
+    };
 
     getAllTraits = () => {
-        return this.traits
-    }
+        return this.traits;
+    };
 
-    setTrait = (key:string, trait_value:IFlagsmithTrait) => {
+    setTrait = (key: string, trait_value: IFlagsmithTrait) => {
         const { api } = this;
 
         if (!api) {
-            console.error(initError("setTrait"))
-            return
+            console.error(initError('setTrait'));
+            return;
         }
-        const traits:ITraits<string> = {};
+        const traits: ITraits<string> = {};
         traits[key] = trait_value;
-        return this.setTraits(traits)
+        return this.setTraits(traits);
     };
 
-    setTraits = (traits:ITraits) => {
+    setTraits = (traits: ITraits) => {
 
         if (!this.api) {
-            console.error(initError("setTraits"))
-            return
+            console.error(initError('setTraits'));
+            return;
         }
 
         if (!traits || typeof traits !== 'object') {
-            console.error("Expected object for flagsmith.setTraits");
+            console.error('Expected object for flagsmith.setTraits');
         }
 
         this.withTraits = {
-            ...(this.withTraits||{}),
-            ...traits
+            ...(this.withTraits || {}),
+            ...traits,
         };
 
         if (!this.identity) {
-            this.log("Set traits prior to identifying", this.withTraits);
-            return
+            this.log('Set traits prior to identifying', this.withTraits);
+            return;
         }
         if (this.initialised) {
-            return this.getFlags()
+            return this.getFlags();
         }
     };
 
-    hasFeature = (key:string) => {
+    hasFeature = (key: string) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = false;
         if (flag && flag.enabled) {
@@ -755,25 +778,25 @@ const Flagsmith = class {
         //todo record check for feature
 
         return res;
-    }
+    };
 
 };
 
-export default function ({ fetch, browserlessStorage, AsyncStorage, eventSource }:Config):IFlagsmith {
+export default function({ fetch, browserlessStorage, AsyncStorage, eventSource }: Config): IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
 };
 
 // transforms any trait to match sendSessionProperties
 // https://www.dynatrace.com/support/doc/javascriptapi/interfaces/dtrum_types.DtrumApi.html#addActionProperties
-const setDynatraceValue = function (obj: DynatraceObject, trait: string, value: string|number|boolean|null|undefined) {
-    let key: keyof DynatraceObject= 'shortString'
-    let convertToString = true
+const setDynatraceValue = function(obj: DynatraceObject, trait: string, value: string | number | boolean | null | undefined) {
+    let key: keyof DynatraceObject = 'shortString';
+    let convertToString = true;
     if (typeof value === 'number') {
-        key = 'javaDouble'
-        convertToString = false
+        key = 'javaDouble';
+        convertToString = false;
     }
     // @ts-expect-error
-    obj[key] = obj[key] || {}
+    obj[key] = obj[key] || {};
     // @ts-expect-error
-    obj[key][trait] = convertToString ? value+"":value
-}
+    obj[key][trait] = convertToString ? value + '' : value;
+};
