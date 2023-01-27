@@ -392,7 +392,7 @@ const Flagsmith = class {
             if (enableDynatrace) {
                 // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                 if (typeof dtrum === 'undefined') {
-                    console.error('You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed.');
+                    console.error('You have attempted to enable dynatrace but dtrum is undefined, please check you have the Dynatrace RUM JavaScript API installed and have enableExperimentalFeatures: ["feature_flags"] in datadogRum.init.');
                 } else {
                     // @ts-expect-error Dynatrace's dtrum is exposed to global scope
                     this.dtrum = dtrum;
