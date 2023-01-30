@@ -33,10 +33,14 @@ flagsmith.init({
     environmentID: environmentID,
     cacheFlags: true,
     enableLogs: true,
+    api: "http://bdsadasdsla.com",
     enableAnalytics:true,
     cacheOptions: {skipAPI:true,ttl:5000},
     defaultFlags: {
         font_size: {value: 10, enabled:true}
+    },
+    onError: function(e) {
+        console.log(e)
     },
     onChange: function() {
         $("#loaded").removeClass("hidden")

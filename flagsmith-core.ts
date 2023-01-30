@@ -87,7 +87,7 @@ const Flagsmith = class {
                         try {
                             err = JSON.parse(text);
                         } catch (e) {}
-                        return res.status >= 200 && res.status ? err : Promise.reject(err);
+                        return res.status && res.status >= 200 && res.status < 300 ? err : Promise.reject(err);
                     })
             }).catch((e)=>{
                 console.error("Flagsmith: Fetch error: " + e)
@@ -286,7 +286,13 @@ const Flagsmith = class {
             this.analyticsInterval = null;
             this.onChange = onChange;
             this.trigger = _trigger || this.trigger;
-            this.onError = onError;
+            this.onError = onError? (message:any)=> {
+                if (message instanceof Error) {
+                    onError(message)
+                } else {
+                    onError(new Error(message))
+                }
+            }: null
             this.identity = identity;
             this.withTraits = traits;
             this.enableLogs = enableLogs|| false;

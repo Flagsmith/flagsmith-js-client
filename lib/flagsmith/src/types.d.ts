@@ -51,9 +51,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     identity?: string;
     traits?: ITraits<T>;
     onChange?: (previousFlags: IFlags<F> | null, params: IRetrieveInfo) => void;
-    onError?: (res: {
-        message: string;
-    }) => void;
+    onError?: (err: Error) => void;
     preventFetch?: boolean;
     state?: IState;
     _trigger?: () => void;
