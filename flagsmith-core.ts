@@ -136,15 +136,6 @@ const Flagsmith = class {
             this.traits = userTraits;
             this.updateStorage();
             if (this.datadogRum) {
-                if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
-                    console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
-                } else {
-                    this.log("Sending feature flag evaluations to Datadog")
-                    Object.keys(this.flags).map((key) => {
-                        this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key));
-                        this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key));
-                    });
-                }
                 if (this.datadogRum!.trackTraits) {
                     let traits: Parameters<IDatadogRum['client']['setUser']>['0'] = {};
                     Object.keys(this.traits).map((key) => {
@@ -168,8 +159,8 @@ const Flagsmith = class {
                     javaLongOrObject: {},
                 };
                 Object.keys(this.flags).map((key) => {
-                    setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key));
-                    setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key));
+                    setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, {}, true));
+                    setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true));
                 });
                 Object.keys(this.traits).map((key) => {
                     setDynatraceValue(traits, 'flagsmith_trait_' + key, this.getTrait(key));
@@ -686,7 +677,20 @@ const Flagsmith = class {
         // return this.segments;
     }
 
-    evaluateFlag = (key: string) => {
+    evaluateFlag = (key: string, method:"VALUE"|"ENABLED") => {
+        if (this.datadogRum) {
+            if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
+                console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
+            } else {
+                this.log("Sending feature flag evaluation to Datadog", key, method)
+                if (method === "VALUE") {
+                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, { }, true));
+                } else {
+                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true));
+                }
+            }
+        }
+
         if (this.enableAnalytics) {
             if (!this.evaluationEvent) return;
             if (!this.evaluationEvent[this.environmentID]) {
@@ -700,14 +704,16 @@ const Flagsmith = class {
         this.updateEventStorage();
     };
 
-    getValue = (key: string, options?: GetValueOptions) => {
+    getValue = (key: string, options?: GetValueOptions, skipAnalytics?:boolean) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = null;
         if (flag) {
             res = flag.value;
         }
 
-        this.evaluateFlag(key);
+        if(!skipAnalytics) {
+            this.evaluateFlag(key, "VALUE");
+        }
 
         if (options?.json) {
             try {
@@ -770,15 +776,15 @@ const Flagsmith = class {
         }
     };
 
-    hasFeature = (key: string) => {
+    hasFeature = (key: string, skipAnalytics?:boolean) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = false;
         if (flag && flag.enabled) {
             res = true;
         }
-        this.evaluateFlag(key);
-
-        //todo record check for feature
+        if(!skipAnalytics) {
+            this.evaluateFlag(key, "ENABLED");
+        }
 
         return res;
     };
