@@ -40,8 +40,6 @@ type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:Async
 
 const Flagsmith = class {
     eventSource:EventSource|null = null
-    isFromIdentify: boolean = false
-
     constructor(props: Config) {
         if (props.fetch) {
             _fetch = props.fetch as LikeFetch;
@@ -98,11 +96,11 @@ const Flagsmith = class {
     };
 
     getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
-        const { onChange, onError, identity, api, isFromIdentify } = this;
+        const { onChange, onError, identity, api } = this;
         let resolved = false;
         this.log("Get Flags")
         const handleResponse = ({ flags: features, traits }:IFlagsmithResponse) => {
-            if (identity && isFromIdentify) {
+            if (identity) {
                 this.withTraits = null;
             }
             // Handle server response
@@ -553,7 +551,6 @@ const Flagsmith = class {
 
     identify(userId: string, traits?:ITraits) {
         this.identity = userId;
-        this.isFromIdentify = true;
         this.log("Identify: " + this.identity)
 
         if(traits) {
