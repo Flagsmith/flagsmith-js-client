@@ -40,6 +40,8 @@ type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:Async
 
 const Flagsmith = class {
     eventSource:EventSource|null = null
+    isFromIdentify: boolean = false
+
     constructor(props: Config) {
         if (props.fetch) {
             _fetch = props.fetch as LikeFetch;
@@ -96,11 +98,11 @@ const Flagsmith = class {
     };
 
     getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
-        const { onChange, onError, identity, api } = this;
+        const { onChange, onError, identity, api, isFromIdentify } = this;
         let resolved = false;
         this.log("Get Flags")
         const handleResponse = ({ flags: features, traits }:IFlagsmithResponse) => {
-            if (identity) {
+            if (identity && isFromIdentify) {
                 this.withTraits = null;
             }
             // Handle server response
@@ -164,15 +166,16 @@ const Flagsmith = class {
 
         if (identity) {
             return Promise.all([
-                this.withTraits?
+                this.withTraits ?
                     this.getJSON(api + 'identities/', "POST", JSON.stringify({
                         "identifier": identity,
                         traits: Object.keys(this.withTraits).map((k)=>({
                             "trait_key":k,
                             "trait_value": this.withTraits![k]
                         }))
-                    })):
-                this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
+                    }))
+                    :
+                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
                     this.withTraits = null
@@ -550,6 +553,7 @@ const Flagsmith = class {
 
     identify(userId: string, traits?:ITraits) {
         this.identity = userId;
+        this.isFromIdentify = true;
         this.log("Identify: " + this.identity)
 
         if(traits) {
