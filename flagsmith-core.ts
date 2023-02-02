@@ -164,7 +164,7 @@ const Flagsmith = class {
 
         if (identity) {
             return Promise.all([
-                this.withTraits ?
+                this.withTraits?
                     this.getJSON(api + 'identities/', "POST", JSON.stringify({
                         "identifier": identity,
                         traits: Object.keys(this.withTraits).map((k)=>({
@@ -172,8 +172,7 @@ const Flagsmith = class {
                             "trait_value": this.withTraits![k]
                         }))
                     }))
-                    :
-                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
+                    :this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
                     this.withTraits = null
