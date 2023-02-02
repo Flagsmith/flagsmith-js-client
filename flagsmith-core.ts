@@ -171,8 +171,7 @@ const Flagsmith = class {
                             "trait_key":k,
                             "trait_value": this.withTraits![k]
                         }))
-                    }))
-                    :this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
+                    })):this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
                 .then((res) => {
                     this.withTraits = null
