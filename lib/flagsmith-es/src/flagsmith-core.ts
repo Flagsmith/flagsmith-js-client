@@ -39,6 +39,8 @@ const initError = function (caller:string) {
 type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
 
 const Flagsmith = class {
+
+    timestamp: number|null = null
     eventSource:EventSource|null = null
     constructor(props: Config) {
         if (props.fetch) {
@@ -60,6 +62,7 @@ const Flagsmith = class {
 
     getJSON = (url:string, method?:"GET"|"POST"|"PUT", body?:string) => {
         const { environmentID, headers } = this;
+        this.timestamp = Math.floor(Date.now() / 1000);
         const options: RequestOptions = {
             method: method || 'GET',
             body,
@@ -315,8 +318,19 @@ const Flagsmith = class {
                     this.log("Creating event source with url " + connectionUrl)
                     this.eventSource = new eventSource(connectionUrl)
                     this.eventSource.addEventListener("environment_updated", (e)=>{
-                        this.log("Received eventsource message")
-                        this.getFlags()
+                        let updated_at;
+                        try {
+                            const data = JSON.parse(e.data)
+                            updated_at = data.updated_at;
+                        } catch (e) {
+                            this.log("Could not parse sse event",e)
+                        }
+                        if (!updated_at) {
+                            this.log("No updated_at received, fetching flags", e)
+                        } else if(!this.timestamp || e.data?.updated_at>this.timestamp) {
+                            this.log("updated_at is new, fetching flags",e.data, this.timestamp)
+                            this.getFlags()
+                        }
                     })
                 }
             }
