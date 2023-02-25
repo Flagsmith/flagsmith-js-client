@@ -33,7 +33,6 @@ flagsmith.init({
     environmentID: environmentID,
     cacheFlags: true,
     enableLogs: true,
-    api: "http://bdsadasdsla.com",
     enableAnalytics:true,
     cacheOptions: {skipAPI:true,ttl:5000},
     defaultFlags: {
