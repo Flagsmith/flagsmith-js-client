@@ -40,6 +40,7 @@ type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:Async
 
 const Flagsmith = class {
     timestamp: number|null = null
+    isLoading = false
     eventSource:EventSource|null = null
     constructor(props: Config) {
         if (props.fetch) {
@@ -61,7 +62,6 @@ const Flagsmith = class {
 
     getJSON = (url:string, method?:"GET"|"POST"|"PUT", body?:string) => {
         const { environmentID, headers } = this;
-        this.timestamp = Math.floor(Date.now() / 1000);
         const options: RequestOptions = {
             method: method || 'GET',
             body,
@@ -82,6 +82,18 @@ const Flagsmith = class {
 
         return _fetch(url, options)
             .then(res => {
+                const lastUpdated = res.headers?.get('x-flagsmith-document-updated-at');
+                if(lastUpdated) {
+                    try {
+                        const lastUpdatedFloat = parseFloat(lastUpdated)
+                        if(isNaN(lastUpdatedFloat)) {
+                            throw "Failed to parse x-flagsmith-document-updated-at"
+                        }
+                        this.timestamp = lastUpdatedFloat
+                    } catch (e) {
+                        this.log(e,"Failed to parse x-flagsmith-document-updated-at",lastUpdated)
+                    }
+                }
                 this.log("Fetch response: "+ res.status + " " + (method||"GET") +  + " " + url)
                 return res.text!()
                     .then((text) => {
@@ -101,7 +113,9 @@ const Flagsmith = class {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
         this.log("Get Flags")
+        this.isLoading = true;
         const handleResponse = ({ flags: features, traits }:IFlagsmithResponse) => {
+            this.isLoading = false;
             if (identity) {
                 this.withTraits = null;
             }
@@ -116,6 +130,7 @@ const Flagsmith = class {
                     enabled: feature.enabled,
                     value: feature.feature_state_value
                 };
+
             });
             traits.forEach(trait => {
                 userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value
@@ -184,6 +199,7 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch(({ message }) => {
+                    this.isLoading = false;
                     onError && onError({ message })
                 });
         } else {
@@ -197,6 +213,7 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch((err) => {
+                    this.isLoading = false;
                     if (reject && !resolved) {
                         resolved = true;
                         reject(err);
@@ -327,8 +344,14 @@ const Flagsmith = class {
                         if (!updated_at) {
                             this.log("No updated_at received, fetching flags", e)
                         } else if(!this.timestamp || e.data?.updated_at>this.timestamp) {
-                            this.log("updated_at is new, fetching flags",e.data, this.timestamp)
-                            this.getFlags()
+                            if (this.isLoading) {
+                                this.log("updated_at is new, but flags are loading",e.data, this.timestamp)
+                            } else {
+                                this.log("updated_at is new, fetching flags",e.data, this.timestamp)
+                                this.getFlags()
+                            }
+                        } else {
+                            this.log("updated_at is outdated, skipping get flags", e.data, this.timestamp)
                         }
                     })
                 }

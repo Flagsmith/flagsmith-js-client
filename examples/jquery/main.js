@@ -5,7 +5,8 @@ function identify() {
 }
 
 function toggleTrait () {
-    flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
+    flagsmith.setTraits({'example_trait': "5"});
+    // flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
 }
 
 function login () {

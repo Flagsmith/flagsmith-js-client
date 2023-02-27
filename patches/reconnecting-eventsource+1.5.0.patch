@@ -1,0 +1,85 @@
+diff --git a/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js b/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js
+index b747477..6bd5422 100644
+--- a/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js
++++ b/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js
+@@ -99,7 +99,7 @@ var ReconnectingEventSource = /** @class */ (function () {
+         this.url = url.toString();
+         this.readyState = this.CONNECTING;
+         this.max_retry_time = 3000;
+-        this.eventSourceClass = globalThis.EventSource;
++        this.eventSourceClass = globalThis.FlagsmithEventSource;
+         if (this._configuration != null) {
+             if (this._configuration.lastEventId) {
+                 this._lastEventId = this._configuration.lastEventId;
+@@ -168,14 +168,12 @@ var ReconnectingEventSource = /** @class */ (function () {
+             this.onerror(event);
+         }
+         if (this._eventSource) {
+-            if (this._eventSource.readyState === 2) {
+                 // reconnect with new object
+                 this._eventSource.close();
+                 this._eventSource = null;
+                 // reconnect after random timeout < max_retry_time
+                 var timeout = Math.round(this.max_retry_time * Math.random());
+                 this._timer = setTimeout(function () { return _this._start(); }, timeout);
+-            }
+         }
+     };
+     ReconnectingEventSource.prototype._onevent = function (event) {
+diff --git a/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js b/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js
+index 09f146e..3b1ddf7 100644
+--- a/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js
++++ b/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js
+@@ -44,7 +44,7 @@ export default class ReconnectingEventSource {
+         this.url = url.toString();
+         this.readyState = this.CONNECTING;
+         this.max_retry_time = 3000;
+-        this.eventSourceClass = globalThis.EventSource;
++        this.eventSourceClass = globalThis.FlagsmithEventSource;
+         if (this._configuration != null) {
+             if (this._configuration.lastEventId) {
+                 this._lastEventId = this._configuration.lastEventId;
+@@ -100,7 +100,6 @@ export default class ReconnectingEventSource {
+             this.onerror(event);
+         }
+         if (this._eventSource) {
+-            if (this._eventSource.readyState === 2) {
+                 // reconnect with new object
+                 this._eventSource.close();
+                 this._eventSource = null;
+@@ -108,7 +107,6 @@ export default class ReconnectingEventSource {
+                 const timeout = Math.round(this.max_retry_time * Math.random());
+                 this._timer = setTimeout(() => this._start(), timeout);
+             }
+-        }
+     }
+     _onevent(event) {
+         if (event instanceof MessageEvent) {
+diff --git a/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js b/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js
+index b3cf336..1623891 100644
+--- a/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js
++++ b/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js
+@@ -48,7 +48,7 @@ class ReconnectingEventSource {
+         this.url = url.toString();
+         this.readyState = this.CONNECTING;
+         this.max_retry_time = 3000;
+-        this.eventSourceClass = globalThis.EventSource;
++        this.eventSourceClass = globalThis.FlagsmithEventSource;
+         if (this._configuration != null) {
+             if (this._configuration.lastEventId) {
+                 this._lastEventId = this._configuration.lastEventId;
+@@ -104,14 +104,12 @@ class ReconnectingEventSource {
+             this.onerror(event);
+         }
+         if (this._eventSource) {
+-            if (this._eventSource.readyState === 2) {
+                 // reconnect with new object
+                 this._eventSource.close();
+                 this._eventSource = null;
+                 // reconnect after random timeout < max_retry_time
+                 const timeout = Math.round(this.max_retry_time * Math.random());
+                 this._timer = setTimeout(() => this._start(), timeout);
+-            }
+         }
+     }
+     _onevent(event) {
