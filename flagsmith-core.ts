@@ -120,8 +120,8 @@ const Flagsmith = class {
                 this.withTraits = null;
             }
             // Handle server response
-            let flags:IFlags = {};
-            let userTraits: ITraits = {};
+            const flags:IFlags = {};
+            const userTraits: ITraits = {};
             features = features || [];
             traits = traits || [];
             features.forEach(feature => {
@@ -144,7 +144,7 @@ const Flagsmith = class {
             this.traits = userTraits;
             this.updateStorage();
             if (this.dtrum) {
-                let traits: DynatraceObject = {
+                const traits: DynatraceObject = {
                     javaDouble: {},
                     date: {},
                     shortString: {},
@@ -165,10 +165,6 @@ const Flagsmith = class {
                 this.dtrum.sendSessionProperties(
                     traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
                 )
-            }
-            if(this.trigger) {
-                this.log("trigger called")
-                this.trigger()
             }
             if (onChange) {
                 onChange(this.oldFlags, {
@@ -256,7 +252,7 @@ const Flagsmith = class {
     ts: number|null= null
     enableAnalytics= false
     enableLogs= false
-    environmentID: string = ""
+    environmentID = ""
     evaluationEvent: Record<string, Record<string, number>> | null= null
     flags:IFlags|null= null
     getFlagInterval: NodeJS.Timer|null= null
@@ -303,7 +299,17 @@ const Flagsmith = class {
             this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
-            this.onChange = onChange;
+
+            this.onChange = (previousFlags, params)  => {
+                if(onChange) {
+                    onChange(previousFlags, params)
+                }
+                if(this.trigger) {
+                    this.log("trigger called")
+                    this.trigger()
+                }
+            }
+
             this.trigger = _trigger || this.trigger;
             this.onError = onError? (message:any)=> {
                 if (message instanceof Error) {
@@ -343,7 +349,7 @@ const Flagsmith = class {
                         }
                         if (!updated_at) {
                             this.log("No updated_at received, fetching flags", e)
-                        } else if(!this.timestamp || e.data?.updated_at>this.timestamp) {
+                        } else if(!this.timestamp || updated_at>this.timestamp) {
                             if (this.isLoading) {
                                 this.log("updated_at is new, but flags are loading",e.data, this.timestamp)
                             } else {
@@ -465,7 +471,7 @@ const Flagsmith = class {
                 if (AsyncStorage && this.canUseStorage) {
                     AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
                         if (res) {
-                            var json = JSON.parse(res);
+                            const json = JSON.parse(res);
                             if (json[this.environmentID]) {
                                 state = this.getState();
                                 this.log("Retrieved events from cache", res);
@@ -487,7 +493,7 @@ const Flagsmith = class {
                     AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
                         if (res) {
                             try {
-                                var json = JSON.parse(res);
+                                const json = JSON.parse(res);
                                 let cachePopulated = false;
                                 if (json && json.api === this.api && json.environmentID === this.environmentID) {
                                     let setState = true;
@@ -511,11 +517,6 @@ const Flagsmith = class {
                                 }
 
                                 if (this.flags) { // retrieved flags from local storage
-
-                                    if(this.trigger) {
-                                        this.log("trigger called")
-                                        this.trigger()
-                                    }
                                     if (this.onChange) {
                                         this.log("onChange called")
                                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
@@ -543,10 +544,6 @@ const Flagsmith = class {
                                 this.getFlags(resolve, reject)
                             } else {
                                 if (defaultFlags) {
-                                    if(this.trigger) {
-                                        this.log("trigger called")
-                                        this.trigger()
-                                    }
                                     if (this.onChange) {
                                         this.log("onChange called")
                                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
@@ -562,10 +559,6 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
-                    if(this.trigger) {
-                        this.log("trigger called")
-                        this.trigger()
-                    }
                     if (this.onChange) {
                         this.log("onChange called")
                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits });
@@ -777,7 +770,7 @@ const Flagsmith = class {
 
 export default function ({ fetch, browserlessStorage, AsyncStorage, eventSource }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
-};
+}
 
 // transforms any trait to match sendSessionProperties
 // https://www.dynatrace.com/support/doc/javascriptapi/interfaces/dtrum_types.DtrumApi.html#addActionProperties

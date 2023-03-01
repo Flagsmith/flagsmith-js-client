@@ -1,5 +1,5 @@
 diff --git a/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js b/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js
-index b747477..6bd5422 100644
+index b747477..6df1ef5 100644
 --- a/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js
 +++ b/node_modules/reconnecting-eventsource/build/esm/reconnecting-eventsource.js
 @@ -99,7 +99,7 @@ var ReconnectingEventSource = /** @class */ (function () {
@@ -11,7 +11,7 @@ index b747477..6bd5422 100644
          if (this._configuration != null) {
              if (this._configuration.lastEventId) {
                  this._lastEventId = this._configuration.lastEventId;
-@@ -168,14 +168,12 @@ var ReconnectingEventSource = /** @class */ (function () {
+@@ -168,19 +168,17 @@ var ReconnectingEventSource = /** @class */ (function () {
              this.onerror(event);
          }
          if (this._eventSource) {
@@ -26,8 +26,14 @@ index b747477..6bd5422 100644
          }
      };
      ReconnectingEventSource.prototype._onevent = function (event) {
+         var e_2, _a;
+-        if (event instanceof MessageEvent) {
++        if (event && event.lastEventId) {
+             this._lastEventId = event.lastEventId;
+         }
+         var listenersForType = this._listeners[event.type];
 diff --git a/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js b/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js
-index 09f146e..3b1ddf7 100644
+index 09f146e..2113a07 100644
 --- a/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js
 +++ b/node_modules/reconnecting-eventsource/build/esnext/reconnecting-eventsource.js
 @@ -44,7 +44,7 @@ export default class ReconnectingEventSource {
@@ -47,16 +53,20 @@ index 09f146e..3b1ddf7 100644
                  // reconnect with new object
                  this._eventSource.close();
                  this._eventSource = null;
-@@ -108,7 +107,6 @@ export default class ReconnectingEventSource {
+@@ -108,10 +107,9 @@ export default class ReconnectingEventSource {
                  const timeout = Math.round(this.max_retry_time * Math.random());
                  this._timer = setTimeout(() => this._start(), timeout);
              }
 -        }
      }
      _onevent(event) {
-         if (event instanceof MessageEvent) {
+-        if (event instanceof MessageEvent) {
++        if (event && event.lastEventId) {
+             this._lastEventId = event.lastEventId;
+         }
+         const listenersForType = this._listeners[event.type];
 diff --git a/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js b/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js
-index b3cf336..1623891 100644
+index b3cf336..7efec8a 100644
 --- a/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js
 +++ b/node_modules/reconnecting-eventsource/build/src/reconnecting-eventsource.js
 @@ -48,7 +48,7 @@ class ReconnectingEventSource {
@@ -68,7 +78,7 @@ index b3cf336..1623891 100644
          if (this._configuration != null) {
              if (this._configuration.lastEventId) {
                  this._lastEventId = this._configuration.lastEventId;
-@@ -104,14 +104,12 @@ class ReconnectingEventSource {
+@@ -104,18 +104,16 @@ class ReconnectingEventSource {
              this.onerror(event);
          }
          if (this._eventSource) {
@@ -83,3 +93,16 @@ index b3cf336..1623891 100644
          }
      }
      _onevent(event) {
+-        if (event instanceof MessageEvent) {
++        if (event && event.lastEventId) {
+             this._lastEventId = event.lastEventId;
+         }
+         const listenersForType = this._listeners[event.type];
+diff --git a/node_modules/reconnecting-eventsource/dist/ReconnectingEventSource.min.js b/node_modules/reconnecting-eventsource/dist/ReconnectingEventSource.min.js
+index 2065976..f1712d9 100644
+--- a/node_modules/reconnecting-eventsource/dist/ReconnectingEventSource.min.js
++++ b/node_modules/reconnecting-eventsource/dist/ReconnectingEventSource.min.js
+@@ -1,2 +1,2 @@
+-var _ReconnectingEventSource;(()=>{"use strict";var e={19:(e,t)=>{Object.defineProperty(t,"__esModule",{value:!0}),t.EventSourceNotAvailableError=void 0;class n extends Error{constructor(){super("EventSource not available.\nConsider loading an EventSource polyfill and making it available globally as EventSource, or passing one in as eventSourceClass to the ReconnectingEventSource constructor.")}}t.EventSourceNotAvailableError=n,t.default=class{constructor(e,t){if(this.CONNECTING=0,this.OPEN=1,this.CLOSED=2,this._configuration=null!=t?Object.assign({},t):void 0,this.withCredentials=!1,this._eventSource=null,this._lastEventId=null,this._timer=null,this._listeners={open:[],error:[],message:[]},this.url=e.toString(),this.readyState=this.CONNECTING,this.max_retry_time=3e3,this.eventSourceClass=globalThis.EventSource,null!=this._configuration&&(this._configuration.lastEventId&&(this._lastEventId=this._configuration.lastEventId,delete this._configuration.lastEventId),this._configuration.max_retry_time&&(this.max_retry_time=this._configuration.max_retry_time,delete this._configuration.max_retry_time),this._configuration.eventSourceClass&&(this.eventSourceClass=this._configuration.eventSourceClass,delete this._configuration.eventSourceClass)),null==this.eventSourceClass||"function"!=typeof this.eventSourceClass)throw new n;this._onevent_wrapped=e=>{this._onevent(e)},this._start()}dispatchEvent(e){throw new Error("Method not implemented.")}_start(){let e=this.url;this._lastEventId&&(-1===e.indexOf("?")?e+="?":e+="&",e+="lastEventId="+encodeURIComponent(this._lastEventId)),this._eventSource=new this.eventSourceClass(e,this._configuration),this._eventSource.onopen=e=>{this._onopen(e)},this._eventSource.onerror=e=>{this._onerror(e)},this._eventSource.onmessage=e=>{this.onmessage(e)};for(const e of Object.keys(this._listeners))this._eventSource.addEventListener(e,this._onevent_wrapped)}_onopen(e){0===this.readyState&&(this.readyState=1,this.onopen(e))}_onerror(e){if(1===this.readyState&&(this.readyState=0,this.onerror(e)),this._eventSource&&2===this._eventSource.readyState){this._eventSource.close(),this._eventSource=null;const e=Math.round(this.max_retry_time*Math.random());this._timer=setTimeout((()=>this._start()),e)}}_onevent(e){e instanceof MessageEvent&&(this._lastEventId=e.lastEventId);const t=this._listeners[e.type];if(null!=t)for(const n of[...t])n.call(this,e);"message"===e.type&&this.onmessage(e)}onopen(e){}onerror(e){}onmessage(e){}close(){this._timer&&(clearTimeout(this._timer),this._timer=null),this._eventSource&&(this._eventSource.close(),this._eventSource=null),this.readyState=2}addEventListener(e,t,n){null==this._listeners[e]&&(this._listeners[e]=[],null!=this._eventSource&&this._eventSource.addEventListener(e,this._onevent_wrapped));const s=this._listeners[e];s.includes(t)||(this._listeners[e]=[...s,t])}removeEventListener(e,t,n){const s=this._listeners[e];this._listeners[e]=s.filter((e=>e!==t))}}}},t={};function n(s){var i=t[s];if(void 0!==i)return i.exports;var r=t[s]={exports:{}};return e[s](r,r.exports,n),r.exports}var s={};(()=>{var e=s;Object.defineProperty(e,"__esModule",{value:!0});const t=n(19);Object.assign(window,{ReconnectingEventSource:t.default,EventSourceNotAvailableError:t.EventSourceNotAvailableError})})(),_ReconnectingEventSource=s})();
++var _ReconnectingEventSource;(()=>{"use strict";var e={19:(e,t)=>{Object.defineProperty(t,"__esModule",{value:!0}),t.EventSourceNotAvailableError=void 0;class n extends Error{constructor(){super("EventSource not available.\nConsider loading an EventSource polyfill and making it available globally as EventSource, or passing one in as eventSourceClass to the ReconnectingEventSource constructor.")}}t.EventSourceNotAvailableError=n,t.default=class{constructor(e,t){if(this.CONNECTING=0,this.OPEN=1,this.CLOSED=2,this._configuration=null!=t?Object.assign({},t):void 0,this.withCredentials=!1,this._eventSource=null,this._lastEventId=null,this._timer=null,this._listeners={open:[],error:[],message:[]},this.url=e.toString(),this.readyState=this.CONNECTING,this.max_retry_time=3e3,this.eventSourceClass=globalThis.EventSource,null!=this._configuration&&(this._configuration.lastEventId&&(this._lastEventId=this._configuration.lastEventId,delete this._configuration.lastEventId),this._configuration.max_retry_time&&(this.max_retry_time=this._configuration.max_retry_time,delete this._configuration.max_retry_time),this._configuration.eventSourceClass&&(this.eventSourceClass=this._configuration.eventSourceClass,delete this._configuration.eventSourceClass)),null==this.eventSourceClass||"function"!=typeof this.eventSourceClass)throw new n;this._onevent_wrapped=e=>{this._onevent(e)},this._start()}dispatchEvent(e){throw new Error("Method not implemented.")}_start(){let e=this.url;this._lastEventId&&(-1===e.indexOf("?")?e+="?":e+="&",e+="lastEventId="+encodeURIComponent(this._lastEventId)),this._eventSource=new this.eventSourceClass(e,this._configuration),this._eventSource.onopen=e=>{this._onopen(e)},this._eventSource.onerror=e=>{this._onerror(e)},this._eventSource.onmessage=e=>{this.onmessage(e)};for(const e of Object.keys(this._listeners))this._eventSource.addEventListener(e,this._onevent_wrapped)}_onopen(e){0===this.readyState&&(this.readyState=1,this.onopen(e))}_onerror(e){if(1===this.readyState&&(this.readyState=0,this.onerror(e)),this._eventSource&&2===this._eventSource.readyState){this._eventSource.close(),this._eventSource=null;const e=Math.round(this.max_retry_time*Math.random());this._timer=setTimeout((()=>this._start()),e)}}_onevent(e){e && e._lastEventId &&(this._lastEventId=e.lastEventId);const t=this._listeners[e.type];if(null!=t)for(const n of[...t])n.call(this,e);"message"===e.type&&this.onmessage(e)}onopen(e){}onerror(e){}onmessage(e){}close(){this._timer&&(clearTimeout(this._timer),this._timer=null),this._eventSource&&(this._eventSource.close(),this._eventSource=null),this.readyState=2}addEventListener(e,t,n){null==this._listeners[e]&&(this._listeners[e]=[],null!=this._eventSource&&this._eventSource.addEventListener(e,this._onevent_wrapped));const s=this._listeners[e];s.includes(t)||(this._listeners[e]=[...s,t])}removeEventListener(e,t,n){const s=this._listeners[e];this._listeners[e]=s.filter((e=>e!==t))}}}},t={};function n(s){var i=t[s];if(void 0!==i)return i.exports;var r=t[s]={exports:{}};return e[s](r,r.exports,n),r.exports}var s={};(()=>{var e=s;Object.defineProperty(e,"__esModule",{value:!0});const t=n(19);Object.assign(window,{ReconnectingEventSource:t.default,EventSourceNotAvailableError:t.EventSourceNotAvailableError})})(),_ReconnectingEventSource=s})();
+ //# sourceMappingURL=ReconnectingEventSource.min.js.map

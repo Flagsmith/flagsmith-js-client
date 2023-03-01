@@ -1,12 +1,11 @@
 import React, {
-    createContext, FC,
-    useCallback,
+    createContext, FC, useCallback,
     useContext,
     useEffect,
     useMemo,
     useRef,
     useState,
-} from 'react'
+} from 'react';
 import Emitter from 'tiny-emitter';
 const events = new Emitter.TinyEmitter();
 
@@ -21,11 +20,10 @@ export type FlagsmithContextType = {
 }
 
 export const FlagsmithProvider: FC<FlagsmithContextType> = ({
- flagsmith, options, serverState, children,
-}) => {
+                                                                flagsmith, options, serverState, children,
+                                                            }) => {
     const firstRenderRef = useRef(true)
     if (flagsmith && !flagsmith?.trigger) {
-        // @ts-expect-error
         flagsmith.trigger = ()=>{
             flagsmith.log("React - trigger event received")
             events.emit('event');
@@ -45,7 +43,6 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
                     if (options.onChange) {
                         options.onChange(...args)
                     }
-                    events.emit('event')
                 },
             })
         }
@@ -96,46 +93,43 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
     [K in T]: IFlagsmithTrait
 } {
     const firstRender = useRef(true)
-
     const flags = useConstant<string[]>(flagsAsArray(_flags))
     const traits = useConstant<string[]>(flagsAsArray(_traits))
     const flagsmith = useContext(FlagsmithContext)
-    const [renderKey, setRenderKey] = useState<string>(
-        getRenderKey(flagsmith as IFlagsmith, flags),
-    )
-    const renderRef = useRef<string>(renderKey)
+    const [renderRef, setRenderRef] = useState(getRenderKey(flagsmith as IFlagsmith, flags, traits));
+
     const eventListener = useCallback(() => {
-        flagsmith?.log("React - Event listener triggered")
         const newRenderKey = getRenderKey(flagsmith as IFlagsmith, flags, traits)
-        if (newRenderKey !== renderRef.current) {
-            renderRef.current = newRenderKey
-            setRenderKey(newRenderKey)
+        if (newRenderKey !== renderRef) {
+            flagsmith?.log("React - useFlags flags and traits have changed")
+            setRenderRef(newRenderKey)
         }
-    }, [])
+    },[renderRef])
+
     if (firstRender.current) {
         firstRender.current = false;
         flagsmith?.log("React - Initialising event listeners")
-        events.on('event', eventListener)
     }
+
     useEffect(()=>{
+        events.on('event', eventListener)
         return () => {
-            flagsmith?.log("React - Removing event listeners")
             events.off('event', eventListener)
         }
-    }, [])
+    }, [eventListener])
+
     const res = useMemo(() => {
-        flagsmith?.log("React - Render key has changed")
         const res: any = {}
-        flags.map((k) => {
-            res[k] = {
+    flags.map((k) => {
+        res[k] = {
                 enabled: flagsmith!.hasFeature(k),
                 value: flagsmith!.getValue(k),
-            }
-        }).concat(traits?.map((v) => {
-            res[v] = flagsmith!.getTrait(v)
-        }))
+        }
+    }).concat(traits?.map((v) => {
+        res[v] = flagsmith!.getTrait(v)
+    }))
         return res
-    }, [renderKey])
+    }, [renderRef])
 
     return res
 }
