@@ -1,7 +1,7 @@
 import { IFlagsmith } from './types';
 
 // @ts-ignore
-globalThis.FlagsmithEventSource = EventSource;
+globalThis.FlagsmithEventSource = typeof EventSource!== "undefined"? EventSource: null;
 
 import fetch from "unfetch"
 // @ts-expect-error

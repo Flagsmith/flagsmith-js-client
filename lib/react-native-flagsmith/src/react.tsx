@@ -22,8 +22,8 @@ export type FlagsmithContextType = {
 }
 
 export const FlagsmithProvider: FC<FlagsmithContextType> = ({
-                                                                flagsmith, options, serverState, children,
-                                                            }) => {
+  flagsmith, options, serverState, children,
+}) => {
     const firstRenderRef = useRef(true)
     if (flagsmith && !flagsmith?.trigger) {
         flagsmith.trigger = ()=>{
