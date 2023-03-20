@@ -68,9 +68,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     identity?: string;
     traits?: ITraits<T>;
     onChange?: (previousFlags: IFlags<F> | null, params: IRetrieveInfo) => void;
-    onError?: (res: {
-        message: string;
-    }) => void;
+    onError?: (err: Error) => void;
     preventFetch?: boolean;
     state?: IState;
     _trigger?: () => void;
@@ -165,7 +163,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
-    trigger?: () => {};
+    trigger?: () => void;
     /**
      * Used internally, this function will console log if enableLogs is being set within flagsmith.init
      */

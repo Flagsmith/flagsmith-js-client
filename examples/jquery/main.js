@@ -5,7 +5,7 @@ function identify() {
 }
 
 function toggleTrait () {
-    flagsmith.setTrait('example_trait', "Some value " + Math.floor(Math.random() * 10)+"");
+    flagsmith.setTraits({'example_trait': "5"});
 }
 
 function login () {
@@ -37,6 +37,9 @@ flagsmith.init({
     cacheOptions: {skipAPI:true,ttl:5000},
     defaultFlags: {
         font_size: {value: 10, enabled:true}
+    },
+    onError: function(e) {
+        console.log(e)
     },
     onChange: function() {
         $("#loaded").removeClass("hidden")
