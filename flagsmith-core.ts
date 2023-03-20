@@ -1,4 +1,5 @@
 import {
+    IDatadogRum,
     IFlags,
     IFlagsmith,
     GetValueOptions,
@@ -37,6 +38,10 @@ const initError = function (caller:string) {
 }
 
 type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
+
+const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
+const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
+const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
 
 const Flagsmith = class {
     timestamp: number|null = null
@@ -143,28 +148,53 @@ const Flagsmith = class {
             this.flags = flags;
             this.traits = userTraits;
             this.updateStorage();
-            if (this.dtrum) {
-                const traits: DynatraceObject = {
-                    javaDouble: {},
-                    date: {},
-                    shortString: {},
-                    javaLongOrObject: {},
+
+            if (this.datadogRum) {
+                try {
+                    if (this.datadogRum!.trackTraits) {
+                        const traits: Parameters<IDatadogRum["client"]["setUser"]>["0"] = {};
+                        Object.keys(this.traits).map((key) => {
+                            traits[FLAGSMITH_TRAIT_ANALYTICS_KEY + key] = this.getTrait(key);
+                        });
+                        const datadogRumData = {
+                            ...this.datadogRum.client.getUser(),
+                            id: this.datadogRum.client.getUser().id || this.identity,
+                            ...traits,
+                        };
+                        this.log("Setting Datadog user", datadogRumData);
+                        this.datadogRum.client.setUser(datadogRumData);
+                    }
+                } catch (e) {
+                    console.error(e)
                 }
-                Object.keys(this.flags).map((key)=>{
-                    setDynatraceValue(traits, "flagsmith_value_"+key, this.getValue(key) )
-                    setDynatraceValue(traits, "flagsmith_enabled_"+key, this.hasFeature(key) )
-                })
-                Object.keys(this.traits).map((key)=>{
-                    setDynatraceValue(traits, "flagsmith_trait_"+key, this.getTrait(key) )
-                })
-                this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
-                this.log("Sending date traits to dynatrace", traits.date)
-                this.log("Sending shortString traits to dynatrace", traits.shortString)
-                this.log("Sending javaDouble to dynatrace", traits.javaDouble)
-                // @ts-expect-error
-                this.dtrum.sendSessionProperties(
-                    traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
-                )
+            }
+
+            if (this.dtrum) {
+                try {
+                    const traits: DynatraceObject = {
+                        javaDouble: {},
+                        date: {},
+                        shortString: {},
+                        javaLongOrObject: {},
+                    }
+                    Object.keys(this.flags).map((key) => {
+                        setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, {}, true))
+                        setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true))
+                    })
+                    Object.keys(this.traits).map((key) => {
+                        setDynatraceValue(traits, FLAGSMITH_TRAIT_ANALYTICS_KEY + key, this.getTrait(key))
+                    })
+                    this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
+                    this.log("Sending date traits to dynatrace", traits.date)
+                    this.log("Sending shortString traits to dynatrace", traits.shortString)
+                    this.log("Sending javaDouble to dynatrace", traits.javaDouble)
+                    // @ts-expect-error
+                    this.dtrum.sendSessionProperties(
+                        traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
+                    )
+                } catch (e) {
+                    console.error(e)
+                }
             }
             if (onChange) {
                 onChange(this.oldFlags, {
@@ -196,7 +226,7 @@ const Flagsmith = class {
                     }
                 }).catch(({ message }) => {
                     this.isLoading = false;
-                    onError && onError({ message })
+                    onError && onError(new Error(message))
                 });
         } else {
             return Promise.all([
@@ -245,6 +275,7 @@ const Flagsmith = class {
         }
     };
 
+    datadogRum: IDatadogRum | null = null;
     canUseStorage = false
     analyticsInterval: NodeJS.Timer | null= null
     api: string|null= null
@@ -275,6 +306,7 @@ const Flagsmith = class {
         headers,
         onChange,
         cacheFlags,
+        datadogRum,
         onError,
         defaultFlags,
         fetch:fetchImplementation,
@@ -391,6 +423,10 @@ const Flagsmith = class {
             if (!environmentID) {
                 reject('Please specify a environment id')
                 throw ('Please specify a environment id');
+            }
+
+            if (datadogRum) {
+                this.datadogRum = datadogRum;
             }
 
             if (enableDynatrace) {
@@ -669,7 +705,20 @@ const Flagsmith = class {
         // return this.segments;
     }
 
-    evaluateFlag = (key:string) => {
+    evaluateFlag = (key: string, method:"VALUE"|"ENABLED") => {
+        if (this.datadogRum) {
+            if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
+                console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
+            } else {
+                this.log("Sending feature flag evaluation to Datadog", key, method)
+                if (method === "VALUE") {
+                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, { }, true));
+                } else {
+                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true));
+                }
+            }
+        }
+
         if (this.enableAnalytics) {
             if (!this.evaluationEvent) return;
             if(!this.evaluationEvent[this.environmentID]) {
@@ -683,14 +732,16 @@ const Flagsmith = class {
         this.updateEventStorage();
     }
 
-    getValue = (key:string, options?: GetValueOptions) => {
+    getValue = (key: string, options?: GetValueOptions, skipAnalytics?:boolean) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = null;
         if (flag) {
             res = flag.value;
         }
 
-        this.evaluateFlag(key);
+        if(!skipAnalytics) {
+            this.evaluateFlag(key, "VALUE");
+        }
 
         if (options?.json) {
             try {
@@ -753,22 +804,22 @@ const Flagsmith = class {
         }
     };
 
-    hasFeature = (key:string) => {
+    hasFeature = (key: string, skipAnalytics?:boolean) => {
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = false;
         if (flag && flag.enabled) {
             res = true;
         }
-        this.evaluateFlag(key);
-
-        //todo record check for feature
+        if(!skipAnalytics) {
+            this.evaluateFlag(key, "ENABLED");
+        }
 
         return res;
     }
 
 };
 
-export default function ({ fetch, browserlessStorage, AsyncStorage, eventSource }:Config):IFlagsmith {
+export default function ({ fetch, AsyncStorage, eventSource }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
 }
 

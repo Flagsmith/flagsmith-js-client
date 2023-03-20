@@ -1,5 +1,5 @@
+type IFlagsmithValue<T = string | number | boolean | null> = T
 
-type IFlagsmithValue<T=string | number | boolean | null> = T
 export interface IFlagsmithFeature {
     id?: number;
     enabled: boolean;
@@ -10,7 +10,7 @@ export declare type IFlagsmithTrait = IFlagsmithValue;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
 
-export declare type GetValueOptions<T = Array<any> | object> =  {
+export declare type GetValueOptions<T = Array<any> | object> = {
     json?: boolean;
     fallback?: T
 }
@@ -21,6 +21,7 @@ export interface IRetrieveInfo {
     flagsChanged: boolean;
     traitsChanged: boolean;
 }
+
 export interface IState<F extends string = string, T extends string = string> {
     api: string;
     environmentID: string;
@@ -29,15 +30,31 @@ export interface IState<F extends string = string, T extends string = string> {
     identity?: string;
     traits: ITraits<T>;
 }
+
 declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
 };
+
+export declare type IDatadogRum = {
+    trackTraits: boolean
+    client: {
+        setUser: (newUser: {
+            [x: string]: unknown
+        }) => void;
+        getUser: () => {
+            [x: string]: unknown
+        };
+        [extraProps: string]: any
+    }
+}
+
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
+    datadogRum?: IDatadogRum;
     defaultFlags?: IFlags<F>;
     fetch?: any;
     realtime?: boolean;
@@ -56,6 +73,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     state?: IState;
     _trigger?: () => void;
 }
+
 export interface IFlagsmithResponse {
     traits?: {
         trait_key: string;
@@ -70,6 +88,7 @@ export interface IFlagsmithResponse {
         };
     }[];
 }
+
 export interface IFlagsmith<F extends string = string, T extends string = string> {
     /**
      * Initialise the sdk against a particular environment
@@ -111,10 +130,12 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * Get the whether a flag is enabled e.g. flagsmith.hasFeature("powerUserFeature")
      */
     hasFeature: (key: F) => boolean;
+
     /**
      * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
      */
-    getValue<T=IFlagsmithValue>(key: F, options?: GetValueOptions<T>): IFlagsmithValue<T>;
+    getValue<T = IFlagsmithValue>(key: F, options?: GetValueOptions<T>): IFlagsmithValue<T>;
+
     /**
      * Get the value of a particular trait for the identified user
      */
@@ -146,7 +167,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Used internally, this function will console log if enableLogs is being set within flagsmith.init
      */
-    log: (message?: any, ...optionalParams: any[]) =>void;
+    log: (message?: any, ...optionalParams: any[]) => void;
     /**
      * Used internally, this is the cache options provided in flagsmith.init
      */
@@ -155,4 +176,5 @@ export interface IFlagsmith<F extends string = string, T extends string = string
         skipAPI: boolean;
     };
 }
+
 export {};
