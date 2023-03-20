@@ -150,43 +150,51 @@ const Flagsmith = class {
             this.updateStorage();
 
             if (this.datadogRum) {
-                if (this.datadogRum!.trackTraits) {
-                    const traits: Parameters<IDatadogRum["client"]["setUser"]>["0"] = {};
-                    Object.keys(this.traits).map((key) => {
-                        traits[FLAGSMITH_TRAIT_ANALYTICS_KEY + key] = this.getTrait(key);
-                    });
-                    const datadogRumData = {
-                        ...this.datadogRum.client.getUser(),
-                        id: this.datadogRum.client.getUser().id || this.identity,
-                        ...traits,
-                    };
-                    this.log("Setting Datadog user", datadogRumData);
-                    this.datadogRum.client.setUser(datadogRumData);
+                try {
+                    if (this.datadogRum!.trackTraits) {
+                        const traits: Parameters<IDatadogRum["client"]["setUser"]>["0"] = {};
+                        Object.keys(this.traits).map((key) => {
+                            traits[FLAGSMITH_TRAIT_ANALYTICS_KEY + key] = this.getTrait(key);
+                        });
+                        const datadogRumData = {
+                            ...this.datadogRum.client.getUser(),
+                            id: this.datadogRum.client.getUser().id || this.identity,
+                            ...traits,
+                        };
+                        this.log("Setting Datadog user", datadogRumData);
+                        this.datadogRum.client.setUser(datadogRumData);
+                    }
+                } catch (e) {
+                    console.error(e)
                 }
             }
 
             if (this.dtrum) {
-                const traits: DynatraceObject = {
-                    javaDouble: {},
-                    date: {},
-                    shortString: {},
-                    javaLongOrObject: {},
+                try {
+                    const traits: DynatraceObject = {
+                        javaDouble: {},
+                        date: {},
+                        shortString: {},
+                        javaLongOrObject: {},
+                    }
+                    Object.keys(this.flags).map((key) => {
+                        setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, {}, true))
+                        setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true))
+                    })
+                    Object.keys(this.traits).map((key) => {
+                        setDynatraceValue(traits, FLAGSMITH_TRAIT_ANALYTICS_KEY + key, this.getTrait(key))
+                    })
+                    this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
+                    this.log("Sending date traits to dynatrace", traits.date)
+                    this.log("Sending shortString traits to dynatrace", traits.shortString)
+                    this.log("Sending javaDouble to dynatrace", traits.javaDouble)
+                    // @ts-expect-error
+                    this.dtrum.sendSessionProperties(
+                        traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
+                    )
+                } catch (e) {
+                    console.error(e)
                 }
-                Object.keys(this.flags).map((key) => {
-                    setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, {}, true))
-                    setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true))
-                })
-                Object.keys(this.traits).map((key) => {
-                    setDynatraceValue(traits, FLAGSMITH_TRAIT_ANALYTICS_KEY + key, this.getTrait(key))
-                })
-                this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
-                this.log("Sending date traits to dynatrace", traits.date)
-                this.log("Sending shortString traits to dynatrace", traits.shortString)
-                this.log("Sending javaDouble to dynatrace", traits.javaDouble)
-                // @ts-expect-error
-                this.dtrum.sendSessionProperties(
-                    traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
-                )
             }
             if (onChange) {
                 onChange(this.oldFlags, {
@@ -218,7 +226,7 @@ const Flagsmith = class {
                     }
                 }).catch(({ message }) => {
                     this.isLoading = false;
-                    onError && onError({ message })
+                    onError && onError(new Error(message))
                 });
         } else {
             return Promise.all([
