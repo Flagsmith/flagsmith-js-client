@@ -142,7 +142,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
-    trigger?: () => {};
+    trigger?: () => void;
     /**
      * Used internally, this function will console log if enableLogs is being set within flagsmith.init
      */

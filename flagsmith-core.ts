@@ -39,6 +39,8 @@ const initError = function (caller:string) {
 type Config= {browserlessStorage?:boolean, fetch?:LikeFetch, AsyncStorage?:AsyncStorageType, eventSource?:any};
 
 const Flagsmith = class {
+    timestamp: number|null = null
+    isLoading = false
     eventSource:EventSource|null = null
     constructor(props: Config) {
         if (props.fetch) {
@@ -80,6 +82,18 @@ const Flagsmith = class {
 
         return _fetch(url, options)
             .then(res => {
+                const lastUpdated = res.headers?.get('x-flagsmith-document-updated-at');
+                if(lastUpdated) {
+                    try {
+                        const lastUpdatedFloat = parseFloat(lastUpdated)
+                        if(isNaN(lastUpdatedFloat)) {
+                            throw "Failed to parse x-flagsmith-document-updated-at"
+                        }
+                        this.timestamp = lastUpdatedFloat
+                    } catch (e) {
+                        this.log(e,"Failed to parse x-flagsmith-document-updated-at",lastUpdated)
+                    }
+                }
                 this.log("Fetch response: "+ res.status + " " + (method||"GET") +  + " " + url)
                 return res.text!()
                     .then((text) => {
@@ -99,13 +113,15 @@ const Flagsmith = class {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
         this.log("Get Flags")
+        this.isLoading = true;
         const handleResponse = ({ flags: features, traits }:IFlagsmithResponse) => {
+            this.isLoading = false;
             if (identity) {
                 this.withTraits = null;
             }
             // Handle server response
-            let flags:IFlags = {};
-            let userTraits: ITraits = {};
+            const flags:IFlags = {};
+            const userTraits: ITraits = {};
             features = features || [];
             traits = traits || [];
             features.forEach(feature => {
@@ -114,6 +130,7 @@ const Flagsmith = class {
                     enabled: feature.enabled,
                     value: feature.feature_state_value
                 };
+
             });
             traits.forEach(trait => {
                 userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value
@@ -127,7 +144,7 @@ const Flagsmith = class {
             this.traits = userTraits;
             this.updateStorage();
             if (this.dtrum) {
-                let traits: DynatraceObject = {
+                const traits: DynatraceObject = {
                     javaDouble: {},
                     date: {},
                     shortString: {},
@@ -148,10 +165,6 @@ const Flagsmith = class {
                 this.dtrum.sendSessionProperties(
                     traits.javaLongOrObject, traits.date, traits.shortString, traits.javaDouble
                 )
-            }
-            if(this.trigger) {
-                this.log("trigger called")
-                this.trigger()
             }
             if (onChange) {
                 onChange(this.oldFlags, {
@@ -182,6 +195,7 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch(({ message }) => {
+                    this.isLoading = false;
                     onError && onError({ message })
                 });
         } else {
@@ -195,6 +209,7 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch((err) => {
+                    this.isLoading = false;
                     if (reject && !resolved) {
                         resolved = true;
                         reject(err);
@@ -237,7 +252,7 @@ const Flagsmith = class {
     ts: number|null= null
     enableAnalytics= false
     enableLogs= false
-    environmentID: string = ""
+    environmentID = ""
     evaluationEvent: Record<string, Record<string, number>> | null= null
     flags:IFlags|null= null
     getFlagInterval: NodeJS.Timer|null= null
@@ -284,7 +299,17 @@ const Flagsmith = class {
             this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
-            this.onChange = onChange;
+
+            this.onChange = (previousFlags, params)  => {
+                if(onChange) {
+                    onChange(previousFlags, params)
+                }
+                if(this.trigger) {
+                    this.log("trigger called")
+                    this.trigger()
+                }
+            }
+
             this.trigger = _trigger || this.trigger;
             this.onError = onError? (message:any)=> {
                 if (message instanceof Error) {
@@ -315,8 +340,25 @@ const Flagsmith = class {
                     this.log("Creating event source with url " + connectionUrl)
                     this.eventSource = new eventSource(connectionUrl)
                     this.eventSource.addEventListener("environment_updated", (e)=>{
-                        this.log("Received eventsource message")
-                        this.getFlags()
+                        let updated_at;
+                        try {
+                            const data = JSON.parse(e.data)
+                            updated_at = data.updated_at;
+                        } catch (e) {
+                            this.log("Could not parse sse event",e)
+                        }
+                        if (!updated_at) {
+                            this.log("No updated_at received, fetching flags", e)
+                        } else if(!this.timestamp || updated_at>this.timestamp) {
+                            if (this.isLoading) {
+                                this.log("updated_at is new, but flags are loading",e.data, this.timestamp)
+                            } else {
+                                this.log("updated_at is new, fetching flags",e.data, this.timestamp)
+                                this.getFlags()
+                            }
+                        } else {
+                            this.log("updated_at is outdated, skipping get flags", e.data, this.timestamp)
+                        }
                     })
                 }
             }
@@ -429,7 +471,7 @@ const Flagsmith = class {
                 if (AsyncStorage && this.canUseStorage) {
                     AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
                         if (res) {
-                            var json = JSON.parse(res);
+                            const json = JSON.parse(res);
                             if (json[this.environmentID]) {
                                 state = this.getState();
                                 this.log("Retrieved events from cache", res);
@@ -451,7 +493,7 @@ const Flagsmith = class {
                     AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
                         if (res) {
                             try {
-                                var json = JSON.parse(res);
+                                const json = JSON.parse(res);
                                 let cachePopulated = false;
                                 if (json && json.api === this.api && json.environmentID === this.environmentID) {
                                     let setState = true;
@@ -475,11 +517,6 @@ const Flagsmith = class {
                                 }
 
                                 if (this.flags) { // retrieved flags from local storage
-
-                                    if(this.trigger) {
-                                        this.log("trigger called")
-                                        this.trigger()
-                                    }
                                     if (this.onChange) {
                                         this.log("onChange called")
                                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
@@ -507,10 +544,6 @@ const Flagsmith = class {
                                 this.getFlags(resolve, reject)
                             } else {
                                 if (defaultFlags) {
-                                    if(this.trigger) {
-                                        this.log("trigger called")
-                                        this.trigger()
-                                    }
                                     if (this.onChange) {
                                         this.log("onChange called")
                                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
@@ -526,10 +559,6 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
-                    if(this.trigger) {
-                        this.log("trigger called")
-                        this.trigger()
-                    }
                     if (this.onChange) {
                         this.log("onChange called")
                         this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits });
@@ -741,7 +770,7 @@ const Flagsmith = class {
 
 export default function ({ fetch, browserlessStorage, AsyncStorage, eventSource }:Config):IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
-};
+}
 
 // transforms any trait to match sendSessionProperties
 // https://www.dynatrace.com/support/doc/javascriptapi/interfaces/dtrum_types.DtrumApi.html#addActionProperties
