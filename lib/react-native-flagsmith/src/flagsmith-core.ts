@@ -213,7 +213,7 @@ const Flagsmith = class {
                         traits: Object.keys(this.withTraits).map((k)=>({
                             "trait_key":k,
                             "trait_value": this.withTraits![k]
-                        }))
+                        })).filter((v)=>typeof v.trait_value !== 'undefined')
                     })):
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
