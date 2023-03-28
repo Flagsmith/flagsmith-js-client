@@ -9,7 +9,9 @@ function toggleTrait () {
 }
 
 function login () {
-    flagsmith.identify("flagsmith_sample_user");
+    flagsmith.identify("flagsmith_sample_user", {
+        createdAt: undefined
+    })
 };
 
 function logout () {
