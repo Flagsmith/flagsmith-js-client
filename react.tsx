@@ -33,7 +33,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
     }
 
     if (flagsmith && !flagsmith?._triggerLoadingState) {
-        flagsmith._trigger = ()=>{
+        flagsmith._triggerLoadingState = ()=>{
             events.emit('loading_event');
         }
     }

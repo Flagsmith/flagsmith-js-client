@@ -2,15 +2,12 @@ import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { FlagsmithProvider } from 'flagsmith-es/react';
 import flagsmith from 'flagsmith-es/isomorphic';
-import { IState } from 'flagsmith-es/types';
-const environmentID = "AbXqsQqLLAzmfj5SGCm8Ng"
+import { IInitConfig, IState } from 'flagsmith-es/types';
+const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'
 
-const options = {
-    api: "https://edge.bullet-train-staging.win/api/v1/",
+const options:IInitConfig = {
     environmentID,
-    enableLogs: false,
-    realtime: typeof window!== 'undefined'?true:false,
-    eventSourceUrl: "https://realtime-staging.flagsmith.com/",
+    cacheFlags: true
 }
 
 function MyApp({ Component, pageProps, flagsmithState }: AppProps & {flagsmithState: IState}) {

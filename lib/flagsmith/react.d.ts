@@ -8,6 +8,7 @@ export declare type FlagsmithContextType = {
     children: React.ReactElement[] | React.ReactElement;
 };
 export declare const FlagsmithProvider: FC<FlagsmithContextType>;
+export declare function useFlagsmithLoading(): import("./types").LoadingState | undefined;
 export declare function useFlags<F extends string = string, T extends string = string>(_flags: readonly F[], _traits?: readonly T[]): {
     [K in F]: IFlagsmithFeature;
 } & {

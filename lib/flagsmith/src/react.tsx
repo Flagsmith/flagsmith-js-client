@@ -25,10 +25,16 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
   flagsmith, options, serverState, children,
 }) => {
     const firstRenderRef = useRef(true)
-    if (flagsmith && !flagsmith?.trigger) {
-        flagsmith.trigger = ()=>{
+    if (flagsmith && !flagsmith?._trigger) {
+        flagsmith._trigger = ()=>{
             flagsmith.log("React - trigger event received")
             events.emit('event');
+        }
+    }
+
+    if (flagsmith && !flagsmith?._triggerLoadingState) {
+        flagsmith._triggerLoadingState = ()=>{
+            events.emit('loading_event');
         }
     }
 
@@ -87,6 +93,21 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
             `${flagsmith.getTrait(t)}`
         )))
         .join(',')
+}
+
+export function useFlagsmithLoading() {
+    const flagsmith = useContext(FlagsmithContext)
+    const [loadingState, setLoadingState] = useState(flagsmith?.loadingState);
+    const eventListener = useCallback(()=>{
+        setLoadingState(flagsmith?.loadingState)
+    },[flagsmith])
+    useEffect(()=>{
+        events.on('event', eventListener)
+        return () => {
+            events.off('event', eventListener)
+        }
+    }, [eventListener])
+    return loadingState
 }
 
 export function useFlags<F extends string=string, T extends string=string>(_flags: readonly F[], _traits: readonly T[] = []): {

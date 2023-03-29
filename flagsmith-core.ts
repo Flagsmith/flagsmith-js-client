@@ -14,6 +14,13 @@ import {
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
 
+enum FlagSource {
+    "NONE" = "NONE",
+    "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
+    "CACHE" = "CACHE",
+    "SERVER" = "SERVER",
+}
+
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
 let _fetch: LikeFetch;
 type RequestOptions = {
@@ -378,6 +385,14 @@ const Flagsmith = class {
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
             this.ticks = 10000;
+            if(Object.keys(this.flags).length){
+                //Flags have been passed as part of SSR / default flags, update state silently for initial render
+                this.loadingState = {
+                    ...this.loadingState,
+                    isLoading: false,
+                    source: FlagSource.DEFAULT_FLAGS
+                }
+            }
             if (realtime && typeof window !== 'undefined') {
                 const connectionUrl = eventSourceUrl + "sse/environments/" +  environmentID + "/stream";
                 if(!eventSource) {

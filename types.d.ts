@@ -49,14 +49,14 @@ export declare type IDatadogRum = {
     }
 }
 
-export enum FlagSource {
+export declare enum FlagSource {
     "NONE" = "NONE",
     "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
     "CACHE" = "CACHE",
     "SERVER" = "SERVER",
 }
 
-export type LoadingState = {
+export declare type LoadingState = {
     error: Error | null, // Current error, resets on next attempt to fetch flags
     isFetching: bool, // Whether there is a current request to fetch server flags
     isLoading: bool,  // Whether any flag data exists
