@@ -49,6 +49,19 @@ export declare type IDatadogRum = {
     }
 }
 
+export enum FlagSource {
+    "NONE" = "NONE",
+    "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
+    "CACHE" = "CACHE",
+    "SERVER" = "SERVER",
+}
+
+export type LoadingState = {
+    error: Error | null, // Current error, resets on next attempt to fetch flags
+    isFetching: bool, // Whether there is a current request to fetch server flags
+    isLoading: bool,  // Whether any flag data exists
+    source: FlagSource //Indicates freshness of flags
+}
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
@@ -67,11 +80,12 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     headers?: object;
     identity?: string;
     traits?: ITraits<T>;
-    onChange?: (previousFlags: IFlags<F> | null, params: IRetrieveInfo) => void;
+    onChange?: (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void;
     onError?: (err: Error) => void;
     preventFetch?: boolean;
     state?: IState;
     _trigger?: () => void;
+    _triggerLoadingStateChange?: () => void;
 }
 
 export interface IFlagsmithResponse {
@@ -160,10 +174,20 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * Whether the flagsmith SDK is initialised
      */
     initialised?: boolean;
+
+    /**
+     * Returns ths current loading state
+     */
+    loadingState?: LoadingState;
+
     /**
      * Used internally, this function will callback separately to onChange whenever flags are updated
      */
-    trigger?: () => void;
+    _trigger?: () => void;
+    /**
+     * Used internally, this function will trigger the useFlagsmithLoading hook when loading state changes
+     */
+    _triggerLoadingState?: () => void;
     /**
      * Used internally, this function will console log if enableLogs is being set within flagsmith.init
      */
