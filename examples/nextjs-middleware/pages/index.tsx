@@ -1,7 +1,8 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import {ChangeEventHandler, FormEventHandler, useCallback, useState} from "react";
+import React, {ChangeEventHandler, FormEventHandler, useCallback, useState} from "react";
 import nookies from 'nookies'
+import Link from 'next/link';
 const Home: NextPage = () => {
     const [user, setUser] = useState<string>(nookies.get().user ||"test1")
     // console.log(nookies.get().user)
@@ -27,7 +28,11 @@ const Home: NextPage = () => {
               This project uses the multivariate feature flag as shown in our <a href={"https://flagsmith-realtime-example.vercel.app/"}>realtime multivariate example</a> to give a user a colour based on a abn percentage split.
           </p>
           <p>
-              Based on the colour feature flag, the Next.js middleware will redirect he user to a url with that colour as a get parameter
+              Based on the colour feature flag, the Next.js middleware will redirect he user to a url with that colour as a get parameter.
+              Once a user is selected and you press login, they will be cookied and you will be redirected to /login.
+          </p>
+          <p>
+              Visiting <Link href={"/login"}>/login</Link> will identify the user in middleware.ts and redirect the user to a page based on their feature flag evaluations.
           </p>
           <form onSubmit={submit} className="row">
               <div className="col-md-4">

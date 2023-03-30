@@ -213,7 +213,13 @@ const Flagsmith = class {
                         traits: Object.keys(this.withTraits).map((k)=>({
                             "trait_key":k,
                             "trait_value": this.withTraits![k]
-                        }))
+                        })).filter((v)=>{
+                            if (typeof v.trait_value === 'undefined') {
+                                this.log("Warning - attempted to set an undefined trait value for key", v.trait_key)
+                                return false
+                            }
+                            return true
+                        })
                     })):
                 this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
             ])
