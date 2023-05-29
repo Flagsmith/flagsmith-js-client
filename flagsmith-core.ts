@@ -333,6 +333,7 @@ const Flagsmith = class {
 
         return new Promise((resolve, _reject) => {
             const onNoCache = ()=> {
+                this.log("No cache was found")
                 // Called when Flagsmith does not get flags from cache
                 defaultFlagsChange()
                 if (!preventFetch) {
@@ -345,7 +346,7 @@ const Flagsmith = class {
             const defaultFlagsChange = ()=> {
                 // Called when we wish to serve default flags
                 if (defaultFlags) {
-                    this.log("onChange called")
+                    this.log("onChange called with default flags", this.flags)
                     this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
                 }
             }
