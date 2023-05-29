@@ -331,7 +331,31 @@ const Flagsmith = class {
         angularHttpClient,
          }: IInitConfig) {
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
+            const onNoCache = ()=> {
+                // Called when Flagsmith does not get flags from cache
+                defaultFlagsChange()
+                if (!preventFetch) {
+                    this.getFlags(resolve, _reject);
+                } else {
+                    resolve(true);
+                }
+            }
+
+            const defaultFlagsChange = ()=> {
+                // Called when we wish to serve default flags
+                if (defaultFlags) {
+                    this.log("onChange called")
+                    this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
+                }
+            }
+
+            const reject = ()=> {
+                // Called when we wish to serve default flags
+                defaultFlagsChange()
+                _reject()
+            }
+
             this.environmentID = environmentID;
             this.api = api;
             this.headers = headers;
@@ -427,7 +451,7 @@ const Flagsmith = class {
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
             this.setState(state as IState)
             if (!environmentID) {
-                reject('Please specify a environment id')
+                _reject('Please specify a environment id')
                 throw ('Please specify a environment id');
             }
 
@@ -571,7 +595,7 @@ const Flagsmith = class {
                                     if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
                                         this.getFlags();
                                     }
-                                } else {
+                                } else { // Cache not populated
                                     if (!preventFetch) {
                                         this.getFlags(resolve, reject);
                                     } else {
@@ -581,32 +605,14 @@ const Flagsmith = class {
                             } catch (e) {
                                 this.log("Exception fetching cached logs", e);
                             }
-                        } else {
-                            if (!preventFetch) {
-                                this.getFlags(resolve, reject)
-                            } else {
-                                if (defaultFlags) {
-                                    if (this.onChange) {
-                                        this.log("onChange called")
-                                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
-                                    }
-                                }
-                                resolve(true);
-                            }
+                        } else { // Cache not found
+                            onNoCache()
                         }
                         return true
                     });
                 }
-            } else if (!preventFetch) {
-                this.getFlags(resolve, reject);
-            } else {
-                if (defaultFlags) {
-                    if (this.onChange) {
-                        this.log("onChange called")
-                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits });
-                    }
-                }
-                resolve(true);
+            } else { // Cache not enabled
+                onNoCache()
             }
         })
         .catch(error => {
