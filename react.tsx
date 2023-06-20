@@ -101,12 +101,16 @@ export function useFlagsmithLoading() {
     const eventListener = useCallback(()=>{
         setLoadingState(flagsmith?.loadingState)
     },[flagsmith])
+    const eventRef = useRef(false);
+    if(!eventRef.current) {
+        eventRef.current = true;
+        events.on('loading_event', eventListener)
+    }
     useEffect(()=>{
-        events.on('event', eventListener)
         return () => {
-            events.off('event', eventListener)
+            events.off('loading_event', eventListener)
         }
-    }, [eventListener])
+    }, [])
     return loadingState
 }
 

@@ -359,6 +359,7 @@ const Flagsmith = class {
             this.analyticsInterval = null;
 
             this.onChange = (previousFlags, params, loadingState)  => {
+                this.setLoadingState(loadingState)
                 if(onChange) {
                     onChange(previousFlags, params, this.loadingState)
                 }
@@ -366,7 +367,6 @@ const Flagsmith = class {
                     this.log("trigger called")
                     this._trigger()
                 }
-                this.setLoadingState(loadingState)
             }
 
             this._trigger = _trigger || this._trigger;
@@ -588,16 +588,17 @@ const Flagsmith = class {
                                 }
 
                                 if (this.flags) { // retrieved flags from local storage
+                                    const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)
                                     this.onChange?.(null,
                                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
-                                        this._loadedState(FlagSource.CACHE)
+                                         this._loadedState(FlagSource.CACHE, shouldFetchFlags)
                                     );
                                     this.oldFlags = this.flags;
                                     resolve(true);
                                     if (this.cacheOptions.skipAPI && cachePopulated) {
                                         this.log("Skipping API, using cache")
                                     }
-                                    if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
+                                    if (shouldFetchFlags) {
                                         this.getFlags();
                                     }
                                 } else {
@@ -641,10 +642,10 @@ const Flagsmith = class {
         });
     }
 
-    _loadedState(source:FlagSource) {
+    _loadedState(source:FlagSource, isFetching=false) {
         return {
             error: null,
-            isFetching: false,
+            isFetching,
             isLoading: false,
             source
         }
@@ -719,7 +720,7 @@ const Flagsmith = class {
     }
     setLoadingState(loadingState:LoadingState) {
         if(!deepEqual(loadingState,this.loadingState)) {
-            this.loadingState = loadingState;
+            this.loadingState = { ...loadingState };
             this.log("Loading state changed", loadingState)
             this._triggerLoadingState?.()
         }
