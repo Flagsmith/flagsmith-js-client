@@ -1,14 +1,26 @@
 import {
+    FlagSource,
+    GetValueOptions,
     IDatadogRum,
     IFlags,
     IFlagsmith,
-    GetValueOptions,
     IFlagsmithResponse,
+    IFlagsmithTrait,
     IInitConfig,
     IState,
     ITraits,
-    IFlagsmithTrait,
+    LoadingState,
 } from './types';
+// @ts-ignore
+import deepEqual from 'fast-deep-equal';
+
+enum FlagSource {
+    "NONE" = "NONE",
+    "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
+    "CACHE" = "CACHE",
+    "SERVER" = "SERVER",
+}
+
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
 let _fetch: LikeFetch;
 type RequestOptions = {
@@ -30,8 +42,6 @@ let AsyncStorage: AsyncStorageType = null;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
 const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
-// @ts-ignore
-import deepEqual from 'fast-deep-equal';
 let eventSource:typeof EventSource;
 const initError = function (caller:string) {
     return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
@@ -44,6 +54,8 @@ const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
 const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
 
 const Flagsmith = class {
+    _trigger?:(()=>void)|null= null
+    _triggerLoadingState?:(()=>void)|null= null
     timestamp: number|null = null
     isLoading = false
     eventSource:EventSource|null = null
@@ -119,6 +131,13 @@ const Flagsmith = class {
         let resolved = false;
         this.log("Get Flags")
         this.isLoading = true;
+
+        if (!this.loadingState.isFetching) {
+            this.setLoadingState({
+                ...this.loadingState,
+                isFetching: true
+            })
+        }
         const handleResponse = ({ flags: features, traits }:IFlagsmithResponse) => {
             this.isLoading = false;
             if (identity) {
@@ -201,7 +220,7 @@ const Flagsmith = class {
                     isFromServer: true,
                     flagsChanged: !flagsEqual,
                     traitsChanged: !traitsEqual
-                });
+                }, this._loadedState(FlagSource.SERVER));
             }
         };
 
@@ -282,6 +301,7 @@ const Flagsmith = class {
     };
 
     datadogRum: IDatadogRum | null = null;
+    loadingState: LoadingState = {isLoading: true, isFetching: true, error: null, source: FlagSource.NONE}
     canUseStorage = false
     analyticsInterval: NodeJS.Timer | null= null
     api: string|null= null
@@ -298,7 +318,6 @@ const Flagsmith = class {
     oldFlags:IFlags|null= null
     onChange:IInitConfig['onChange']|null= null
     onError:IInitConfig['onError']|null = null
-    trigger?:(()=>void)|null= null
     identity?: string|null= null
     ticks: number|null= null
     timer: number|null= null
@@ -325,11 +344,12 @@ const Flagsmith = class {
         AsyncStorage: _AsyncStorage,
         identity,
         traits,
-        _trigger,
         state,
         cacheOptions,
         angularHttpClient,
-         }: IInitConfig) {
+        _trigger,
+        _triggerLoadingStateChange,
+}: IInitConfig) {
 
         return new Promise((resolve, reject) => {
             this.environmentID = environmentID;
@@ -338,17 +358,18 @@ const Flagsmith = class {
             this.getFlagInterval = null;
             this.analyticsInterval = null;
 
-            this.onChange = (previousFlags, params)  => {
+            this.onChange = (previousFlags, params, loadingState)  => {
+                this.setLoadingState(loadingState)
                 if(onChange) {
-                    onChange(previousFlags, params)
+                    onChange(previousFlags, params, this.loadingState)
                 }
-                if(this.trigger) {
+                if(this._trigger) {
                     this.log("trigger called")
-                    this.trigger()
+                    this._trigger()
                 }
             }
 
-            this.trigger = _trigger || this.trigger;
+            this._trigger = _trigger || this._trigger;
             this.onError = onError? (message:any)=> {
                 if (message instanceof Error) {
                     onError(message)
@@ -370,6 +391,14 @@ const Flagsmith = class {
             this.flags = Object.assign({}, defaultFlags) || {};
             this.initialised = true;
             this.ticks = 10000;
+            if(Object.keys(this.flags).length){
+                //Flags have been passed as part of SSR / default flags, update state silently for initial render
+                this.loadingState = {
+                    ...this.loadingState,
+                    isLoading: false,
+                    source: FlagSource.DEFAULT_FLAGS
+                }
+            }
             if (realtime && typeof window !== 'undefined') {
                 const connectionUrl = eventSourceUrl + "sse/environments/" +  environmentID + "/stream";
                 if(!eventSource) {
@@ -559,16 +588,17 @@ const Flagsmith = class {
                                 }
 
                                 if (this.flags) { // retrieved flags from local storage
-                                    if (this.onChange) {
-                                        this.log("onChange called")
-                                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
-                                    }
+                                    const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)
+                                    this.onChange?.(null,
+                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                                         this._loadedState(FlagSource.CACHE, shouldFetchFlags)
+                                    );
                                     this.oldFlags = this.flags;
                                     resolve(true);
                                     if (this.cacheOptions.skipAPI && cachePopulated) {
                                         this.log("Skipping API, using cache")
                                     }
-                                    if (!preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)) {
+                                    if (shouldFetchFlags) {
                                         this.getFlags();
                                     }
                                 } else {
@@ -586,10 +616,10 @@ const Flagsmith = class {
                                 this.getFlags(resolve, reject)
                             } else {
                                 if (defaultFlags) {
-                                    if (this.onChange) {
-                                        this.log("onChange called")
-                                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits });
-                                    }
+                                    this.onChange?.(null,
+                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                                        this._loadedState(FlagSource.DEFAULT_FLAGS)
+                                    );
                                 }
                                 resolve(true);
                             }
@@ -601,10 +631,7 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
-                    if (this.onChange) {
-                        this.log("onChange called")
-                        this.onChange(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits });
-                    }
+                    this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(FlagSource.CACHE));
                 }
                 resolve(true);
             }
@@ -613,6 +640,15 @@ const Flagsmith = class {
             this.log("Error during initialisation ", error)
             onError && onError(error)
         });
+    }
+
+    _loadedState(source:FlagSource, isFetching=false) {
+        return {
+            error: null,
+            isFetching,
+            isLoading: false,
+            source
+        }
     }
 
     getAllFlags() {
@@ -682,7 +718,13 @@ const Flagsmith = class {
             AsyncStorage!.setItem(FLAGSMITH_EVENT, events);
         }
     }
-
+    setLoadingState(loadingState:LoadingState) {
+        if(!deepEqual(loadingState,this.loadingState)) {
+            this.loadingState = { ...loadingState };
+            this.log("Loading state changed", loadingState)
+            this._triggerLoadingState?.()
+        }
+    }
     logout() {
         this.identity = null;
         this.traits = null;
