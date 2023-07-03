@@ -58,8 +58,8 @@ export declare enum FlagSource {
 
 export declare type LoadingState = {
     error: Error | null, // Current error, resets on next attempt to fetch flags
-    isFetching: bool, // Whether there is a current request to fetch server flags
-    isLoading: bool,  // Whether any flag data exists
+    isFetching: boolean, // Whether there is a current request to fetch server flags
+    isLoading: boolean,  // Whether any flag data exists
     source: FlagSource //Indicates freshness of flags
 }
 export interface IInitConfig<F extends string = string, T extends string = string> {
