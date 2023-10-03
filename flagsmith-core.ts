@@ -185,6 +185,12 @@ const Flagsmith = class {
                     }
                 } catch (e) {
                     console.error(e)
+                    this.setLoadingState({
+                        ...this.loadingState,
+                        isFetching: false,
+                        isLoading: false,
+                        error: e
+                    })
                 }
             }
 
@@ -213,6 +219,12 @@ const Flagsmith = class {
                     )
                 } catch (e) {
                     console.error(e)
+                    this.setLoadingState({
+                        ...this.loadingState,
+                        isFetching: false,
+                        isLoading: false,
+                        error: e
+                    })
                 }
             }
             if (onChange) {
@@ -250,7 +262,12 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch(({ message }) => {
-                    this.isLoading = false;
+                    this.setLoadingState({
+                        ...this.loadingState,
+                        isFetching: false,
+                        isLoading: false,
+                        error: e
+                    })
                     onError && onError(new Error(message))
                 });
         } else {
@@ -264,10 +281,15 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch((err) => {
-                    this.isLoading = false;
                     if (reject && !resolved) {
                         resolved = true;
                         reject(err);
+                        this.setLoadingState({
+                            ...this.loadingState,
+                            isFetching: false,
+                            isLoading: false,
+                            error: err
+                        })
                     }
                     onError && onError(err)
                 });
