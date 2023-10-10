@@ -624,6 +624,13 @@ const Flagsmith = class {
                                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
                                         this._loadedState(FlagSource.DEFAULT_FLAGS)
                                     );
+                                } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
+                                    this.onChange?.(null,
+                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                                        this._loadedState(FlagSource.DEFAULT_FLAGS)
+                                    );
+                                } else {
+                                    onError('SDK has no flags and prevent flags is true');
                                 }
                                 resolve(true);
                             }
@@ -636,6 +643,15 @@ const Flagsmith = class {
             } else {
                 if (defaultFlags) {
                     this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(FlagSource.CACHE));
+                }
+                if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
+                    this.onChange?.(null,
+                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                        this._loadedState(FlagSource.DEFAULT_FLAGS)
+                    );
+                } 
+                if(Object.keys(this.flags).length === 0){
+                    this.getFlags(resolve, reject);
                 }
                 resolve(true);
             }
