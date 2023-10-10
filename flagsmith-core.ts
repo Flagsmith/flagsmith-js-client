@@ -355,6 +355,7 @@ const Flagsmith = class {
             this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
+            const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided'
 
             this.onChange = (previousFlags, params, loadingState)  => {
                 this.setLoadingState(loadingState)
@@ -630,7 +631,7 @@ const Flagsmith = class {
                                         this._loadedState(FlagSource.DEFAULT_FLAGS)
                                     );
                                 } else {
-                                    onError('SDK has no flags and prevent flags is true');
+                                    onError(WRONG_FLAGSMITH_CONFIG);
                                 }
                                 resolve(true);
                             }
@@ -644,14 +645,13 @@ const Flagsmith = class {
                 if (defaultFlags) {
                     this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(FlagSource.CACHE));
                 }
-                if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
+                if (this.flags && Object.keys(this.flags).length > 0) { // flags exist due to set state being called e.g. from nextJS serverState
                     this.onChange?.(null,
                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
                         this._loadedState(FlagSource.DEFAULT_FLAGS)
                     );
-                } 
-                if(Object.keys(this.flags).length === 0){
-                    this.getFlags(resolve, reject);
+                } else {
+                    onError(WRONG_FLAGSMITH_CONFIG);
                 }
                 resolve(true);
             }
