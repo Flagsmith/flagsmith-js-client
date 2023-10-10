@@ -185,12 +185,6 @@ const Flagsmith = class {
                     }
                 } catch (e) {
                     console.error(e)
-                    this.setLoadingState({
-                        ...this.loadingState,
-                        isFetching: false,
-                        isLoading: false,
-                        error: e
-                    })
                 }
             }
 
@@ -219,12 +213,6 @@ const Flagsmith = class {
                     )
                 } catch (e) {
                     console.error(e)
-                    this.setLoadingState({
-                        ...this.loadingState,
-                        isFetching: false,
-                        isLoading: false,
-                        error: e
-                    })
                 }
             }
             if (onChange) {
@@ -262,12 +250,6 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch(({ message }) => {
-                    this.setLoadingState({
-                        ...this.loadingState,
-                        isFetching: false,
-                        isLoading: false,
-                        error: e
-                    })
                     onError && onError(new Error(message))
                 });
         } else {
@@ -284,12 +266,6 @@ const Flagsmith = class {
                     if (reject && !resolved) {
                         resolved = true;
                         reject(err);
-                        this.setLoadingState({
-                            ...this.loadingState,
-                            isFetching: false,
-                            isLoading: false,
-                            error: err
-                        })
                     }
                     onError && onError(err)
                 });
@@ -393,6 +369,12 @@ const Flagsmith = class {
 
             this._trigger = _trigger || this._trigger;
             this.onError = onError? (message:any)=> {
+                this.setLoadingState({
+                    ...this.loadingState,
+                    isFetching: false,
+                    isLoading: false,
+                    error: message
+                })
                 if (message instanceof Error) {
                     onError(message)
                 } else {
