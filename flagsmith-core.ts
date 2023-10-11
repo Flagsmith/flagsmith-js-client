@@ -644,14 +644,13 @@ const Flagsmith = class {
             } else {
                 if (defaultFlags) {
                     this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(FlagSource.CACHE));
-                }
-                if (this.flags && Object.keys(this.flags).length > 0) { // flags exist due to set state being called e.g. from nextJS serverState
-                    this.onChange?.(null,
-                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
-                        this._loadedState(FlagSource.DEFAULT_FLAGS)
-                    );
-                } else {
-                    onError(WRONG_FLAGSMITH_CONFIG);
+                }else if (this.flags) {
+                    let error = null
+                    if(Object.keys(this.flags).length === 0){
+                        error = WRONG_FLAGSMITH_CONFIG
+                    }
+                    this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
+                
                 }
                 resolve(true);
             }
@@ -662,9 +661,9 @@ const Flagsmith = class {
         });
     }
 
-    _loadedState(source:FlagSource, isFetching=false) {
+    _loadedState(error=null, source:FlagSource, isFetching=false) {
         return {
-            error: null,
+            error,
             isFetching,
             isLoading: false,
             source

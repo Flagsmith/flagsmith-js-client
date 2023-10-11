@@ -97,21 +97,26 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
 }
 
 export function useFlagsmithLoading() {
-    const flagsmith = useContext(FlagsmithContext)
-    const [loadingState, setLoadingState] = useState(flagsmith?.loadingState)
-    const subscribed = useRef(false)
+    const flagsmith = useContext(FlagsmithContext);
+    const [loadingState, setLoadingState] = useState(flagsmith?.loadingState);
+    const [subscribed, setSubscribed] = useState(false);
+    const refSubscribed  = useRef(subscribed)
 
     const eventListener = useCallback(() => {
         setLoadingState(flagsmith?.loadingState);
     }, [flagsmith])
+    if (!refSubscribed.current){
+        events.on('loading_event', eventListener)
+        refSubscribed.current = true
+    }
 
     useEffect(() => {
-        if (!subscribed.current) {
+        if (!subscribed && flagsmith.initialised) {
             events.on('loading_event', eventListener)
-            subscribed.current = true
+            setSubscribed(true)
         }
         return () => {
-            if (subscribed.current) {
+            if (subscribed) {
                 events.off('loading_event', eventListener)
             }
         };
