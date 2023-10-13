@@ -41,6 +41,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
     if (serverState && !flagsmith.initialised) {
         flagsmith.setState(serverState)
     }
+
     if (firstRenderRef.current) {
         firstRenderRef.current = false
         if (options) {
@@ -96,21 +97,31 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
 }
 
 export function useFlagsmithLoading() {
-    const flagsmith = useContext(FlagsmithContext)
+    const flagsmith = useContext(FlagsmithContext);
     const [loadingState, setLoadingState] = useState(flagsmith?.loadingState);
-    const eventListener = useCallback(()=>{
-        setLoadingState(flagsmith?.loadingState)
-    },[flagsmith])
-    const eventRef = useRef(false);
-    if(!eventRef.current) {
-        eventRef.current = true;
+    const [subscribed, setSubscribed] = useState(false);
+    const refSubscribed  = useRef(subscribed)
+
+    const eventListener = useCallback(() => {
+        setLoadingState(flagsmith?.loadingState);
+    }, [flagsmith])
+    if (!refSubscribed.current){
         events.on('loading_event', eventListener)
+        refSubscribed.current = true
     }
-    useEffect(()=>{
-        return () => {
-            events.off('loading_event', eventListener)
+
+    useEffect(() => {
+        if (!subscribed && flagsmith.initialised) {
+            events.on('loading_event', eventListener)
+            setSubscribed(true)
         }
-    }, [])
+        return () => {
+            if (subscribed) {
+                events.off('loading_event', eventListener)
+            }
+        };
+    }, [flagsmith, subscribed, eventListener])
+
     return loadingState
 }
 

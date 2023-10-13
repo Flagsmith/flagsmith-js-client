@@ -250,7 +250,6 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch(({ message }) => {
-                    this.isLoading = false;
                     onError && onError(new Error(message))
                 });
         } else {
@@ -264,7 +263,6 @@ const Flagsmith = class {
                         resolve();
                     }
                 }).catch((err) => {
-                    this.isLoading = false;
                     if (reject && !resolved) {
                         resolved = true;
                         reject(err);
@@ -357,6 +355,7 @@ const Flagsmith = class {
             this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
+            const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided'
 
             this.onChange = (previousFlags, params, loadingState)  => {
                 this.setLoadingState(loadingState)
@@ -371,6 +370,12 @@ const Flagsmith = class {
 
             this._trigger = _trigger || this._trigger;
             this.onError = onError? (message:any)=> {
+                this.setLoadingState({
+                    ...this.loadingState,
+                    isFetching: false,
+                    isLoading: false,
+                    error: message
+                })
                 if (message instanceof Error) {
                     onError(message)
                 } else {
@@ -620,6 +625,13 @@ const Flagsmith = class {
                                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
                                         this._loadedState(FlagSource.DEFAULT_FLAGS)
                                     );
+                                } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
+                                    this.onChange?.(null,
+                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                                        this._loadedState(FlagSource.DEFAULT_FLAGS)
+                                    );
+                                } else {
+                                    onError(WRONG_FLAGSMITH_CONFIG);
                                 }
                                 resolve(true);
                             }
@@ -632,6 +644,13 @@ const Flagsmith = class {
             } else {
                 if (defaultFlags) {
                     this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(FlagSource.CACHE));
+                }else if (this.flags) {
+                    let error = null
+                    if(Object.keys(this.flags).length === 0){
+                        error = WRONG_FLAGSMITH_CONFIG
+                    }
+                    this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
+                
                 }
                 resolve(true);
             }
@@ -642,9 +661,9 @@ const Flagsmith = class {
         });
     }
 
-    _loadedState(source:FlagSource, isFetching=false) {
+    _loadedState(error=null, source:FlagSource, isFetching=false) {
         return {
-            error: null,
+            error,
             isFetching,
             isLoading: false,
             source
