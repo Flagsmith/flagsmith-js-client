@@ -368,19 +368,22 @@ const Flagsmith = class {
             }
 
             this._trigger = _trigger || this._trigger;
-            this.onError = onError? (message:any)=> {
+            this.onError = (message:any)=> {
                 this.setLoadingState({
                     ...this.loadingState,
                     isFetching: false,
                     isLoading: false,
                     error: message
                 })
-                if (message instanceof Error) {
-                    onError(message)
-                } else {
-                    onError(new Error(message))
+                if (onError) {
+                    if (message instanceof Error) {
+                        onError(message)
+                    } else {
+                        onError(new Error(message))
+                    }    
                 }
-            }: null
+            }
+
             this.identity = identity;
             this.withTraits = traits;
             this.enableLogs = enableLogs|| false;
