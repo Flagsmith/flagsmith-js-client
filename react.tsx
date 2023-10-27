@@ -144,17 +144,18 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
         }
     },[renderRef])
 
+    events.once('event', eventListener)
+    
     if (firstRender.current) {
         firstRender.current = false;
         flagsmith?.log("React - Initialising event listeners")
     }
 
     useEffect(()=>{
-        events.on('event', eventListener)
         return () => {
             events.off('event', eventListener)
         }
-    }, [eventListener])
+    }, [])
 
     const res = useMemo(() => {
         const res: any = {}
