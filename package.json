@@ -19,7 +19,7 @@
     "continuous deployment"
   ],
   "author": "SSG",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"
   },
