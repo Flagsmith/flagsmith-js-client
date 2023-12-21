@@ -380,7 +380,7 @@ const Flagsmith = class {
                         onError(message)
                     } else {
                         onError(new Error(message))
-                    }    
+                    }
                 }
             }
 
@@ -652,7 +652,7 @@ const Flagsmith = class {
                         error = WRONG_FLAGSMITH_CONFIG
                     }
                     this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
-                
+
                 }
                 resolve(true);
             }
@@ -735,7 +735,6 @@ const Flagsmith = class {
     updateEventStorage() {
         if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
-            this.log("Setting event storage", events);
             AsyncStorage!.setItem(FLAGSMITH_EVENT, events);
         }
     }
@@ -779,7 +778,6 @@ const Flagsmith = class {
             if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
                 console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
             } else {
-                this.log("Sending feature flag evaluation to Datadog", key, method)
                 if (method === "VALUE") {
                     this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, { }, true));
                 } else {
