@@ -96,8 +96,14 @@ const Flagsmith = class {
             console.error("Flagsmith: fetch is undefined, please specify a fetch implementation into flagsmith.init to support SSR.");
         }
 
+        const requestedIdentity = `${this.identity}`
         return _fetch(url, options)
             .then(res => {
+                const newIdentity = `${this.identity}`;
+                if(requestedIdentity!==newIdentity){
+                    this.log(`Received response with identity miss-match, ignoring response. Requested: ${requestedIdentity}, Current: ${newIdentity}`)
+                    return
+                }
                 const lastUpdated = res.headers?.get('x-flagsmith-document-updated-at');
                 if(lastUpdated) {
                     try {
@@ -380,7 +386,7 @@ const Flagsmith = class {
                         onError(message)
                     } else {
                         onError(new Error(message))
-                    }    
+                    }
                 }
             }
 
@@ -652,7 +658,7 @@ const Flagsmith = class {
                         error = WRONG_FLAGSMITH_CONFIG
                     }
                     this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
-                
+
                 }
                 resolve(true);
             }
