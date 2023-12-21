@@ -652,7 +652,6 @@ const Flagsmith = class {
                         error = WRONG_FLAGSMITH_CONFIG
                     }
                     this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
-
                 }
                 resolve(true);
             }
