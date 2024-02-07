@@ -138,6 +138,19 @@ const Flagsmith = class {
             })
     };
 
+    events: string[] = []
+
+    trackEvent = (event: string)=> {
+        if(!this.enableAnalytics) {
+            console.error("In order to track events, please configure the enableAnalytics option. See https://docs.flagsmith.com/clients/javascript/#initialisation-options.")
+        } else if (!this.identity) {
+            this.events.push(event)
+            this.log("Waiting for user to be identified before tracking event", event )
+        } else {
+            this.getJSON(this.api + 'split-testing/conversion-events', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
+        }
+    }
+
     getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
@@ -587,7 +600,6 @@ const Flagsmith = class {
                         return true
                     });
                 }
-
             }
 
             //If the user specified default flags emit a changed event immediately
@@ -703,6 +715,7 @@ const Flagsmith = class {
 
     identify(userId: string, traits?:ITraits) {
         this.identity = userId;
+        this.events.map(this.trackEvent)
         this.log("Identify: " + this.identity)
 
         if(traits) {
