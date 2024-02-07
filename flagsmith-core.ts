@@ -52,6 +52,13 @@ const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
 const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
 const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
 
+
+/*API configuration includes the /v1/
+This function replaces that version with another.
+In future, we may exclude /v1/ from api configuration however this would be a breaking change*/
+function apiVersion(api:string, version:number) {
+    return api.replace("/v1/",`/v${version}/`)
+}
 const Flagsmith = class {
     _trigger?:(()=>void)|null= null
     _triggerLoadingState?:(()=>void)|null= null
@@ -277,15 +284,27 @@ const Flagsmith = class {
         }
     };
 
+    _parseEvaluations = (evaluations: Record<string, number>|null)=> {
+        if(!evaluations) return []
+        return Object.keys(evaluations).map((feature_name)=>(
+             {
+                feature_name,
+                "identity_identifier": this.identity||null,
+                "count": evaluations[feature_name],
+                "enabled_when_evaluated": this.hasFeature(feature_name),
+            }
+        ))
+    };
+
     analyticsFlags = () => {
         const { api } = this;
 
-        if (!this.evaluationEvent|| !this.evaluationEvent[this.environmentID]) {
+        if (!this.evaluationEvent|| !this.evaluationEvent[this.environmentID] || !api) {
             return
         }
 
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
-            return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.environmentID]))
+            return this.getJSON(apiVersion(`${api}`, 2) + 'analytics/flags/', 'POST', JSON.stringify(this._parseEvaluations(this.evaluationEvent[this.environmentID])))
                 .then((res) => {
                     const state = this.getState();
                     if(!this.evaluationEvent) {
