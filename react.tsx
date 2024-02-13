@@ -11,7 +11,7 @@ import React, {
 import Emitter from 'tiny-emitter';
 const events = new Emitter.TinyEmitter();
 
-import {IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState} from './types'
+import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState } from './types'
 
 export const FlagsmithContext = createContext<IFlagsmith<string,string> | null>(null)
 export type FlagsmithContextType = {
@@ -23,17 +23,17 @@ export type FlagsmithContextType = {
 
 export const FlagsmithProvider: FC<FlagsmithContextType> = ({
   flagsmith, options, serverState, children,
-}) => {
+                                                            }) => {
     const firstRenderRef = useRef(true)
     if (flagsmith && !flagsmith?._trigger) {
-        flagsmith._trigger = ()=>{
+        flagsmith._trigger = () => {
             flagsmith.log("React - trigger event received")
             events.emit('event');
         }
     }
 
     if (flagsmith && !flagsmith?._triggerLoadingState) {
-        flagsmith._triggerLoadingState = ()=>{
+        flagsmith._triggerLoadingState = () => {
             events.emit('loading_event');
         }
     }
@@ -100,12 +100,12 @@ export function useFlagsmithLoading() {
     const flagsmith = useContext(FlagsmithContext);
     const [loadingState, setLoadingState] = useState(flagsmith?.loadingState);
     const [subscribed, setSubscribed] = useState(false);
-    const refSubscribed  = useRef(subscribed)
+    const refSubscribed = useRef(subscribed)
 
     const eventListener = useCallback(() => {
         setLoadingState(flagsmith?.loadingState);
     }, [flagsmith])
-    if (!refSubscribed.current){
+    if (!refSubscribed.current) {
         events.on('loading_event', eventListener)
         refSubscribed.current = true
     }
@@ -142,30 +142,24 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
             flagsmith?.log("React - useFlags flags and traits have changed")
             setRenderRef(newRenderKey)
         }
-    },[renderRef])
+    }, [renderRef])
 
     events.once('event', eventListener)
-    
+
     if (firstRender.current) {
         firstRender.current = false;
         flagsmith?.log("React - Initialising event listeners")
     }
 
-    useEffect(()=>{
-        return () => {
-            events.off('event', eventListener)
-        }
-    }, [])
-
     const res = useMemo(() => {
         const res: any = {}
     flags.map((k) => {
-        res[k] = {
-                enabled: flagsmith!.hasFeature(k),
-                value: flagsmith!.getValue(k),
-        }
+                res[k] = {
+                    enabled: flagsmith!.hasFeature(k),
+                    value: flagsmith!.getValue(k),
+                }
     }).concat(traits?.map((v) => {
-        res[v] = flagsmith!.getTrait(v)
+                    res[v] = flagsmith!.getTrait(v)
     }))
         return res
     }, [renderRef])
@@ -180,5 +174,5 @@ export function useFlagsmith<F extends string=string, T extends string=string>()
         throw new Error('useFlagsmith must be used with in a FlagsmithProvider')
     }
 
-    return context as IFlagsmith<F,T>
+    return context as IFlagsmith<F, T>
 }
