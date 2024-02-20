@@ -826,7 +826,7 @@ const Flagsmith = class {
             try {
                 if (res === null) {
                     this.log("Tried to parse null flag as JSON: " + key);
-                    return undefined;
+                    return null;
                 }
                 return JSON.parse(res as string);
             } catch (e) {
