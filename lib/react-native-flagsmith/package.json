@@ -1,6 +1,6 @@
 {
   "name": "react-native-flagsmith",
-  "version": "3.22.0",
+  "version": "3.22.1",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "repository": {
