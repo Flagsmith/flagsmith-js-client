@@ -147,7 +147,9 @@ const Flagsmith = class {
             this.events.push(event)
             this.log("Waiting for user to be identified before tracking event", event )
         } else {
-            this.getJSON(this.api + 'split-testing/conversion-events', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
+            this.analyticsFlags().then(()=> {
+                this.getJSON(this.api + 'split-testing/conversion-events', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
+            })
         }
     }
 
@@ -313,7 +315,7 @@ const Flagsmith = class {
         const { api } = this;
 
         if (!this.evaluationEvent|| !this.evaluationEvent[this.environmentID] || !api) {
-            return
+            return Promise.resolve()
         }
 
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
@@ -333,6 +335,7 @@ const Flagsmith = class {
                     this.log("Exception fetching evaluationEvent", err);
                 });
         }
+        return Promise.resolve()
     };
 
     datadogRum: IDatadogRum | null = null;
