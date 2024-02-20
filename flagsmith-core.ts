@@ -153,11 +153,22 @@ const Flagsmith = class {
         }
     }
 
+    _onChange: IInitConfig['onChange'] = (previousFlags, params, loadingState) => {
+        this.setLoadingState(loadingState)
+        if (this.onChange) {
+            this.onChange(previousFlags, params, this.loadingState)
+        }
+        if (this._trigger) {
+            this.log('trigger called')
+            this._trigger()
+        }
+    }
     getFlags = (resolve?:(v?:any)=>any, reject?:(v?:any)=>any) => {
         const { onChange, onError, identity, api } = this;
         let resolved = false;
         this.log("Get Flags")
         this.isLoading = true;
+        this.onChange = onChange;
 
         if (!this.loadingState.isFetching) {
             this.setLoadingState({
@@ -242,13 +253,11 @@ const Flagsmith = class {
                     console.error(e)
                 }
             }
-            if (onChange) {
-                onChange(this.oldFlags, {
+            this._onChange!(this.oldFlags, {
                     isFromServer: true,
                     flagsChanged: !flagsEqual,
                     traitsChanged: !traitsEqual
                 }, this._loadedState(null, FlagSource.SERVER));
-            }
         };
 
         if (identity) {
@@ -396,17 +405,6 @@ const Flagsmith = class {
             this.getFlagInterval = null;
             this.analyticsInterval = null;
             const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided'
-
-            this.onChange = (previousFlags, params, loadingState)  => {
-                this.setLoadingState(loadingState)
-                if(onChange) {
-                    onChange(previousFlags, params, this.loadingState)
-                }
-                if(this._trigger) {
-                    this.log("trigger called")
-                    this._trigger()
-                }
-            }
 
             this._trigger = _trigger || this._trigger;
             this.onError = (message:any)=> {
@@ -636,7 +634,7 @@ const Flagsmith = class {
 
                                 if (this.flags) { // retrieved flags from local storage
                                     const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)
-                                    this.onChange?.(null,
+                                    this._onChange!(null,
                                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
                                          this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
                                     );
@@ -663,12 +661,12 @@ const Flagsmith = class {
                                 this.getFlags(resolve, reject)
                             } else {
                                 if (defaultFlags) {
-                                    this.onChange?.(null,
+                                    this._onChange!(null,
                                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS)
                                     );
                                 } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
-                                    this.onChange?.(null,
+                                    this._onChange?.(null,
                                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS)
                                     );
@@ -685,13 +683,13 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
-                    this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(null, FlagSource.CACHE));
+                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(null, FlagSource.CACHE));
                 }else if (this.flags) {
                     let error = null
                     if(Object.keys(this.flags).length === 0){
                         error = WRONG_FLAGSMITH_CONFIG
                     }
-                    this.onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
+                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
 
                 }
                 resolve(true);
