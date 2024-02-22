@@ -309,15 +309,17 @@ const Flagsmith = class {
     };
 
     _parseEvaluations = (evaluations: Record<string, number>|null)=> {
-        if(!evaluations) return []
-        return Object.keys(evaluations).map((feature_name)=>(
-             {
-                feature_name,
-                "identity_identifier": this.identity||null,
-                "count": evaluations[feature_name],
-                "enabled_when_evaluated": this.hasFeature(feature_name),
-            }
-        ))
+        if(!evaluations) return {evaluations: []}
+        return {
+            evaluations:  Object.keys(evaluations).map((feature_name)=>(
+                {
+                    feature_name,
+                    "identity_identifier": this.identity||null,
+                    "count": evaluations[feature_name],
+                    "enabled_when_evaluated": this.hasFeature(feature_name),
+                }
+            ))
+        }
     };
 
     analyticsFlags = () => {
