@@ -1,12 +1,9 @@
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import typescript from "@rollup/plugin-typescript";
-import dts from "rollup-plugin-dts";
-import { terser } from "rollup-plugin-terser";
+import resolve, { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import typescript from '@rollup/plugin-typescript';
+import { terser } from 'rollup-plugin-terser';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import path from "path";
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import replace  from '@rollup/plugin-replace';
+import path from 'path';
 import * as react from 'react';
 import * as reactDom from 'react-dom';
 
@@ -162,7 +159,7 @@ const reactModule =     {
         {
             file: path.join(__dirname, 'lib/flagsmith/react.js'),
             format: "umd",
-            name:"flagsmith/react",
+            name:"flagsmith-react",
             sourcemap: true,
         },
     ],
@@ -183,7 +180,7 @@ const reactReactNativeModule =     {
         {
             file: path.join(__dirname, 'lib/react-native-flagsmith/react.js'),
             format: "umd",
-            name:"react-native-flagsmith/react",
+            name:"react-native-flagsmith-react",
             sourcemap: true,
         },
     ],

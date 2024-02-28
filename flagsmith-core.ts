@@ -816,15 +816,19 @@ const Flagsmith = class {
             this.evaluateFlag(key, "VALUE");
         }
 
+        if (res === null && typeof options?.fallback !== 'undefined') {
+            return options.fallback;
+        }
+
         if (options?.json) {
             try {
                 if (res === null) {
-                    this.log("Tried to parse null flag as JSON: " + key)
-                    return options.fallback;
+                    this.log("Tried to parse null flag as JSON: " + key);
+                    return null;
                 }
-                return JSON.parse(res as string)
+                return JSON.parse(res as string);
             } catch (e) {
-                return options.fallback
+                return options.fallback;
             }
         }
         //todo record check for value
