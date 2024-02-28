@@ -148,7 +148,7 @@ const Flagsmith = class {
             this.log("Waiting for user to be identified before tracking event", event )
         } else {
             this.analyticsFlags().then(()=> {
-                this.getJSON(this.api + 'split-testing/conversion-events', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
+                this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
             })
         }
     }
