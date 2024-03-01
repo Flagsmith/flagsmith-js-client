@@ -81,6 +81,8 @@ const Flagsmith = class {
         const options: RequestOptions = {
             method: method || 'GET',
             body,
+            // @ts-ignore next-js overrides fetch
+            cache: 'no-cache',
             headers: {
                 'x-environment-key': `${environmentID}`
             }
