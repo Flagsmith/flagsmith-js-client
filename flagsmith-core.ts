@@ -148,7 +148,6 @@ const Flagsmith = class {
         let resolved = false;
         this.log("Get Flags")
         this.isLoading = true;
-        this.onChange = onChange;
 
         if (!this.loadingState.isFetching) {
             this.setLoadingState({
@@ -371,8 +370,8 @@ const Flagsmith = class {
             this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
+            this.onChange = onChange;
             const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided'
-
             this._trigger = _trigger || this._trigger;
             this.onError = (message:any)=> {
                 this.setLoadingState({
@@ -741,7 +740,6 @@ const Flagsmith = class {
     updateEventStorage() {
         if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
-            this.log("Setting event storage", events);
             AsyncStorage!.setItem(FLAGSMITH_EVENT, events);
         }
     }
@@ -785,7 +783,6 @@ const Flagsmith = class {
             if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
                 console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
             } else {
-                this.log("Sending feature flag evaluation to Datadog", key, method)
                 if (method === "VALUE") {
                     this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, { }, true));
                 } else {
