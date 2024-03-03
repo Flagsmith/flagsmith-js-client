@@ -5,49 +5,65 @@ import fetch from 'isomorphic-unfetch';
 
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
 
+
 export const defaultState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     environmentID,
     identity: undefined,
     traits: {},
     flags: {
-        "hero": {
-            "id": 1804,
-            "enabled": true,
-            "value": "https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg"
+        hero: {
+            id: 1804,
+            enabled: true,
+            value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg',
         },
-        "font_size": {
-            "id": 6149,
-            "enabled": true,
-            "value": 16
+        font_size: { id: 6149, enabled: true, value: 16 },
+        json_value: { id: 80317, enabled: true, value: '{"title":"Hello World"}' },
+        number_value: { id: 80318, enabled: true, value: 1 },
+        off_value: { id: 80319, enabled: false, value: null },
+    },
+};
+export const identityState = {
+    api: 'https://edge.api.flagsmith.com/api/v1/',
+    environmentID,
+    'identity': 'test',
+    'traits': {
+        'example_trait': 'Some value 9',
+        'test': 1,
+    },
+    flags: {
+        hero: {
+            id: 1804,
+            enabled: true,
+            value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03224.jpg'
         },
-        "json_value": {
-            "id": 80317,
-            "enabled": true,
-            "value": "{\"title\":\"Hello World\"}"
+        font_size: { id: 6149, enabled: true, value: 16 },
+        json_value: { id: 80317, enabled: true, value: '{"title":"Hello World"}' },
+        number_value: { id: 80318, enabled: true, value: 1 },
+        off_value: { id: 80319, enabled: false, value: null },
+    },
+};
+export const defaultStateAlt = {
+    ...defaultState,
+    flags: {
+        'example': {
+            'id': 1,
+            'enabled': true,
+            'value': 'a',
         },
-        "number_value": {
-            "id": 80318,
-            "enabled": true,
-            "value": 1
-        },
-        "off_value": {
-            "id": 80319,
-            "enabled": false,
-            "value": null
-        }
-    }
+    },
+};
+
+export function getStateToCheck(_state: IState) {
+    const state = {
+        ..._state,
+    };
+    delete state.evaluationEvent;
+    // @ts-ignore internal property
+    delete state.ts;
+    return state;
 }
 
-export function getStateToCheck(_state:IState) {
-    const state = {
-    ..._state,
-    }
-    delete state.evaluationEvent
-    // @ts-ignore internal property
-    delete state.ts
-    return state
-}
 export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();

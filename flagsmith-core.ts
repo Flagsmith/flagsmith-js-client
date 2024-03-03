@@ -401,6 +401,7 @@ const Flagsmith = class {
             }
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};
+            this.traits = Object.assign({}, traits) || {};
             this.initialised = true;
             this.ticks = 10000;
             if(Object.keys(this.flags).length){
@@ -545,7 +546,6 @@ const Flagsmith = class {
                     })
             }
 
-
             if (this.enableAnalytics) {
                 if (this.analyticsInterval) {
                     clearInterval(this.analyticsInterval);
@@ -599,10 +599,10 @@ const Flagsmith = class {
                                     }
                                 }
 
-                                if (this.flags) { // retrieved flags from local storage
+                                if (cachePopulated) { // retrieved flags from local storage
                                     const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)
                                     this._onChange!(null,
-                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits && !!Object.keys(this.traits).length },
                                          this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
                                     );
                                     this.oldFlags = this.flags;
@@ -629,12 +629,12 @@ const Flagsmith = class {
                             } else {
                                 if (defaultFlags) {
                                     this._onChange!(null,
-                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits && !!Object.keys(this.traits).length },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS)
                                     );
                                 } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
                                     this._onChange?.(null,
-                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits },
+                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits && !!Object.keys(this.traits).length },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS)
                                     );
                                 } else {
@@ -650,13 +650,13 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
-                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(null, FlagSource.CACHE));
+                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits && !!Object.keys(this.traits).length },this._loadedState(null, FlagSource.DEFAULT_FLAGS));
                 }else if (this.flags) {
                     let error = null
                     if(Object.keys(this.flags).length === 0){
                         error = WRONG_FLAGSMITH_CONFIG
                     }
-                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
+                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits && !!Object.keys(this.traits).length },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
 
                 }
                 resolve(true);
@@ -752,7 +752,7 @@ const Flagsmith = class {
     }
     logout() {
         this.identity = null;
-        this.traits = null;
+        this.traits = {};
         if (this.initialised) {
             return this.getFlags();
         }
