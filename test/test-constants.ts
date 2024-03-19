@@ -2,9 +2,7 @@ import { IFlagsmith, IInitConfig, IState } from '../lib/flagsmith/types';
 import MockAsyncStorage from './mocks/async-storage-mock';
 import { createFlagsmithInstance } from '../lib/flagsmith';
 import fetch from 'isomorphic-unfetch';
-
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
-
 
 export const defaultState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
