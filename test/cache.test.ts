@@ -197,4 +197,50 @@ describe('Flagsmith.init', () => {
             ...defaultState,
         });
     });
+    test('should validate flags are unchanged when fetched and default flags are provided', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            onChange,
+            cacheFlags: true,
+            preventFetch: true,
+            defaultFlags: defaultState.flags
+        });
+        await AsyncStorage.setItem("BULLET_TRAIN_DB", JSON.stringify({
+            ...defaultState
+        }) )
+        await flagsmith.init(initConfig);
+
+        expect(AsyncStorage.getItem).toHaveBeenCalledTimes(2);
+        expect(mockFetch).toHaveBeenCalledTimes(0);
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenCalledWith(
+            null,
+            { 'flagsChanged': true, 'isFromServer': false, 'traitsChanged': false },
+            {
+                'error': null,
+                'isFetching': false,
+                'isLoading': false,
+                'source': 'CACHE',
+            },
+        );
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...defaultState,
+        });
+        await flagsmith.getFlags()
+        expect(onChange).toHaveBeenCalledTimes(2);
+
+        expect(onChange).toHaveBeenCalledWith(
+            defaultState.flags,
+            { 'flagsChanged': false, 'isFromServer': true, 'traitsChanged': false },
+            {
+                'error': null,
+                'isFetching': false,
+                'isLoading': false,
+                'source': 'SERVER',
+            },
+        );
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...defaultState,
+        });
+    });
 });

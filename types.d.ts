@@ -85,7 +85,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     preventFetch?: boolean;
     state?: IState;
     _trigger?: () => void;
-    _triggerLoadingStateChange?: () => void;
+    _triggerLoadingState?: () => void;
 }
 
 export interface IFlagsmithResponse {

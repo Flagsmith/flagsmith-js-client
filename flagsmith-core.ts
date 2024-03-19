@@ -361,7 +361,7 @@ const Flagsmith = class {
         cacheOptions,
         angularHttpClient,
         _trigger,
-        _triggerLoadingStateChange,
+        _triggerLoadingState,
 }: IInitConfig) {
 
         return new Promise((resolve, reject) => {
@@ -373,6 +373,7 @@ const Flagsmith = class {
             this.onChange = onChange;
             const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided'
             this._trigger = _trigger || this._trigger;
+            this._triggerLoadingState = _triggerLoadingState || this._triggerLoadingState;
             this.onError = (message:any)=> {
                 this.setLoadingState({
                     ...this.loadingState,
