@@ -85,7 +85,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     preventFetch?: boolean;
     state?: IState;
     _trigger?: () => void;
-    _triggerLoadingStateChange?: () => void;
+    _triggerLoadingState?: () => void;
 }
 
 export interface IFlagsmithResponse {
@@ -199,6 +199,14 @@ export interface IFlagsmith<F extends string = string, T extends string = string
         ttl: number;
         skipAPI: boolean;
     };
+    /**
+     * Used internally, this is the api provided in flagsmith.init, defaults to our production API
+     */
+    api: string
+    /**
+     * Used internally, this is the environmentID provided in flagsmith.init or as part of serverState
+     */
+    environmentID: string | null
 }
 
 export {};
