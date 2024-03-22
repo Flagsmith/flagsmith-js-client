@@ -718,6 +718,10 @@ const Flagsmith = class {
             this.flags = state.flags || this.flags;
             this.identity = state.identity || this.identity;
             this.traits = state.traits || this.traits;
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...this.traits,
+            };
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
             this.log("setState called", this)
         }
