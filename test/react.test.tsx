@@ -19,7 +19,7 @@ const FlagsmithPage: FC<any> = () => {
 };
 
 export default FlagsmithPage;
-describe.only('FlagsmithProvider', () => {
+describe('FlagsmithProvider', () => {
     it('renders without crashing', () => {
 
         const onChange = jest.fn();

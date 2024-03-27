@@ -12,6 +12,7 @@ import {
 } from './types';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
+import { AsyncStorageType } from './async-storage';
 
 enum FlagSource {
     "NONE" = "NONE",
@@ -33,10 +34,7 @@ type DynatraceObject = {
     "shortString": Record<string, string>,
     "javaDouble": Record<string, number>,
 }
-type AsyncStorageType = {
-    getItem: (key:string, cb?:(err:string|null, res:string|null)=>void)=>Promise<string|null>
-    setItem: (key:string, value: string)=>Promise<string|null>
-} | null
+
 let AsyncStorage: AsyncStorageType = null;
 const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
 const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
@@ -574,7 +572,7 @@ const Flagsmith = class {
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
                 if (AsyncStorage && this.canUseStorage) {
-                    AsyncStorage.getItem(FLAGSMITH_KEY, (err, res) => {
+                    const onRetrievedStorage = (err: Error|null, res: string|null) => {
                         if (res) {
                             try {
                                 const json = JSON.parse(res);
@@ -604,7 +602,7 @@ const Flagsmith = class {
                                     const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)
                                     this._onChange!(null,
                                         { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits && !!Object.keys(this.traits).length },
-                                         this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
+                                        this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
                                     );
                                     this.oldFlags = this.flags;
                                     resolve(true);
@@ -639,13 +637,20 @@ const Flagsmith = class {
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS)
                                     );
                                 } else {
-                                    onError(WRONG_FLAGSMITH_CONFIG);
+                                    this.onError?.(new Error(WRONG_FLAGSMITH_CONFIG));
                                 }
                                 resolve(true);
                             }
                         }
                         return true
-                    });
+                    }
+                    if(AsyncStorage.getItemSync) {
+                        try {
+                            onRetrievedStorage(null, AsyncStorage.getItemSync(FLAGSMITH_KEY))
+                        } catch (e) {}
+                    } else {
+                        AsyncStorage.getItem(FLAGSMITH_KEY,onRetrievedStorage);
+                    }
                 }
             } else if (!preventFetch) {
                 this.getFlags(resolve, reject);
@@ -718,6 +723,10 @@ const Flagsmith = class {
             this.flags = state.flags || this.flags;
             this.identity = state.identity || this.identity;
             this.traits = state.traits || this.traits;
+            this.withTraits = {
+                ...(this.withTraits||{}),
+                ...this.traits,
+            };
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
             this.log("setState called", this)
         }

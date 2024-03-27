@@ -100,7 +100,6 @@ fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flags
 fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/types.d.ts"))
 
 
-
 //Rollup can't ignore lib d.ts files
 try {
     fs.rmdirSync(path.join(__dirname,"lib/flagsmith-es/lib"), {recursive:true})
@@ -110,4 +109,15 @@ try {
 } catch (e){}
 try {
     fs.rmdirSync(path.join(__dirname,"lib/react-native-flagsmith/lib"), {recursive:true})
+} catch (e){}
+
+
+try {
+    fs.rmdirSync(path.join(__dirname,"lib/flagsmith/test"), {recursive:true})
+} catch (e){}
+try {
+    fs.rmdirSync(path.join(__dirname,"lib/flagsmith-es/test"), {recursive:true})
+} catch (e){}
+try {
+    fs.rmdirSync(path.join(__dirname,"lib/react-native-flagsmith/test"), {recursive:true})
 } catch (e){}
