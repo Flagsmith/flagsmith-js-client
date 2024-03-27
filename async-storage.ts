@@ -6,11 +6,7 @@ export type AsyncStorageType = {
 const AsyncStorage: AsyncStorageType = {
     getItemSync: function(key) {
         const data = localStorage.getItem(key);
-        if (data !== null) {
-            return data;
-        } else {
-            throw new Error(`Key ${key} not found`);
-        }
+        return data || null
     },
     getItem: function (key, cb) {
         return new Promise<any>((resolve, reject) => {
