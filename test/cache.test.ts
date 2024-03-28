@@ -1,7 +1,8 @@
 // Sample test
 import { defaultState, defaultStateAlt, getFlagsmith, getStateToCheck } from './test-constants';
+import SyncStorageMock from './mocks/sync-storage-mock';
 
-describe('Flagsmith.init', () => {
+describe('Cache', () => {
 
     beforeEach(() => {
         // Avoid mocks, but if you need to add them here
@@ -96,7 +97,6 @@ describe('Flagsmith.init', () => {
             ...defaultState,
         })
     });
-
     test('should not ignore cache with valid ttl', async () => {
         const onChange = jest.fn()
         const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({
@@ -115,7 +115,6 @@ describe('Flagsmith.init', () => {
             ...defaultStateAlt,
         })
     });
-
     test('should not ignore cache when setting is disabled', async () => {
         const onChange = jest.fn()
         const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({
@@ -133,7 +132,6 @@ describe('Flagsmith.init', () => {
             ...defaultState,
         })
     });
-
     test('should not get flags from API when skipAPI is set', async () => {
         const onChange = jest.fn()
         const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({
@@ -242,5 +240,31 @@ describe('Flagsmith.init', () => {
         expect(getStateToCheck(flagsmith.getState())).toEqual({
             ...defaultState,
         });
+    });
+    test('should synchronously use cache if implementation allows', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage } = getFlagsmith({
+            onChange,
+            cacheFlags: true,
+            preventFetch: true,
+        });
+        const storage = new SyncStorageMock()
+        await storage.setItem("BULLET_TRAIN_DB", JSON.stringify({
+            ...defaultState
+        }) )
+        flagsmith.init({
+            ...initConfig,
+            AsyncStorage: storage
+        });
+        expect(onChange).toHaveBeenCalledWith(
+            null,
+            { 'flagsChanged': true, 'isFromServer': false, 'traitsChanged': false },
+            {
+                'error': null,
+                'isFetching': false,
+                'isLoading': false,
+                'source': 'CACHE',
+            },
+        );
     });
 });

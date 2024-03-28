@@ -1,4 +1,4 @@
-import { IFlagsmith, IInitConfig, IState } from '../lib/flagsmith/types';
+import { IInitConfig, IState } from '../lib/flagsmith/types';
 import MockAsyncStorage from './mocks/async-storage-mock';
 import { createFlagsmithInstance } from '../lib/flagsmith';
 import fetch from 'isomorphic-unfetch';

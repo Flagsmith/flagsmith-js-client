@@ -1,7 +1,7 @@
 // Sample test
 import { defaultState, defaultStateAlt, getFlagsmith, getStateToCheck } from './test-constants';
 
-describe('Flagsmith.init', () => {
+describe('Default Flags', () => {
 
     beforeEach(() => {
         // Avoid mocks, but if you need to add them here
