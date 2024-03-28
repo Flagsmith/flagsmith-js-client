@@ -5,8 +5,12 @@ export type AsyncStorageType = {
 } | null
 const AsyncStorage: AsyncStorageType = {
     getItemSync: function(key) {
-        const data = localStorage.getItem(key);
-        return data || null
+        try {
+            const data = localStorage.getItem(key);
+            return data || null
+        } catch (e) {
+            return null
+        }
     },
     getItem: function (key, cb) {
         return new Promise<any>((resolve, reject) => {
