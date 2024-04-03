@@ -18,8 +18,8 @@ export declare type GetValueOptions<T = Array<any> | object> = {
 
 export interface IRetrieveInfo {
     isFromServer: boolean;
-    flagsChanged: boolean;
-    traitsChanged: boolean;
+    flagsChanged: string[] | null;
+    traitsChanged: string[] | null;
 }
 
 export interface IState<F extends string = string, T extends string = string> {

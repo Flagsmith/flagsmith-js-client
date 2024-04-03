@@ -12,7 +12,8 @@ import {
 } from './types';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
-import { AsyncStorageType } from './async-storage';
+import { AsyncStorageType } from './utils/async-storage';
+import getChanges from './utils/get-changes';
 
 enum FlagSource {
     "NONE" = "NONE",
@@ -177,8 +178,8 @@ const Flagsmith = class {
             this.oldFlags = {
                 ...this.flags
             };
-            const flagsEqual = deepEqual(this.flags, flags);
-            const traitsEqual = deepEqual(this.traits, userTraits);
+            const flagsChanged = getChanges(this.oldFlags, flags);
+            const traitsChanged = getChanges(this.withTraits, userTraits);
             this.flags = flags;
             this.traits = userTraits;
             this.updateStorage();
@@ -232,8 +233,8 @@ const Flagsmith = class {
             }
             this._onChange!(this.oldFlags, {
                     isFromServer: true,
-                    flagsChanged: !flagsEqual,
-                    traitsChanged: !traitsEqual
+                    flagsChanged,
+                    traitsChanged
                 }, this._loadedState(null, FlagSource.SERVER));
         };
 
@@ -574,6 +575,8 @@ const Flagsmith = class {
                 if (AsyncStorage && this.canUseStorage) {
                     const onRetrievedStorage = (err: Error|null, res: string|null) => {
                         if (res) {
+                            let flagsChanged = null
+                            let traitsChanged = null
                             try {
                                 const json = JSON.parse(res);
                                 let cachePopulated = false;
@@ -593,6 +596,8 @@ const Flagsmith = class {
                                     }
                                     if (setState) {
                                         cachePopulated = true;
+                                        traitsChanged = getChanges(this.traits, json.traits)
+                                        flagsChanged = getChanges(this.flags, json.flags)
                                         this.setState(json);
                                         this.log("Retrieved flags from cache", json);
                                     }
@@ -601,7 +606,7 @@ const Flagsmith = class {
                                 if (cachePopulated) { // retrieved flags from local storage
                                     const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)
                                     this._onChange!(null,
-                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits && !!Object.keys(this.traits).length },
+                                        { isFromServer: false, flagsChanged, traitsChanged },
                                         this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
                                     );
                                     this.oldFlags = this.flags;
@@ -628,12 +633,12 @@ const Flagsmith = class {
                             } else {
                                 if (defaultFlags) {
                                     this._onChange!(null,
-                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits && !!Object.keys(this.traits).length },
+                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.traits) },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS)
                                     );
                                 } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
                                     this._onChange?.(null,
-                                        { isFromServer: false, flagsChanged: true, traitsChanged: !!this.traits && !!Object.keys(this.traits).length },
+                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.traits) },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS)
                                     );
                                 } else {
@@ -656,13 +661,13 @@ const Flagsmith = class {
                 this.getFlags(resolve, reject);
             } else {
                 if (defaultFlags) {
-                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits && !!Object.keys(this.traits).length },this._loadedState(null, FlagSource.DEFAULT_FLAGS));
-                }else if (this.flags) {
+                    this._onChange?.(null, { isFromServer: false, flagsChanged: getChanges({}, defaultFlags), traitsChanged:getChanges({}, traits) },this._loadedState(null, FlagSource.DEFAULT_FLAGS));
+                } else if (this.flags) {
                     let error = null
                     if(Object.keys(this.flags).length === 0){
                         error = WRONG_FLAGSMITH_CONFIG
                     }
-                    this._onChange?.(null, { isFromServer: false, flagsChanged: true, traitsChanged:!!this.traits && !!Object.keys(this.traits).length },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
+                    this._onChange?.(null, { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged:getChanges({}, traits) },this._loadedState(error, FlagSource.DEFAULT_FLAGS));
 
                 }
                 resolve(true);
@@ -674,7 +679,7 @@ const Flagsmith = class {
         });
     }
 
-    _loadedState(error=null, source:FlagSource, isFetching=false) {
+    _loadedState(error:any=null, source:FlagSource, isFetching=false) {
         return {
             error,
             isFetching,

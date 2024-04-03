@@ -16,7 +16,7 @@ describe('Default Flags', () => {
         expect(onChange).toHaveBeenCalledTimes(1);
         expect(onChange).toHaveBeenCalledWith(
             null,
-            { 'flagsChanged': true, 'isFromServer': false, 'traitsChanged': false },
+            { 'flagsChanged': null, 'isFromServer': false, 'traitsChanged': null },
             {
                 'error': 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided',
                 'isFetching': false,
@@ -43,7 +43,7 @@ describe('Default Flags', () => {
         expect(onChange).toHaveBeenCalledTimes(1);
         expect(onChange).toHaveBeenCalledWith(
             null,
-            { 'flagsChanged': true, 'isFromServer': false, 'traitsChanged': false },
+            { 'flagsChanged': Object.keys(defaultState.flags), 'isFromServer': false, 'traitsChanged': null },
             {
                 'error': null,
                 'isFetching': false,
@@ -68,7 +68,7 @@ describe('Default Flags', () => {
         expect(onChange).toHaveBeenCalledTimes(1);
         expect(onChange).toHaveBeenCalledWith(
             defaultStateAlt.flags,
-            { 'flagsChanged': true, 'isFromServer': true, 'traitsChanged': false },
+            { 'flagsChanged': Object.keys(defaultState.flags).concat(Object.keys(defaultStateAlt.flags)), 'isFromServer': true, 'traitsChanged': null },
             {
                 'error': null,
                 'isFetching': false,
@@ -94,7 +94,7 @@ describe('Default Flags', () => {
         expect(onChange).toHaveBeenCalledTimes(1);
         expect(onChange).toHaveBeenCalledWith(
             null,
-            { 'flagsChanged': true, 'isFromServer': false, 'traitsChanged': false },
+            { 'flagsChanged': Object.keys(defaultState.flags), 'isFromServer': false, 'traitsChanged': null },
             {
                 'error': null,
                 'isFetching': false,
@@ -110,7 +110,7 @@ describe('Default Flags', () => {
 
         expect(onChange).toHaveBeenCalledWith(
             defaultState.flags,
-            { 'flagsChanged': false, 'isFromServer': true, 'traitsChanged': false },
+            { 'flagsChanged': null, 'isFromServer': true, 'traitsChanged': null },
             {
                 'error': null,
                 'isFetching': false,

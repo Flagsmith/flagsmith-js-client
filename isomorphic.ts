@@ -1,4 +1,4 @@
-import AsyncStorage from "./async-storage";
+import AsyncStorage from "./utils/async-storage";
 import {IFlagsmith} from "./types";
 import core from './flagsmith-core'
 

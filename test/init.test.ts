@@ -18,14 +18,14 @@ describe('Flagsmith.init', () => {
         expect(onChange).toHaveBeenCalledTimes(1);
         expect(onChange).toHaveBeenCalledWith(
             {},
-            {"flagsChanged": true, "isFromServer": true, "traitsChanged": false},
+            {"flagsChanged": Object.keys(defaultState.flags), "isFromServer": true, "traitsChanged": null},
             {"error": null, "isFetching": false, "isLoading": false, "source": "SERVER"}
         );
         expect(getStateToCheck(flagsmith.getState())).toEqual(defaultState)
     });
     test('should initialize with identity', async () => {
         const onChange = jest.fn()
-        const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange, identity:"test"})
+        const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange, identity:"test_identity"})
         await flagsmith.init(initConfig);
 
         expect(flagsmith.environmentID).toBe(initConfig.environmentID);
@@ -35,9 +35,29 @@ describe('Flagsmith.init', () => {
         expect(onChange).toHaveBeenCalledTimes(1);
         expect(onChange).toHaveBeenCalledWith(
             {},
-            {"flagsChanged": true, "isFromServer": true, "traitsChanged": true},
+            {"flagsChanged": Object.keys(defaultState.flags), "isFromServer": true, "traitsChanged": expect.arrayContaining(Object.keys(identityState.traits))},
             {"error": null, "isFetching": false, "isLoading": false, "source": "SERVER"}
         );
         expect(getStateToCheck(flagsmith.getState())).toEqual(identityState)
+    });
+    test('should initialize with identity and traits', async () => {
+        const onChange = jest.fn()
+        const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange, identity:"test_identity_with_traits", traits:{number_trait:1, string_trait:"Example"}})
+        await flagsmith.init(initConfig);
+
+        expect(flagsmith.environmentID).toBe(initConfig.environmentID);
+        expect(flagsmith.api).toBe('https://edge.api.flagsmith.com/api/v1/'); // Assuming defaultAPI is globally defined
+        expect(AsyncStorage.getItem).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenCalledWith(
+            {},
+            {"flagsChanged": Object.keys(defaultState.flags), "isFromServer": true, "traitsChanged": ["number_trait","string_trait"]},
+            {"error": null, "isFetching": false, "isLoading": false, "source": "SERVER"}
+        );
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...identityState,
+            identity: 'test_identity_with_traits'
+        })
     });
 });

@@ -8,7 +8,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import Emitter from './emitter';
+import Emitter from './utils/emitter';
 const events = new Emitter();
 
 import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState } from './types'
@@ -111,7 +111,7 @@ export function useFlagsmithLoading() {
     }
 
     useEffect(() => {
-        if (!subscribed && flagsmith.initialised) {
+        if (!subscribed && flagsmith?.initialised) {
             events.on('loading_event', eventListener)
             setSubscribed(true)
         }

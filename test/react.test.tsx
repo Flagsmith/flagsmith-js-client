@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react';
-import { defaultState, environmentID, getFlagsmith, identityState } from './test-constants';
-import removeIds from './util/remove-ids';
+import { defaultState, environmentID, getFlagsmith, identityState, testIdentity } from './test-constants';
+import removeIds from './test-utils/remove-ids';
 const FlagsmithPage: FC<any> = () => {
     const flags = useFlags(Object.keys(defaultState.flags))
     const loadingState = useFlagsmithLoading()
@@ -62,7 +62,7 @@ describe('FlagsmithProvider', () => {
     it('fetches and renders flags for an identified user', async () => {
 
         const onChange = jest.fn();
-        const {flagsmith,initConfig, mockFetch} = getFlagsmith({onChange, identity:'test'})
+        const {flagsmith,initConfig, mockFetch} = getFlagsmith({onChange, identity:testIdentity})
         render(
             <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
                 <FlagsmithPage/>
