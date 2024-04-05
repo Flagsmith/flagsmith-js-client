@@ -60,4 +60,14 @@ describe('Flagsmith.init', () => {
             identity: 'test_identity_with_traits'
         })
     });
+    test('should reject initialize with identity no key', async () => {
+        const onChange = jest.fn()
+        const {flagsmith,initConfig} = getFlagsmith({onChange, environmentID:""})
+        await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
+    });
+    test('should reject initialize with identity bad key', async () => {
+        const onChange = jest.fn()
+        const {flagsmith,initConfig} = getFlagsmith({onChange, environmentID:"bad"})
+        await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
+    });
 });

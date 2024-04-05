@@ -10,7 +10,7 @@ describe('Default Flags', () => {
     test('should error and not hit the API when preventFetch is true without default flags', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({ onChange, preventFetch: true });
-        await flagsmith.init(initConfig)
+        await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
 
         expect(AsyncStorage.getItem).toHaveBeenCalledTimes(1);
         expect(mockFetch).toHaveBeenCalledTimes(0);
@@ -30,7 +30,7 @@ describe('Default Flags', () => {
             flags: {},
         });
     });
-    test.only('should return accurate changed flags', async () => {
+    test('should return accurate changed flags', async () => {
         const onChange = jest.fn();
         const defaultFlags: IFlags = {
             string_value:{id:1,enabled:true,value:"test"},
