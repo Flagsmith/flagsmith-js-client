@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react';
-import { defaultState, environmentID, getFlagsmith, identityState, testIdentity } from './test-constants';
+import { defaultState, getFlagsmith, identityState, testIdentity } from './test-constants';
 import removeIds from './test-utils/remove-ids';
 const FlagsmithPage: FC<any> = () => {
     const flags = useFlags(Object.keys(defaultState.flags))
