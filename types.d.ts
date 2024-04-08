@@ -1,5 +1,11 @@
 type IFlagsmithValue<T = string | number | boolean | null> = T
 
+export type DynatraceObject = {
+    "javaLongOrObject": Record<string, number>,
+    "date": Record<string, Date>,
+    "shortString": Record<string, string>,
+    "javaDouble": Record<string, number>,
+}
 export interface IFlagsmithFeature {
     id?: number;
     enabled: boolean;
@@ -18,8 +24,8 @@ export declare type GetValueOptions<T = Array<any> | object> = {
 
 export interface IRetrieveInfo {
     isFromServer: boolean;
-    flagsChanged: boolean;
-    traitsChanged: boolean;
+    flagsChanged: string[] | null;
+    traitsChanged: string[] | null;
 }
 
 export interface IState<F extends string = string, T extends string = string> {
@@ -62,6 +68,8 @@ export declare type LoadingState = {
     isLoading: boolean,  // Whether any flag data exists
     source: FlagSource //Indicates freshness of flags
 }
+
+export type OnChange = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
@@ -80,7 +88,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     headers?: object;
     identity?: string;
     traits?: ITraits<T>;
-    onChange?: (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void;
+    onChange?: OnChange;
     onError?: (err: Error) => void;
     preventFetch?: boolean;
     state?: IState;

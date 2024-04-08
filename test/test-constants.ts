@@ -21,19 +21,21 @@ export const defaultState = {
         off_value: { id: 80319, enabled: false, value: null },
     },
 };
+
+export const testIdentity = 'test_identity'
 export const identityState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     environmentID,
-    'identity': 'test',
+    'identity': testIdentity,
     'traits': {
-        'example_trait': 'Some value 9',
-        'test': 1,
+        'string_trait': 'Example',
+        'number_trait': 1,
     },
     flags: {
         hero: {
             id: 1804,
             enabled: true,
-            value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03224.jpg'
+            value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg'
         },
         font_size: { id: 6149, enabled: true, value: 16 },
         json_value: { id: 80317, enabled: true, value: '{"title":"Hello World"}' },
