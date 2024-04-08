@@ -82,7 +82,7 @@ const webModule = {
 //
 const webES = generateES(
     webModule,
-    path.join(__dirname, 'lib/flagsmith-es/index.js'),
+    path.join(__dirname, 'lib/flagsmith/es/index.js'),
     [
         "./react.tsx",
         "./isomorphic.ts",
@@ -114,7 +114,7 @@ const isomorphicModule =  {
 
 const isomorphicES = generateES(
     isomorphicModule,
-    path.join(__dirname, 'lib/flagsmith-es/isomorphic.js'),
+    path.join(__dirname, 'lib/flagsmith/es/isomorphic.js'),
     [
         "./react/index.ts",
         "./index.react-native.ts",
@@ -144,7 +144,7 @@ const nextModule =  {
 
 const nextES = generateES(
     nextModule,
-    path.join(__dirname, 'lib/flagsmith-es/next-middleware.js'),
+    path.join(__dirname, 'lib/flagsmith/es/next-middleware.js'),
     [
         "./react.tsx",
         "./index.react-native.ts",
@@ -197,7 +197,7 @@ const reactReactNativeModule =     {
 
 const reactModuleES = generateES(
     reactModule,
-    path.join(__dirname, 'lib/flagsmith-es/react.js'),
+    path.join(__dirname, 'lib/flagsmith/es/react.js'),
     [
         "./index.ts",
         "./types.ts",

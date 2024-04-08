@@ -16,6 +16,14 @@
   "bugs": {
     "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"
   },
+  "exports": {
+    "./package.json": "./package.json",
+    "./": {
+      "module": "./es/",
+      "import": "./",
+      "default": "./"
+    }
+  },
   "homepage": "https://flagsmith.com",
   "types": "./index.d.ts"
 }
