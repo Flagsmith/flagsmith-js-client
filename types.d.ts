@@ -69,7 +69,7 @@ export declare type LoadingState = {
     source: FlagSource //Indicates freshness of flags
 }
 
-export type OnChange = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
+export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
@@ -88,7 +88,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     headers?: object;
     identity?: string;
     traits?: ITraits<T>;
-    onChange?: OnChange;
+    onChange?: OnChange<F>;
     onError?: (err: Error) => void;
     preventFetch?: boolean;
     state?: IState;
