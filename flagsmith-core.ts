@@ -815,3 +815,5 @@ const Flagsmith = class {
 export default function({ fetch, AsyncStorage, eventSource }: Config): IFlagsmith {
     return new Flagsmith({ fetch, AsyncStorage, eventSource }) as IFlagsmith;
 }
+
+console.log("test pr")
