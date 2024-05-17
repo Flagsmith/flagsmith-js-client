@@ -70,4 +70,19 @@ describe('Flagsmith.init', () => {
         const {flagsmith,initConfig} = getFlagsmith({onChange, environmentID:"bad"})
         await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
     });
+    test('identifying with new identity should not carry over previous traits for different identity', async () => {
+        const onChange = jest.fn()
+        const now = Date.now();
+        const identityA = `test_identity_a_${now}`
+        const identityB = `test_identity_b_${now}`
+        const {flagsmith,initConfig} = getFlagsmith({onChange, identity:identityA, traits: {a:`example`}})
+        await flagsmith.init(initConfig);
+        expect(flagsmith.getTrait("a")).toEqual(`example`)
+        await flagsmith.identify(identityB)
+        expect(flagsmith.getTrait("a")).toEqual(null)
+        await flagsmith.identify(identityA)
+        expect(flagsmith.getTrait("a")).toEqual(`example`)
+        await flagsmith.identify(identityB)
+        expect(flagsmith.getTrait("a")).toEqual(null)
+    });
 });

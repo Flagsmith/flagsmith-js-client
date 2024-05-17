@@ -506,6 +506,10 @@ const Flagsmith = class {
     }
 
     identify(userId: string, traits?: ITraits) {
+        if(this.identity && this.identity !== userId) {
+            // clear out old traits when switching identity
+            this.withTraits = {}
+        }
         this.identity = userId;
         this.log("Identify: " + this.identity)
 
