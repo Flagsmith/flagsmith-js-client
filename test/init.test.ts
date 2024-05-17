@@ -83,6 +83,6 @@ describe('Flagsmith.init', () => {
         await flagsmith.identify(identityA)
         expect(flagsmith.getTrait("a")).toEqual(`example`)
         await flagsmith.identify(identityB)
-        expect(flagsmith.getTrait("a")).toEqual(null)
+        expect(flagsmith.getTrait("a")).toEqual(undefined)
     });
 });
