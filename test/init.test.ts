@@ -86,16 +86,30 @@ describe('Flagsmith.init', () => {
         expect(flagsmith.getTrait("a")).toEqual(undefined)
     });
     test('identifying with new identity after logout should not carry over previous traits for different identity', async () => {
+        // Given
         const onChange = jest.fn()
         const now = Date.now();
         const identityA = `test_identity_a_${now}`
         const identityB = `test_identity_b_${now}`
-        const {flagsmith,initConfig} = getFlagsmith({onChange, identity:identityA, traits: {a:`example`}})
+        const { flagsmith, initConfig } = getFlagsmith({
+            onChange,
+            identity: identityA,
+            traits: { a: `example` },
+            cacheOptions: { skipAPI: true },
+        });
         await flagsmith.init(initConfig);
         expect(flagsmith.getTrait("a")).toEqual(`example`)
 
+        // Also force an identify call to ensure nothing else is being set
+        // as part of the identify call that perhaps doesn't get cleared
+        // by logout.
+        await flagsmith.identify(identityA)
+
+        // When
         await flagsmith.logout()
         await flagsmith.identify(identityB)
+
+        // Then
         expect(flagsmith.getTrait("a")).toEqual(undefined)
     });
 });
