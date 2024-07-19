@@ -8,15 +8,16 @@ import {
     IFlagsmithResponse,
     IFlagsmithTrait,
     IIdentity,
-    IIdentityConfig,
     IInitConfig,
     IState,
     ITraits,
     LoadingState,
     OnChange,
+} from './types';
+import {
     isIdentityConfig,
     isTraitConfig,
-} from './types';
+} from './utils';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
 import { AsyncStorageType } from './utils/async-storage';
