@@ -180,11 +180,12 @@ const Flagsmith = class {
         };
 
         if (identity) {
+            let identifier: string;
+            let transient: boolean | undefined = false;
             if (isIdentityConfig(identity)) {
-                var {identifier, transient} = identity;
+                ({identifier, transient} = identity);
             } else {
-                var identifier = identity;
-                var transient: boolean | undefined = false;
+                identifier = identity;
             }
             return Promise.all([
                 this.withTraits ?
