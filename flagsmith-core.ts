@@ -7,11 +7,15 @@ import {
     IFlagsmith,
     IFlagsmithResponse,
     IFlagsmithTrait,
+    IIdentity,
+    IIdentityConfig,
     IInitConfig,
     IState,
     ITraits,
     LoadingState,
     OnChange,
+    isIdentityConfig,
+    isTraitConfig,
 } from './types';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
@@ -175,14 +179,30 @@ const Flagsmith = class {
         };
 
         if (identity) {
+            if (isIdentityConfig(identity)) {
+                var {identifier, transient} = identity;
+            } else {
+                var identifier = identity;
+                var transient: boolean | undefined = false;
+            }
             return Promise.all([
                 this.withTraits ?
                     this.getJSON(api + 'identities/', "POST", JSON.stringify({
-                        "identifier": identity,
-                        traits: Object.keys(this.withTraits).map((k) => ({
-                            "trait_key":k,
-                            "trait_value": this.withTraits![k]
-                        })).filter((v) => {
+                        "identifier": identifier,
+                        "transient": transient,
+                        traits: Object.keys(this.withTraits).map((k) => {
+                            const trait = this.withTraits![k];
+                            const data: any = { "trait_key": k };
+                            if (isTraitConfig(trait)) {
+                                data["trait_value"] = trait.value;
+                                if (trait.transient) {
+                                    data["transient"] = true;
+                                }
+                            } else {
+                                data["trait_value"] = trait;
+                            }
+                            return data;
+                        }).filter((v) => {
                             if (typeof v.trait_value === 'undefined') {
                                 this.log("Warning - attempted to set an undefined trait value for key", v.trait_key)
                                 return false
@@ -190,7 +210,7 @@ const Flagsmith = class {
                             return true
                         })
                     })) :
-                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identity)),
+                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identifier) + '&transient=' + encodeURIComponent(!!transient)),
             ])
                 .then((res) => {
                     this.withTraits = null
@@ -251,7 +271,7 @@ const Flagsmith = class {
     oldFlags:IFlags|null= null
     onChange:IInitConfig['onChange']|null= null
     onError:IInitConfig['onError']|null = null
-    identity?: string|null= null
+    identity?: IIdentity|null= null
     ticks: number|null= null
     timer: number|null= null
     traits:ITraits|null= null
@@ -626,6 +646,9 @@ const Flagsmith = class {
 
     getTrait = (key: string) => {
         const trait = this.traits && this.traits[key.toLowerCase().replace(/ /g, '_')];
+        if (isTraitConfig(trait)) {
+            return trait.value;
+        }
         return trait;
     }
 
@@ -633,14 +656,14 @@ const Flagsmith = class {
         return this.traits
     }
 
-    setTrait = (key: string, trait_value: IFlagsmithTrait) => {
+    setTrait = (key: string, trait_value: IFlagsmithTrait, transient?: boolean) => {
         const { api } = this;
 
         if (!api) {
             return
         }
         const traits: ITraits<string> = {};
-        traits[key] = trait_value;
+        traits[key] = { value: trait_value, transient: transient };
         return this.setTraits(traits)
     };
 

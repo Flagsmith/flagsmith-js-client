@@ -12,9 +12,14 @@ export interface IFlagsmithFeature {
     value?: IFlagsmithValue;
 }
 
+export interface ITraitConfig {
+    value: IFlagsmithTrait;
+    transient?: boolean;
+}
+
 export declare type IFlagsmithTrait = IFlagsmithValue;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
-export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
+export declare type ITraits<T extends string = string> = Record<T, ITraitConfig | IFlagsmithTrait>;
 
 export declare type GetValueOptions<T = Array<any> | object> = {
     skipAnalytics?: boolean
@@ -28,6 +33,13 @@ export declare type HasFeatureOptions = {
 } | boolean
 
 
+export interface IIdentityConfig {
+    identifier: string;
+    transient?: boolean;
+}
+
+export declare type IIdentity<T = string | IIdentityConfig> = T;
+
 export interface IRetrieveInfo {
     isFromServer: boolean;
     flagsChanged: string[] | null;
@@ -39,7 +51,7 @@ export interface IState<F extends string = string, T extends string = string> {
     environmentID: string;
     flags?: IFlags<F>;
     evaluationEvent?: Record<string, Record<string, number>> | null;
-    identity?: string;
+    identity?: IIdentity;
     traits: ITraits<T>;
 }
 
@@ -93,7 +105,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     angularHttpClient?: any;
     environmentID: string;
     headers?: object;
-    identity?: string;
+    identity?: IIdentity;
     traits?: ITraits<T>;
     onChange?: OnChange<F>;
     onError?: (err: Error) => void;
@@ -205,7 +217,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * The stored identity of the user
      */
-    identity?: string;
+    identity?: IIdentity;
     /**
      * Whether the flagsmith SDK is initialised
      */
@@ -244,6 +256,14 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * Used internally, this is the environmentID provided in flagsmith.init or as part of serverState
      */
     environmentID: string | null
+}
+
+export function isTraitConfig(trait: ITraitConfig | IFlagsmithTrait): trait is ITraitConfig {
+    return typeof trait == 'object' && trait.value !== undefined;
+}
+
+export function isIdentityConfig(identity: IIdentityConfig | string): identity is IIdentityConfig {
+    return typeof(identity == 'object') && identity.identity !== undefined;
 }
 
 export {};
