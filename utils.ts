@@ -1,6 +1,4 @@
-import { IIdentityConfig } from "./types.d";
-import { IFlagsmithTrait } from "./types.d";
-import { ITraitConfig } from "./types.d";
+import { IIdentityConfig, IFlagsmithTrait, ITraitConfig } from "./types.d";
 
 export function isTraitConfig(trait: ITraitConfig | IFlagsmithTrait): trait is ITraitConfig {
     return typeof trait == 'object' && trait.value !== undefined;
