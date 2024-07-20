@@ -17,7 +17,7 @@ import {
 import {
     isIdentityConfig,
     isTraitConfig,
-} from './utils';
+} from './utils/types';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
 import { AsyncStorageType } from './utils/async-storage';
