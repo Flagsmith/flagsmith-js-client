@@ -43,9 +43,10 @@ describe('Flagsmith.init', () => {
     });
     test('should initialize with identity and traits', async () => {
         const onChange = jest.fn()
-        const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange, identity:"test_identity_with_traits", traits:{number_trait:1, string_trait:"Example"}})
+        const testIdentityWithTraits = `test_identity_with_traits`
+        const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange, identity:testIdentityWithTraits, traits:{number_trait:1, string_trait:"Example"}})
         //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile('./test/data/identities_test_identity_with_traits.json')})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentityWithTraits}.json`)})
 
         await flagsmith.init(initConfig);
 
@@ -82,19 +83,19 @@ describe('Flagsmith.init', () => {
         const identityB = `test_identity_b`
         const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, identity:identityA, traits: {a:`example`}})
         //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile('./test/data/identities_test_identity_a.json')})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityA}.json`)})
         await flagsmith.init(initConfig);
         expect(flagsmith.getTrait("a")).toEqual(`example`)
         //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile('./test/data/identities_test_identity_b.json')})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityB}.json`)})
         await flagsmith.identify(identityB)
         expect(flagsmith.getTrait("a")).toEqual(undefined)
         //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile('./test/data/identities_test_identity_a.json')})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityA}.json`)})
         await flagsmith.identify(identityA)
         expect(flagsmith.getTrait("a")).toEqual(`example`)
         //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile('./test/data/identities_test_identity_b.json')})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityB}.json`)})
         await flagsmith.identify(identityB)
         expect(flagsmith.getTrait("a")).toEqual(undefined)
     });
