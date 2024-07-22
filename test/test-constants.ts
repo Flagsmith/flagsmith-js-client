@@ -1,9 +1,9 @@
 import { IInitConfig, IState } from '../lib/flagsmith/types';
 import MockAsyncStorage from './mocks/async-storage-mock';
 import { createFlagsmithInstance } from '../lib/flagsmith';
-import fetch from 'isomorphic-unfetch';
-import type { ModuleMocker } from 'jest-mock';
 import Mock = jest.Mock;
+import { promises as fs } from 'fs';
+
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
 
 export const defaultState = {
@@ -45,6 +45,16 @@ export const identityState = {
         off_value: { id: 80319, enabled: false, value: null },
     },
 };
+export const identityLocalState = {
+    ...identityState,
+    'traits': {
+        ...identityState.traits,
+        'transient_trait': {
+            'value': 'Example',
+            'transient': true,
+        }
+    }
+};
 export const defaultStateAlt = {
     ...defaultState,
     flags: {
@@ -70,8 +80,16 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
     const mockFetch = jest.fn(async (url, options) => {
-        return fetch(url, options);
+        switch (url) {
+            case 'https://edge.api.flagsmith.com/api/v1/flags/':
+                return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}
+            case 'https://edge.api.flagsmith.com/api/v1/identities/?identifier=' + testIdentity:
+                return {status: 200, text: () => fs.readFile('./test/data/identities_test_identity.json', 'utf8')}
+        }
+
+        throw new Error('Please mock the call to ' + url)
     });
+
     //@ts-ignore, we want to test storage even though flagsmith thinks there is none
     flagsmith.canUseStorage = true;
     const initConfig: IInitConfig = {

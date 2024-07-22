@@ -212,7 +212,7 @@ const Flagsmith = class {
                             return true
                         })
                     })) :
-                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identifier) + '&transient=' + encodeURIComponent(!!transient)),
+                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identifier) + (transient ? '&transient=true' : '')),
             ])
                 .then((res) => {
                     this.withTraits = null
