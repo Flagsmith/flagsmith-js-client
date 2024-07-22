@@ -84,7 +84,7 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
             case 'https://edge.api.flagsmith.com/api/v1/flags/':
                 return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}
             case 'https://edge.api.flagsmith.com/api/v1/identities/?identifier=' + testIdentity:
-                return {status: 200, text: () => fs.readFile('./test/data/identities_test_identity.json', 'utf8')}
+                return {status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentity}.json`, 'utf8')}
         }
 
         throw new Error('Please mock the call to ' + url)
