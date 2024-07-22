@@ -1,5 +1,5 @@
 {
-    "identifier": "test_identity",
+    "identifier": "test_transient_identity",
     "flags": [
         {
             "feature": {
@@ -47,14 +47,5 @@
             "feature_state_value": null
         }
     ],
-    "traits": [
-        {
-            "trait_key": "number_trait",
-            "trait_value": 1
-        },
-        {
-            "trait_key": "string_trait",
-            "trait_value": "Example"
-        }
-    ]
+    "traits": []
 }
