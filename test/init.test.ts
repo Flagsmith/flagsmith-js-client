@@ -45,8 +45,7 @@ describe('Flagsmith.init', () => {
         const onChange = jest.fn()
         const testIdentityWithTraits = `test_identity_with_traits`
         const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange, identity:testIdentityWithTraits, traits:{number_trait:1, string_trait:"Example"}})
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentityWithTraits}.json`)})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentityWithTraits}.json`, 'utf8')})
 
         await flagsmith.init(initConfig);
 
@@ -73,8 +72,7 @@ describe('Flagsmith.init', () => {
     test('should reject initialize with identity bad key', async () => {
         const onChange = jest.fn()
         const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, environmentID:"bad"})
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce(async () => { return {status: 404} })
+        mockFetch.mockResolvedValueOnce({status: 404, text: async () => ''})
         await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
     });
     test('identifying with new identity should not carry over previous traits for different identity', async () => {
@@ -82,20 +80,16 @@ describe('Flagsmith.init', () => {
         const identityA = `test_identity_a`
         const identityB = `test_identity_b`
         const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, identity:identityA, traits: {a:`example`}})
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityA}.json`)})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityA}.json`, 'utf8')})
         await flagsmith.init(initConfig);
         expect(flagsmith.getTrait("a")).toEqual(`example`)
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityB}.json`)})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityB}.json`, 'utf8')})
         await flagsmith.identify(identityB)
         expect(flagsmith.getTrait("a")).toEqual(undefined)
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityA}.json`)})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityA}.json`, 'utf8')})
         await flagsmith.identify(identityA)
         expect(flagsmith.getTrait("a")).toEqual(`example`)
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityB}.json`)})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${identityB}.json`, 'utf8')})
         await flagsmith.identify(identityB)
         expect(flagsmith.getTrait("a")).toEqual(undefined)
     });
@@ -103,8 +97,7 @@ describe('Flagsmith.init', () => {
         const onChange = jest.fn()
         const testTransientIdentity = `test_transient_identity`
         const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, identity: {identifier: testTransientIdentity, transient: true}})
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testTransientIdentity}.json`)})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testTransientIdentity}.json`, 'utf8')})
         await flagsmith.init(initConfig);
         expect(mockFetch).toHaveBeenCalledWith(`https://edge.api.flagsmith.com/api/v1/identities/?identifier=${testTransientIdentity}&transient=true`,
             expect.objectContaining({method: 'GET'}),
@@ -116,8 +109,7 @@ describe('Flagsmith.init', () => {
         const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, identity: testIdentityWithTransientTraits,
             traits: {number_trait:1, string_trait:"Example",transient_trait:{transient:true,value:"Example"}}
         })
-        //@ts-ignore
-        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentityWithTransientTraits}.json`)})
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentityWithTransientTraits}.json`, 'utf8')})
         await flagsmith.init(initConfig);
         expect(mockFetch).toHaveBeenCalledWith('https://edge.api.flagsmith.com/api/v1/identities/',
             expect.objectContaining({method: 'POST', body: JSON.stringify({
