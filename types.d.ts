@@ -119,6 +119,7 @@ export interface IFlagsmithResponse {
     traits?: {
         trait_key: string;
         trait_value: IFlagsmithValue;
+        transient?: boolean;
     }[];
     flags?: {
         enabled: boolean;

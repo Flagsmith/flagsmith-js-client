@@ -45,16 +45,6 @@ export const identityState = {
         off_value: { id: 80319, enabled: false, value: null },
     },
 };
-export const identityLocalState = {
-    ...identityState,
-    'traits': {
-        ...identityState.traits,
-        'transient_trait': {
-            'value': 'Example',
-            'transient': true,
-        }
-    }
-};
 export const defaultStateAlt = {
     ...defaultState,
     flags: {

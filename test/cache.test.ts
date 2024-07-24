@@ -8,6 +8,7 @@ import {
     testIdentity,
 } from './test-constants';
 import SyncStorageMock from './mocks/sync-storage-mock';
+import { promises as fs } from 'fs'
 
 describe('Cache', () => {
 
@@ -338,6 +339,36 @@ describe('Cache', () => {
         expect(flagsmith.getAllTraits()).toEqual({
             ...identityState.traits,
             ts
+        })
+    });
+    test('should cache transient traits correctly', async () => {
+        const onChange = jest.fn();
+        const testIdentityWithTransientTraits = 'test_identity_with_transient_traits'
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            cacheFlags: true,
+            identity: testIdentityWithTransientTraits,
+            traits: {
+                transient_trait: {
+                    value: 'Example',
+                    transient: true,
+                }
+            },
+            onChange,
+        });
+        mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentityWithTransientTraits}.json`, 'utf8')})
+        await flagsmith.init(initConfig);
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...identityState,
+            identity: testIdentityWithTransientTraits,
+            traits: {
+                ...identityState.traits,
+                transient_trait: {
+                    transient: true,
+                    value: 'Example',
+                }
+            }
         })
     });
 });

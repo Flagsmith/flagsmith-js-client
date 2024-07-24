@@ -114,7 +114,8 @@ const Flagsmith = class {
                 };
             });
             traits.forEach(trait => {
-                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.trait_value
+                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.transient ? 
+                    {transient: true, value: trait.trait_value} : trait.trait_value
             });
 
             this.oldFlags = { ...this.flags };
