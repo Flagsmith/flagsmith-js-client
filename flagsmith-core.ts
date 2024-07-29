@@ -74,7 +74,7 @@ const Flagsmith = class {
         }
     }
 
-    getFlags = () => {
+    _getFlags = () => {
         const { identity, api } = this;
         this.log("Get Flags")
         this.isLoading = true;
@@ -116,6 +116,7 @@ const Flagsmith = class {
             this.flags = flags;
             this.traits = userTraits;
             this.updateStorage();
+            this.initializing = false;
             this._onChange(this.oldFlags, {
                 isFromServer: true,
                 flagsChanged,
@@ -205,6 +206,24 @@ const Flagsmith = class {
         }
     };
 
+    getFlags = () => {
+        if(this.initializing) {
+            const flags = new Promise(() => {
+                const interval = setInterval(async (resolve) => {
+                    if (this.initialised && !this.initializing) {
+                        clearInterval(interval)
+                        return this._getFlags().then(resolve)
+                    }
+                }, 3000)
+            })
+            return flags
+        }
+        if (!this.initialised || this.initializing) {
+            return Promise.resolve();
+        }
+        return this._getFlags()
+    }
+
     analyticsFlags = () => {
         const { api } = this;
 
@@ -246,6 +265,7 @@ const Flagsmith = class {
     getFlagInterval: NodeJS.Timer|null= null
     headers?: object | null= null
     initialised= false
+    initializing= true
     oldFlags:IFlags|null= null
     onChange:IInitConfig['onChange']|null= null
     onError:IInitConfig['onError']|null = null
@@ -437,11 +457,11 @@ const Flagsmith = class {
                                     }
                                     if (shouldFetchFlags) {
                                         // We want to resolve init since we have cached flags
-                                        this.getFlags();
+                                        this._getFlags();
                                     }
                                 } else {
                                     if (!preventFetch) {
-                                        await this.getFlags();
+                                        await this._getFlags();
                                     }
                                 }
                             } catch (e) {
@@ -449,7 +469,7 @@ const Flagsmith = class {
                             }
                         } else {
                             if (!preventFetch) {
-                                await this.getFlags();
+                                await this._getFlags();
                             } else {
                                 if (defaultFlags) {
                                     this._onChange(null,
@@ -473,7 +493,7 @@ const Flagsmith = class {
                     } catch (e) {}
                 }
             } else if (!preventFetch) {
-                await this.getFlags();
+                await this._getFlags();
             } else {
                 if (defaultFlags) {
                     this._onChange(null, { isFromServer: false, flagsChanged: getChanges({}, defaultFlags), traitsChanged: getChanges({}, traits) }, this._loadedState(null, FlagSource.DEFAULT_FLAGS));
@@ -506,7 +526,21 @@ const Flagsmith = class {
     }
 
     getAllFlags() {
-        return this.flags;
+        if(this.initialised) {
+            if(this.initializing) {
+                const flags = new Promise((resolve) => {
+                    const interval = setInterval(() => {
+                        if (this.initialised && !this.initializing) {
+                            clearInterval(interval)
+                            return resolve(true)
+                        }
+                    }, 3000)
+                })
+                return flags.then(() => {return this.flags})
+            } else {
+                return this.flags;
+            }
+        }    
     }
 
     identify(userId: string, traits?: ITraits) {
@@ -523,8 +557,8 @@ const Flagsmith = class {
                 ...traits
             };
         }
-        if (this.initialised) {
-            return this.getFlags();
+        if (this.initialised && !this.initializing) {
+            return this._getFlags();
         }
         return Promise.resolve();
     }
@@ -561,8 +595,8 @@ const Flagsmith = class {
     logout() {
         this.identity = null;
         this.traits = {};
-        if (this.initialised) {
-            return this.getFlags();
+        if (this.initialised && !this.initializing) {
+            return this._getFlags();
         }
         return Promise.resolve();
     }
@@ -571,7 +605,7 @@ const Flagsmith = class {
         if (this.getFlagInterval) {
             clearInterval(this.getFlagInterval);
         }
-        this.getFlagInterval = setInterval(this.getFlags, ticks);
+        this.getFlagInterval = setInterval(this._getFlags, ticks);
     }
 
     stopListening() {
@@ -651,8 +685,8 @@ const Flagsmith = class {
             this.log("Set traits prior to identifying", this.withTraits);
             return
         }
-        if (this.initialised) {
-            return this.getFlags()
+        if (this.initialised && !this.initializing) {
+            return this._getFlags()
         }
     };
 
@@ -810,7 +844,7 @@ const Flagsmith = class {
                         this.log('updated_at is new, but flags are loading', e.data, this.timestamp);
                     } else {
                         this.log('updated_at is new, fetching flags', e.data, this.timestamp);
-                        this.getFlags();
+                        this._getFlags();
                     }
                 } else {
                     this.log('updated_at is outdated, skipping get flags', e.data, this.timestamp);
