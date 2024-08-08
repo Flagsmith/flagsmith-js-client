@@ -1,9 +1,6 @@
-import { IIdentityConfig, IFlagsmithTrait, ITraitConfig } from "../types";
+import { TraitEvaluationContext } from "../evaluation-context";
+import { IFlagsmithTrait } from "../types";
 
-export function isTraitConfig(trait: ITraitConfig | IFlagsmithTrait): trait is ITraitConfig {
+export function isTraitEvaluationContext(trait: TraitEvaluationContext | IFlagsmithTrait): trait is TraitEvaluationContext {
     return !!trait && typeof trait == 'object' && trait.value !== undefined;
-}
-
-export function isIdentityConfig(identity: IIdentityConfig | string): identity is IIdentityConfig {
-    return typeof (identity == 'object') && identity.identifier !== undefined;
 }

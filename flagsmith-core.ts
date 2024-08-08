@@ -13,17 +13,16 @@ import {
     ITraits,
     LoadingState,
     OnChange,
+    Traits,
 } from './types';
-import {
-    isIdentityConfig,
-    isTraitConfig,
-} from './utils/types';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
 import { AsyncStorageType } from './utils/async-storage';
 import getChanges from './utils/get-changes';
 import angularFetch from './utils/angular-fetch';
 import setDynatraceValue from './utils/set-dynatrace-value';
+import { EvaluationContext } from './evaluation-context';
+import { isTraitEvaluationContext } from './utils/types';
 
 enum FlagSource {
     "NONE" = "NONE",
@@ -81,7 +80,7 @@ const Flagsmith = class {
     }
 
     getFlags = () => {
-        const { identity, api } = this;
+        let { api, evaluationContext } = this;
         this.log("Get Flags")
         this.isLoading = true;
 
@@ -96,14 +95,11 @@ const Flagsmith = class {
             if(!response || previousIdentity !== `${this.identity}`) {
                 return // getJSON returned null due to request/response mismatch
             }
-            let { flags: features, traits }: IFlagsmithResponse = response
+            let { flags: features, traits, identifier }: IFlagsmithResponse = response
             this.isLoading = false;
-            if (identity) {
-                this.withTraits = null;
-            }
             // Handle server response
             const flags: IFlags = {};
-            const userTraits: ITraits = {};
+            const userTraits: Traits = {};
             features = features || [];
             traits = traits || [];
             features.forEach(feature => {
@@ -114,15 +110,22 @@ const Flagsmith = class {
                 };
             });
             traits.forEach(trait => {
-                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = trait.transient ? 
-                    {transient: true, value: trait.trait_value} : trait.trait_value
+                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = {
+                    transient: trait.transient,
+                    value: trait.trait_value,
+                }
             });
 
             this.oldFlags = { ...this.flags };
             const flagsChanged = getChanges(this.oldFlags, flags);
-            const traitsChanged = getChanges(this.withTraits, userTraits);
+            const traitsChanged = getChanges(this.evaluationContext.identity?.traits, userTraits);
+            if (identifier || Object.keys(userTraits).length) {
+                this.evaluationContext.identity = {traits: userTraits};
+                if (identifier) {
+                    this.evaluationContext.identity.identifier = identifier;
+                }
+            }
             this.flags = flags;
-            this.traits = userTraits;
             this.updateStorage();
             this._onChange(this.oldFlags, {
                 isFromServer: true,
@@ -134,12 +137,12 @@ const Flagsmith = class {
                 try {
                     if (this.datadogRum!.trackTraits) {
                         const traits: Parameters<IDatadogRum["client"]["setUser"]>["0"] = {};
-                        Object.keys(this.traits).map((key) => {
+                        Object.keys(this.evaluationContext.identity?.traits || {}).map((key) => {
                             traits[FLAGSMITH_TRAIT_ANALYTICS_KEY + key] = this.getTrait(key);
                         });
                         const datadogRumData = {
                             ...this.datadogRum.client.getUser(),
-                            id: this.datadogRum.client.getUser().id || this.identity,
+                            id: this.datadogRum.client.getUser().id || this.evaluationContext.identity?.identifier,
                             ...traits,
                         };
                         this.log("Setting Datadog user", datadogRumData);
@@ -162,7 +165,7 @@ const Flagsmith = class {
                         setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, { skipAnalytics: true }))
                         setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, { skipAnalytics: true }))
                     })
-                    Object.keys(this.traits).map((key) => {
+                    Object.keys(this.evaluationContext.identity?.traits || {}).map((key) => {
                         setDynatraceValue(traits, FLAGSMITH_TRAIT_ANALYTICS_KEY + key, this.getTrait(key))
                     })
                     this.log("Sending javaLongOrObject traits to dynatrace", traits.javaLongOrObject)
@@ -180,31 +183,18 @@ const Flagsmith = class {
 
         };
 
-        if (identity) {
-            let identifier: string;
-            let transient: boolean | undefined = false;
-            if (isIdentityConfig(identity)) {
-                ({identifier, transient} = identity);
-            } else {
-                identifier = identity;
-            }
+        if (evaluationContext.identity) {
             return Promise.all([
-                this.withTraits ?
+                (evaluationContext.identity.traits && Object.keys(evaluationContext.identity.traits).length) || !evaluationContext.identity.identifier ?
                     this.getJSON(api + 'identities/', "POST", JSON.stringify({
-                        "identifier": identifier,
-                        "transient": transient,
-                        traits: Object.keys(this.withTraits).map((k) => {
-                            const trait = this.withTraits![k];
-                            const data: any = { "trait_key": k };
-                            if (isTraitConfig(trait)) {
-                                data["trait_value"] = trait.value;
-                                if (trait.transient) {
-                                    data["transient"] = true;
-                                }
-                            } else {
-                                data["trait_value"] = trait;
+                        "identifier": evaluationContext.identity.identifier,
+                        "transient": evaluationContext.identity.transient,
+                        traits: Object.entries(evaluationContext.identity.traits!).map(([tKey, tContext]) => {
+                            return {
+                                trait_key: tKey,
+                                trait_value: tContext?.value,
+                                transient: tContext?.transient,
                             }
-                            return data;
                         }).filter((v) => {
                             if (typeof v.trait_value === 'undefined') {
                                 this.log("Warning - attempted to set an undefined trait value for key", v.trait_key)
@@ -213,10 +203,10 @@ const Flagsmith = class {
                             return true
                         })
                     })) :
-                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(identifier) + (transient ? '&transient=true' : '')),
+                    this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(evaluationContext.identity.identifier) + (evaluationContext.identity.transient ? '&transient=true' : '')),
             ])
                 .then((res) => {
-                    this.withTraits = null
+                    this.evaluationContext.identity = {...this.evaluationContext.identity, traits: {}}
                     return handleResponse(res?.[0] as IFlagsmithResponse | null)
                 }).catch(({ message }) => {
                     const error = new Error(message)
@@ -233,18 +223,21 @@ const Flagsmith = class {
     analyticsFlags = () => {
         const { api } = this;
 
-        if (!this.evaluationEvent || !this.evaluationEvent[this.environmentID]) {
+        if (!this.evaluationEvent || !this.evaluationContext.environment || !this.evaluationEvent[this.evaluationContext.environment.apiKey]) {
             return
         }
 
-        if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
-            return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.environmentID]))
+        if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.evaluationContext.environment.apiKey]).length !== 0) {
+            return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.evaluationContext.environment.apiKey]))
                 .then((res) => {
+                    if (!this.evaluationContext.environment) {
+                        return;
+                    }
                     const state = this.getState();
                     if (!this.evaluationEvent) {
                         this.evaluationEvent = {}
                     }
-                    this.evaluationEvent[this.environmentID] = {}
+                    this.evaluationEvent[this.evaluationContext.environment.apiKey] = {}
                     this.setState({
                         ...state,
                         evaluationEvent: this.evaluationEvent,
@@ -265,7 +258,7 @@ const Flagsmith = class {
     ts: number|null= null
     enableAnalytics= false
     enableLogs= false
-    environmentID = ""
+    evaluationContext: EvaluationContext = {}
     evaluationEvent: Record<string, Record<string, number>> | null= null
     flags:IFlags|null= null
     getFlagInterval: NodeJS.Timer|null= null
@@ -274,10 +267,8 @@ const Flagsmith = class {
     oldFlags:IFlags|null= null
     onChange:IInitConfig['onChange']|null= null
     onError:IInitConfig['onError']|null = null
-    identity?: IIdentity|null= null
     ticks: number|null= null
     timer: number|null= null
-    traits:ITraits|null= null
     dtrum= null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false}
@@ -286,6 +277,7 @@ const Flagsmith = class {
             const {
                 environmentID,
                 api = defaultAPI,
+                evaluationContext,
                 headers,
                 onChange,
                 cacheFlags,
@@ -308,7 +300,19 @@ const Flagsmith = class {
                 _trigger,
                 _triggerLoadingState,
             } = config;
-            this.environmentID = environmentID;
+            evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
+            if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
+                throw new Error('Please provide `evaluationContext.environment` with non-empty `apiKey`');
+            }
+            evaluationContext.identity = identity || traits ? {
+                identifier: identity,
+                traits: traits ? Object.fromEntries(
+                    Object.entries(traits).map(
+                        ([tKey, tValue]) => [tKey, {value: tValue}]
+                    )
+                ) : {},
+            } : evaluationContext.identity;
+            this.evaluationContext = evaluationContext;
             this.api = api;
             this.headers = headers;
             this.getFlagInterval = null;
@@ -326,8 +330,6 @@ const Flagsmith = class {
                 });
                 onError?.(message);
             };
-            this.identity = identity;
-            this.withTraits = traits;
             this.enableLogs = enableLogs || false;
             this.cacheOptions = cacheOptions ? { skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0, loadStale: !!cacheOptions.loadStale } : this.cacheOptions;
             if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
@@ -338,7 +340,6 @@ const Flagsmith = class {
             }
             this.enableAnalytics = enableAnalytics ? enableAnalytics : false;
             this.flags = Object.assign({}, defaultFlags) || {};
-            this.traits = Object.assign({}, traits) || {};
             this.datadogRum = datadogRum || null;
             this.initialised = true;
             this.ticks = 10000;
@@ -348,7 +349,7 @@ const Flagsmith = class {
                 AsyncStorage = _AsyncStorage;
             }
             if (realtime && typeof window !== 'undefined') {
-                this.setupRealtime(eventSourceUrl, environmentID);
+                this.setupRealtime(eventSourceUrl, evaluationContext.environment.apiKey);
             }
 
             if (Object.keys(this.flags).length) {
@@ -363,10 +364,6 @@ const Flagsmith = class {
             this.setState(state as IState);
 
             this.log('Initialising with properties', config, this);
-
-            if (!environmentID) {
-                throw new Error('Please specify a environment id');
-            }
 
             if (enableDynatrace) {
                 // @ts-expect-error Dynatrace's dtrum is exposed to global scope
@@ -402,14 +399,14 @@ const Flagsmith = class {
 
                 if (AsyncStorage && this.canUseStorage) {
                     AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
-                        if (res) {
+                        if (res && this.evaluationContext.environment) {
                             const json = JSON.parse(res);
-                            if (json[this.environmentID]) {
+                            if (json[this.evaluationContext.environment.apiKey]) {
                                     const state = this.getState();
                                     this.log("Retrieved events from cache", res);
                                 this.setState({
                                     ...state,
-                                    evaluationEvent: json[this.environmentID],
+                                    evaluationEvent: json[this.evaluationContext.environment.apiKey],
                                 });
                             }
                         }
@@ -425,12 +422,12 @@ const Flagsmith = class {
                             let flagsChanged = null
                             let traitsChanged = null
                             try {
-                                const json = JSON.parse(res);
+                                const json = JSON.parse(res) as IState;
                                 let cachePopulated = false;
-                                if (json && json.api === this.api && json.environmentID === this.environmentID) {
+                                if (json && json.api === this.api && json.evaluationContext?.environment?.apiKey === this.evaluationContext.environment?.apiKey) {
                                     let setState = true;
-                                    if (this.identity && (json.identity !== this.identity)) {
-                                        this.log("Ignoring cache,  identity has changed from " + json.identity + " to " + this.identity )
+                                    if (this.evaluationContext.identity && (json.evaluationContext?.identity?.identifier !== this.evaluationContext.identity.identifier)) {
+                                        this.log("Ignoring cache, identity has changed from " + json.evaluationContext?.identity?.identifier + " to " + this.evaluationContext.identity.identifier )
                                         setState = false;
                                     }
                                     if (this.cacheOptions.ttl) {
@@ -447,7 +444,7 @@ const Flagsmith = class {
                                     }
                                     if (setState) {
                                         cachePopulated = true;
-                                        traitsChanged = getChanges(this.traits, json.traits)
+                                        traitsChanged = getChanges(this.evaluationContext.identity?.traits, json.evaluationContext?.identity?.traits)
                                         flagsChanged = getChanges(this.flags, json.flags)
                                         // When populating state from cache, we merge traits passed in flagsmith.init
                                         this.setState({
@@ -489,12 +486,12 @@ const Flagsmith = class {
                             } else {
                                 if (defaultFlags) {
                                     this._onChange(null,
-                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.traits) },
+                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.evaluationContext.identity?.traits) },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS),
                                     );
                                 } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
                                     this._onChange(null,
-                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.traits) },
+                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.evaluationContext.identity?.traits) },
                                         this._loadedState(null, FlagSource.DEFAULT_FLAGS),
                                     );
                                 } else {
@@ -512,13 +509,13 @@ const Flagsmith = class {
                 await this.getFlags();
             } else {
                 if (defaultFlags) {
-                    this._onChange(null, { isFromServer: false, flagsChanged: getChanges({}, defaultFlags), traitsChanged: getChanges({}, traits) }, this._loadedState(null, FlagSource.DEFAULT_FLAGS));
+                    this._onChange(null, { isFromServer: false, flagsChanged: getChanges({}, defaultFlags), traitsChanged: getChanges({}, evaluationContext.identity?.traits) }, this._loadedState(null, FlagSource.DEFAULT_FLAGS));
                 } else if (this.flags) {
                     let error = null;
                     if (Object.keys(this.flags).length === 0) {
                         error = WRONG_FLAGSMITH_CONFIG;
                     }
-                    this._onChange(null, { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, traits) }, this._loadedState(error, FlagSource.DEFAULT_FLAGS));
+                    this._onChange(null, { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, evaluationContext.identity?.traits) }, this._loadedState(error, FlagSource.DEFAULT_FLAGS));
                     if(error) {
                         throw new Error(error)
                     }
@@ -545,19 +542,22 @@ const Flagsmith = class {
         return this.flags;
     }
 
-    identify(userId: string, traits?: ITraits) {
-        if(this.identity && this.identity !== userId) {
+    identify(userId?: string | null, traits?: ITraits, transient?: boolean) {
+        this.evaluationContext.identity = {
+            identifier: userId,
+            transient: transient,
             // clear out old traits when switching identity
-            this.withTraits = {}
+            traits: this.evaluationContext.identity && this.evaluationContext.identity.identifier == userId ? this.evaluationContext.identity.traits : {}
         }
-        this.identity = userId;
-        this.log("Identify: " + this.identity)
+        this.evaluationContext.identity.identifier = userId;
+        this.log("Identify: " + this.evaluationContext.identity.identifier)
 
         if (traits) {
-            this.withTraits = {
-                ...(this.withTraits || {}),
-                ...traits
-            };
+            this.evaluationContext.identity.traits = Object.fromEntries(
+                Object.entries(traits).map(
+                    ([tKey, tValue]) => [tKey, isTraitEvaluationContext(tValue) ? tValue : {value: tValue}]
+                )
+            );
         }
         if (this.initialised) {
             return this.getFlags();
@@ -568,11 +568,9 @@ const Flagsmith = class {
     getState() {
         return {
             api: this.api,
-            environmentID: this.environmentID,
             flags: this.flags,
-            identity: this.identity,
             ts: this.ts,
-            traits: this.traits,
+            evaluationContext: this.evaluationContext,
             evaluationEvent: this.evaluationEvent,
         } as IState
     }
@@ -581,22 +579,15 @@ const Flagsmith = class {
         if (state) {
             this.initialised = true;
             this.api = state.api || this.api || defaultAPI;
-            this.environmentID = state.environmentID || this.environmentID;
             this.flags = state.flags || this.flags;
-            this.identity = state.identity || this.identity;
-            this.traits = state.traits || this.traits;
-            this.withTraits = {
-                ...(this.withTraits || {}),
-                ...this.traits,
-            };
+            this.evaluationContext = state.evaluationContext || this.evaluationContext,
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
             this.log("setState called", this)
         }
     }
 
     logout() {
-        this.identity = null;
-        this.traits = {};
+        this.evaluationContext.identity = null;
         if (this.initialised) {
             return this.getFlags();
         }
@@ -648,26 +639,53 @@ const Flagsmith = class {
     }
 
     getTrait = (key: string) => {
-        const trait = this.traits && this.traits[key.toLowerCase().replace(/ /g, '_')];
-        if (isTraitConfig(trait)) {
-            return trait.value;
-        }
-        return trait;
+        return this.evaluationContext.identity?.traits && this.evaluationContext.identity.traits[key.toLowerCase().replace(/ /g, '_')]?.value;
     }
 
     getAllTraits = () => {
-        return this.traits
+        return Object.fromEntries(
+            Object.entries(this.evaluationContext.identity?.traits || {}).map(
+                ([tKey, tContext]) => [tKey, tContext?.value]
+            )
+        );
     }
 
-    setTrait = (key: string, trait_value: IFlagsmithTrait, transient?: boolean) => {
+    setContext = (evaluationContext: EvaluationContext) => {
+        this.evaluationContext = {
+            ...evaluationContext,
+            environment: evaluationContext.environment || this.evaluationContext.environment,
+        };
+
+        if (this.initialised) {
+            return this.getFlags();
+        }
+
+        return Promise.resolve();
+    }
+
+    getContext = () => {
+        return this.evaluationContext;
+    }
+
+    setTrait = (key: string, trait_value: IFlagsmithTrait) => {
         const { api } = this;
 
         if (!api) {
             return
         }
-        const traits: ITraits<string> = {};
-        traits[key] = { value: trait_value, transient: transient };
-        return this.setTraits(traits)
+
+        return this.setContext({
+            ...this.evaluationContext,
+            identity: {
+                ...this.evaluationContext.identity,
+                traits: {
+                    ...this.evaluationContext.identity?.traits,
+                    ...Object.fromEntries(
+                        [[key, isTraitEvaluationContext(trait_value) ? trait_value : {value: trait_value}]],
+                    )
+                }
+            }
+        });
     };
 
     setTraits = (traits: ITraits) => {
@@ -677,22 +695,20 @@ const Flagsmith = class {
             return
         }
 
-        if (!traits || typeof traits !== 'object') {
-            console.error("Expected object for flagsmith.setTraits");
-        }
-
-        this.withTraits = {
-            ...(this.withTraits || {}),
-            ...traits
-        };
-
-        if (!this.identity) {
-            this.log("Set traits prior to identifying", this.withTraits);
-            return
-        }
-        if (this.initialised) {
-            return this.getFlags()
-        }
+        return this.setContext({
+            ...this.evaluationContext,
+            identity: {
+                ...this.evaluationContext.identity,
+                traits: {
+                    ...this.evaluationContext.identity?.traits,
+                    ...Object.fromEntries(
+                        Object.entries(traits).map(
+                            (([tKey, tValue]) => [tKey, isTraitEvaluationContext(tValue) ? tValue : {value: tValue}])
+                        )
+                    )
+                }
+            }
+        });
     };
 
     hasFeature = (key: string, options?: HasFeatureOptions) => {
@@ -728,16 +744,16 @@ const Flagsmith = class {
     }
 
     private getJSON = (url: string, method?: 'GET' | 'POST' | 'PUT', body?: string) => {
-        const { environmentID, headers } = this;
+        const { evaluationContext, headers } = this;
         const options: RequestOptions = {
             method: method || 'GET',
             body,
             // @ts-ignore next-js overrides fetch
             cache: 'no-cache',
-            headers: {
-                'x-environment-key': `${environmentID}`,
-            },
+            headers: {},
         };
+        if (this.evaluationContext.environment)
+            options.headers['X-Environment-Key'] = this.evaluationContext.environment.apiKey;
         if (method && method !== 'GET')
             options.headers['Content-Type'] = 'application/json; charset=utf-8';
 
@@ -749,12 +765,12 @@ const Flagsmith = class {
             console.error('Flagsmith: fetch is undefined, please specify a fetch implementation into flagsmith.init to support SSR.');
         }
 
-        const requestedIdentity = `${this.identity}`;
+        const requestedIdentity = `${this.evaluationContext.identity?.identifier}`;
         return _fetch(url, options)
             .then(res => {
-                const newIdentity = `${this.identity}`;
+                const newIdentity = `${this.evaluationContext.identity?.identifier}`;
                 if (requestedIdentity !== newIdentity) {
-                    this.log(`Received response with identity miss-match, ignoring response. Requested: ${requestedIdentity}, Current: ${newIdentity}`);
+                    this.log(`Received response with identity mismatch, ignoring response. Requested: ${requestedIdentity}, Current: ${newIdentity}`);
                     return;
                 }
                 const lastUpdated = res.headers?.get('x-flagsmith-document-updated-at');
@@ -805,14 +821,14 @@ const Flagsmith = class {
         }
 
         if (this.enableAnalytics) {
-            if (!this.evaluationEvent) return;
-            if (!this.evaluationEvent[this.environmentID]) {
-                this.evaluationEvent[this.environmentID] = {};
+            if (!this.evaluationEvent || !this.evaluationContext.environment) return;
+            if (!this.evaluationEvent[this.evaluationContext.environment.apiKey]) {
+                this.evaluationEvent[this.evaluationContext.environment.apiKey] = {};
             }
-            if (this.evaluationEvent[this.environmentID][key] === undefined) {
-                this.evaluationEvent[this.environmentID][key] = 0;
+            if (this.evaluationEvent[this.evaluationContext.environment.apiKey][key] === undefined) {
+                this.evaluationEvent[this.evaluationContext.environment.apiKey][key] = 0;
             }
-            this.evaluationEvent[this.environmentID][key] += 1;
+            this.evaluationEvent[this.evaluationContext.environment.apiKey][key] += 1;
         }
         this.updateEventStorage();
     };

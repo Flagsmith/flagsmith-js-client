@@ -36,7 +36,7 @@ describe('Flagsmith.init', () => {
         expect(onChange).toHaveBeenCalledTimes(1);
         expect(onChange).toHaveBeenCalledWith(
             {},
-            {"flagsChanged": Object.keys(defaultState.flags), "isFromServer": true, "traitsChanged": expect.arrayContaining(Object.keys(identityState.traits))},
+            {"flagsChanged": Object.keys(defaultState.flags), "isFromServer": true, "traitsChanged": expect.arrayContaining(Object.keys(identityState.evaluationContext.identity.traits))},
             {"error": null, "isFetching": false, "isLoading": false, "source": "SERVER"}
         );
         expect(getStateToCheck(flagsmith.getState())).toEqual(identityState)
@@ -61,12 +61,18 @@ describe('Flagsmith.init', () => {
         );
         expect(getStateToCheck(flagsmith.getState())).toEqual({
             ...identityState,
-            identity: 'test_identity_with_traits'
+            evaluationContext: {
+                ...identityState.evaluationContext,
+                identity: {
+                    ...identityState.evaluationContext.identity,
+                    identifier: testIdentityWithTraits
+                },
+            },
         })
     });
     test('should reject initialize with identity no key', async () => {
         const onChange = jest.fn()
-        const {flagsmith,initConfig} = getFlagsmith({onChange, environmentID:""})
+        const {flagsmith,initConfig} = getFlagsmith({onChange, evaluationContext:{environment:{apiKey: ""}}})
         await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
     });
     test('should reject initialize with identity bad key', async () => {
@@ -96,7 +102,10 @@ describe('Flagsmith.init', () => {
     test('identifying with transient identity should request the API correctly', async () => {
         const onChange = jest.fn()
         const testTransientIdentity = `test_transient_identity`
-        const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, identity: {identifier: testTransientIdentity, transient: true}})
+        const evaluationContext = {
+            identity: {identifier: testTransientIdentity, transient: true}
+        }
+        const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, evaluationContext})
         mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testTransientIdentity}.json`, 'utf8')})
         await flagsmith.init(initConfig);
         expect(mockFetch).toHaveBeenCalledWith(`https://edge.api.flagsmith.com/api/v1/identities/?identifier=${testTransientIdentity}&transient=true`,
@@ -106,15 +115,22 @@ describe('Flagsmith.init', () => {
     test('identifying with transient traits should request the API correctly', async () => {
         const onChange = jest.fn()
         const testIdentityWithTransientTraits = `test_identity_with_transient_traits`
-        const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, identity: testIdentityWithTransientTraits,
-            traits: {number_trait:1, string_trait:"Example",transient_trait:{transient:true,value:"Example"}}
-        })
+        const evaluationContext = {
+            identity: {
+                identifier: testIdentityWithTransientTraits,
+                traits: {
+                    number_trait: {value: 1},
+                    string_trait: {value: 'Example'},
+                    transient_trait: {value: 'Example', transient: true},
+                }
+            }
+        }
+        const {flagsmith,initConfig,mockFetch} = getFlagsmith({onChange, evaluationContext})
         mockFetch.mockResolvedValueOnce({status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentityWithTransientTraits}.json`, 'utf8')})
         await flagsmith.init(initConfig);
         expect(mockFetch).toHaveBeenCalledWith('https://edge.api.flagsmith.com/api/v1/identities/',
             expect.objectContaining({method: 'POST', body: JSON.stringify({
                 "identifier": testIdentityWithTransientTraits,
-                "transient": false,
                 "traits": [
                   {
                     "trait_key": "number_trait",

@@ -8,9 +8,9 @@ export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Project
 
 export const defaultState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
-    environmentID,
-    identity: undefined,
-    traits: {},
+    evaluationContext: {
+        environment: {apiKey: environmentID},
+    },
     flags: {
         hero: {
             id: 1804,
@@ -27,11 +27,15 @@ export const defaultState = {
 export const testIdentity = 'test_identity'
 export const identityState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
-    environmentID,
-    'identity': testIdentity,
-    'traits': {
-        'string_trait': 'Example',
-        'number_trait': 1,
+    evaluationContext: {
+        environment: {apiKey: environmentID},
+        identity: {
+            identifier: testIdentity,
+            traits: {
+                string_trait: {value: 'Example'},
+                number_trait: {value: 1},
+            }
+        }
     },
     flags: {
         hero: {
@@ -83,11 +87,14 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     //@ts-ignore, we want to test storage even though flagsmith thinks there is none
     flagsmith.canUseStorage = true;
     const initConfig: IInitConfig = {
-        environmentID,
         AsyncStorage,
         fetch: mockFetch,
         ...config,
     };
+    initConfig.evaluationContext = {
+        environment: {apiKey: environmentID},
+        ...config?.evaluationContext,
+    }
     return { flagsmith, initConfig, mockFetch, AsyncStorage };
 }
 export const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));

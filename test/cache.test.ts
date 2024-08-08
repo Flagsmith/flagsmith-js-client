@@ -361,14 +361,20 @@ describe('Cache', () => {
         expect(mockFetch).toHaveBeenCalledTimes(1);
         expect(getStateToCheck(flagsmith.getState())).toEqual({
             ...identityState,
-            identity: testIdentityWithTransientTraits,
-            traits: {
-                ...identityState.traits,
-                transient_trait: {
-                    transient: true,
-                    value: 'Example',
-                }
-            }
+            evaluationContext: {
+                ...identityState.evaluationContext,
+                identity: {
+                    ...identityState.evaluationContext.identity,
+                    identifier: testIdentityWithTransientTraits,
+                    traits: {
+                        ...identityState.evaluationContext.identity.traits,
+                        transient_trait: {
+                            transient: true,
+                            value: 'Example',
+                        },
+                    },
+                },
+            },
         })
     });
 });
