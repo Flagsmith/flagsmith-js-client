@@ -1,7 +1,7 @@
-import { IFlags, ITraits } from '../types';
+import { IFlags, Traits } from '../types';
 import deepEqual from 'fast-deep-equal';
 
-export default function(before: ITraits | IFlags | undefined | null, after:ITraits | IFlags | undefined | null) {
+export default function(before: Traits | IFlags | undefined | null, after:Traits | IFlags | undefined | null) {
     const changedValues = Object.keys(after||{}).filter((flagKey)=>{
         const beforeValue = before?.[flagKey]
         const afterValue = after?.[flagKey]
