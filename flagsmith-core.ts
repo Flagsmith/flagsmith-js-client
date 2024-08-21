@@ -667,6 +667,13 @@ const Flagsmith = class {
         return this.evaluationContext;
     }
 
+    updateContext = (evaluationContext: EvaluationContext) => {
+        return this.setContext({
+            ...this.getContext(),
+            ...evaluationContext,
+        })
+    }
+
     setTrait = (key: string, trait_value: IFlagsmithTrait) => {
         const { api } = this;
 

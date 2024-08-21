@@ -144,6 +144,11 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     setContext: (context: EvaluationContext) => Promise<void>;
     /**
+     * Merge current evaluation context with the provided one. Refresh the flags.
+     */
+    updateContext: () => Promise<void>;
+    /**
+    /**
      * Get current context.
      */
     getContext: () => EvaluationContext;
