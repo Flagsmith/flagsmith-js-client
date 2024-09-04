@@ -1,7 +1,7 @@
 // Sample test
-import { defaultState, getFlagsmith, getStateToCheck, identityState } from './test-constants';
+import { getFlagsmith } from './test-constants';
 
-describe.only('Flagsmith.functions', () => {
+describe('Flagsmith.functions', () => {
 
     beforeEach(() => {
         // Avoid mocks, but if you need to add them here
