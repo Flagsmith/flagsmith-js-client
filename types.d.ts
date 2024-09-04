@@ -17,9 +17,15 @@ export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeat
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
 
 export declare type GetValueOptions<T = Array<any> | object> = {
-    json?: boolean;
+    skipAnalytics?: boolean
+    json?: boolean
     fallback?: T
 }
+
+export declare type HasFeatureOptions = {
+    skipAnalytics?: boolean
+    fallback?: boolean
+} | boolean
 
 
 export interface IRetrieveInfo {
@@ -149,14 +155,35 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     stopListening: () => void;
     /**
-     * Get the whether a flag is enabled e.g. flagsmith.hasFeature("powerUserFeature")
+     * Returns whether a feature is enabled, or a fallback value if it does not exist.
+     * @param {HasFeatureOptions} [optionsOrSkipAnalytics=false] If `true`, will not track analytics for this flag
+     * evaluation. Using a boolean for this parameter is deprecated - use `{ skipAnalytics: true }` instead.
+     * @param [optionsOrSkipAnalytics.fallback=false] Returns this value if the feature does not exist.
+     * @param [optionsOrSkipAnalytics.skipAnalytics=false] If `true`, do not track analytics for this feature evaluation.
+     * @example
+     * flagsmith.hasFeature("power_user_feature")
+     * @example
+     * flagsmith.hasFeature("enabled_by_default_feature", { fallback: true })
      */
-    hasFeature: (key: F) => boolean;
+    hasFeature: (key: F, optionsOrSkipAnalytics?: HasFeatureOptions) => boolean;
 
     /**
-     * Get the value of a particular remote config e.g. flagsmith.getValue("font_size")
+     * Returns the value of a feature, or a fallback value.
+     * @param [options.json=false] Deserialise the feature value using `JSON.parse` and return the result or `options.fallback`.
+     * @param [options.fallback=null] Return this value in any of these cases:
+     * * The feature does not exist.
+     * * The feature has no value.
+     * * `options.json` is `true` and the feature's value is not valid JSON.
+     * @param [options.skipAnalytics=false] If `true`, do not track analytics for this feature evaluation.
+     * @param [skipAnalytics=false] Deprecated - use `options.skipAnalytics` instead.
+     * @example
+     * flagsmith.getValue("remote_config") // "{\"hello\":\"world\"}"
+     * flagsmith.getValue("remote_config", { json: true }) // { hello: "world" }
+     * @example
+     * flagsmith.getValue("font_size") // "12px"
+     * flagsmith.getValue("font_size", { json: true, fallback: "8px" }) // "8px"
      */
-    getValue<T = IFlagsmithValue>(key: F, options?: GetValueOptions<T>): IFlagsmithValue<T>;
+    getValue<T = IFlagsmithValue>(key: F, options?: GetValueOptions<T>, skipAnalytics?: boolean): IFlagsmithValue<T>;
 
     /**
      * Get the value of a particular trait for the identified user

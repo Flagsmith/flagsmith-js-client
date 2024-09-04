@@ -1,6 +1,7 @@
 import {
     DynatraceObject,
     GetValueOptions,
+    HasFeatureOptions,
     IDatadogRum,
     IFlags,
     IFlagsmith,
@@ -151,8 +152,8 @@ const Flagsmith = class {
                         javaLongOrObject: {},
                     }
                     Object.keys(this.flags).map((key) => {
-                        setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, {}, true))
-                        setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true))
+                        setDynatraceValue(traits, FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, { skipAnalytics: true }))
+                        setDynatraceValue(traits, FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, { skipAnalytics: true }))
                     })
                     Object.keys(this.traits).map((key) => {
                         setDynatraceValue(traits, FLAGSMITH_TRAIT_ANALYTICS_KEY + key, this.getTrait(key))
@@ -595,7 +596,7 @@ const Flagsmith = class {
             res = flag.value;
         }
 
-        if (!skipAnalytics) {
+        if (!options?.skipAnalytics && !skipAnalytics) {
             this.evaluateFlag(key, "VALUE");
         }
 
@@ -663,13 +664,17 @@ const Flagsmith = class {
         }
     };
 
-    hasFeature = (key: string, skipAnalytics?: boolean) => {
+    hasFeature = (key: string, options?: HasFeatureOptions) => {
+        // Support legacy skipAnalytics boolean parameter
+        const usingNewOptions = typeof options === 'object'
         const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
         let res = false;
-        if (flag && flag.enabled) {
+        if (!flag && usingNewOptions && typeof options.fallback !== 'undefined') {
+            res = options?.fallback
+        } else if (flag && flag.enabled) {
             res = true;
         }
-        if (!skipAnalytics) {
+        if ((usingNewOptions && !options.skipAnalytics) || !options) {
             this.evaluateFlag(key, "ENABLED");
         }
 
