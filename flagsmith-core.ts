@@ -420,7 +420,14 @@ const Flagsmith = class {
                                         cachePopulated = true;
                                         traitsChanged = getChanges(this.traits, json.traits)
                                         flagsChanged = getChanges(this.flags, json.flags)
-                                        this.setState(json);
+                                        // When populating state from cache, we merge traits passed in flagsmith.init
+                                        this.setState({
+                                            ...json,
+                                            traits: ({
+                                                ...(json.traits||{}),
+                                                ...(traits||{})
+                                            })
+                                        });
                                         this.log("Retrieved flags from cache", json);
                                     }
                                 }
