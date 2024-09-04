@@ -86,7 +86,11 @@ const Flagsmith = class {
                 isFetching: true
             })
         }
-        const handleResponse = ({ flags: features, traits }: IFlagsmithResponse) => {
+        const handleResponse = (response: IFlagsmithResponse | null) => {
+            if(!response) {
+                return // getJSON returned null due to request/response mismatch
+            }
+            let { flags: features, traits }: IFlagsmithResponse = response
             this.isLoading = false;
             if (identity) {
                 this.withTraits = null;
@@ -189,7 +193,7 @@ const Flagsmith = class {
             ])
                 .then((res) => {
                     this.withTraits = null
-                    return handleResponse(res[0] as IFlagsmithResponse)
+                    return handleResponse(res?.[0] as IFlagsmithResponse | null)
                 }).catch(({ message }) => {
                     const error = new Error(message)
                     return Promise.reject(error)
