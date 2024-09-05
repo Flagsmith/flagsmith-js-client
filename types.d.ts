@@ -46,6 +46,7 @@ export interface IState<F extends string = string, T extends string = string> {
 declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
+    storageKey?: string;
 };
 
 export declare type IDatadogRum = {

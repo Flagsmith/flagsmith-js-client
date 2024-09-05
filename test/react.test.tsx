@@ -1,7 +1,13 @@
 import React, { FC } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react';
-import { defaultState, environmentID, getFlagsmith, identityState, testIdentity } from './test-constants';
+import {
+    defaultState,
+    FLAGSMITH_KEY,
+    getFlagsmith,
+    identityState,
+    testIdentity,
+} from './test-constants';
 import removeIds from './test-utils/remove-ids';
 const FlagsmithPage: FC<any> = () => {
     const flags = useFlags(Object.keys(defaultState.flags))
@@ -17,6 +23,7 @@ const FlagsmithPage: FC<any> = () => {
         </>
     );
 };
+
 
 export default FlagsmithPage;
 describe('FlagsmithProvider', () => {
@@ -84,7 +91,7 @@ describe('FlagsmithProvider', () => {
             preventFetch: true,
             defaultFlags: defaultState.flags
         });
-        await AsyncStorage.setItem("BULLET_TRAIN_DB", JSON.stringify({
+        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
             ...defaultState
         }) )
         render(
@@ -98,6 +105,34 @@ describe('FlagsmithProvider', () => {
             expect(JSON.parse(screen.getByTestId("flags").innerHTML)).toEqual(removeIds(defaultState.flags));
         });
     });
+
+    it('renders cached flags by custom key', async () => {
+        const customKey = 'custom_key';
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage } = getFlagsmith({
+            onChange,
+            cacheFlags: true,
+            preventFetch: true,
+            defaultFlags: defaultState.flags,
+            cacheOptions: {
+                storageKey: customKey,
+            },
+        });
+        await AsyncStorage.setItem(customKey, JSON.stringify({
+            ...defaultState
+        }) )
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <FlagsmithPage/>
+            </FlagsmithProvider>
+        );
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId("loading-state").innerHTML)).toEqual({"isLoading":false,"isFetching":false,"error":null,"source":"CACHE"});
+            expect(JSON.parse(screen.getByTestId("flags").innerHTML)).toEqual(removeIds(defaultState.flags));
+        });
+    });
+
     it('renders default flags', async () => {
 
         const onChange = jest.fn();
