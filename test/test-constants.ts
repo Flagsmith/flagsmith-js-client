@@ -3,7 +3,7 @@ import MockAsyncStorage from './mocks/async-storage-mock';
 import { createFlagsmithInstance } from '../lib/flagsmith';
 import fetch from 'isomorphic-unfetch';
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
-export const FLAGSMITH_KEY = 'BULLET_TRAIN_DB' + "_" + environmentID;
+export const FLAGSMITH_KEY = 'FLAGSMITH_DB' + "_" + environmentID;
 export const defaultState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     environmentID,

@@ -37,8 +37,8 @@ type RequestOptions = {
 }
 
 let AsyncStorage: AsyncStorageType = null;
-const DEFAULT_FLAGSMITH_KEY = "BULLET_TRAIN_DB";
-const DEFAULT_FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
+const DEFAULT_FLAGSMITH_KEY = "FLAGSMITH_DB";
+const DEFAULT_FLAGSMITH_EVENT = "FLAGSMITH_EVENT";
 let FlagsmithKey = DEFAULT_FLAGSMITH_KEY;
 let FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT;
 const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
@@ -396,6 +396,27 @@ const Flagsmith = class {
                             }
                         }
                     });
+                }
+            }
+
+            const migrateAsyncStorageCache = async () => {
+                try {
+                    // Check if data exists under the old key using getItemSync or getItem
+                    const oldData = AsyncStorage?.getItemSync ?
+                        AsyncStorage.getItemSync(oldKey) :
+                        await AsyncStorage?.getItem(oldKey);
+
+                    if (oldData) {
+                        // Migrate the data to the new key
+                        await AsyncStorage?.setItem(newKey, oldData);
+
+                        // Optionally, you can remove the old key after migration
+                        await AsyncStorage?.removeItem(oldKey);
+
+                        console.log(`Cache migrated from '${oldKey}' to '${newKey}'.`);
+                    }
+                } catch (error) {
+                    console.error(`Failed to migrate cache from '${oldKey}' to '${newKey}':`, error);
                 }
             }
 
