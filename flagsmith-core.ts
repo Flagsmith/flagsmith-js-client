@@ -218,23 +218,6 @@ const Flagsmith = class {
         }
     };
 
-    _parseV2Analytics = (evaluations: Record<string, number>|null)=> {
-        if(!this.splitTestingAnalytics) {
-            return evaluations || {}
-        }
-        if(!evaluations) return {evaluations: []}
-        return {
-            evaluations:  Object.keys(evaluations).map((feature_name)=>(
-                {
-                    feature_name,
-                    "identity_identifier": this.identity||null,
-                    "count": evaluations[feature_name],
-                    "enabled_when_evaluated": this.hasFeature(feature_name),
-                }
-            ))
-        }
-    };
-
     datadogRum: IDatadogRum | null = null;
     loadingState: LoadingState = {isLoading: true, isFetching: true, error: null, source: FlagSource.NONE}
     canUseStorage = false
@@ -716,7 +699,7 @@ const Flagsmith = class {
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
             return this.getJSON(apiVersion(`${api}`, this.splitTestingAnalytics?2:1) + 'analytics/flags/',
                 'POST',
-                JSON.stringify(this._parseV2Analytics(this.evaluationEvent[this.environmentID])))
+                JSON.stringify(this.parseV2Analytics(this.evaluationEvent[this.environmentID])))
                 .then((res) => {
                     const state = this.getState();
                     if (!this.evaluationEvent) {
@@ -740,6 +723,23 @@ const Flagsmith = class {
             console.log.apply(this, ['FLAGSMITH:', new Date().valueOf() - (this.timer || 0), 'ms', ...args]);
         }
     }
+
+    private parseV2Analytics = (evaluations: Record<string, number>|null)=> {
+        if(!this.splitTestingAnalytics) {
+            return evaluations || {}
+        }
+        if(!evaluations) return {evaluations: []}
+        return {
+            evaluations:  Object.keys(evaluations).map((feature_name)=>(
+                {
+                    feature_name,
+                    "identity_identifier": this.identity||null,
+                    "count": evaluations[feature_name],
+                    "enabled_when_evaluated": this.hasFeature(feature_name),
+                }
+            ))
+        }
+    };
 
     private updateStorage() {
         if (this.cacheFlags) {
