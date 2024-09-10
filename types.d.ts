@@ -204,7 +204,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Track a conversion event within your application, used for split testing analytics.
      */
-    trackEvent: (event: string) => void;
+    trackEvent: (event: string) => Promise<void>;
     /**
      * The stored identity of the user
      */

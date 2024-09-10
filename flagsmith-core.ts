@@ -230,33 +230,6 @@ const Flagsmith = class {
         }
     };
 
-    analyticsFlags = () => {
-        const { api } = this;
-
-        if (!this.evaluationEvent|| !this.evaluationEvent[this.environmentID] || !api) {
-            return Promise.resolve()
-        }
-
-        if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
-            return this.getJSON(apiVersion(`${api}`, 2) + 'analytics/flags/', 'POST', JSON.stringify(this._parseEvaluations(this.evaluationEvent[this.environmentID])))
-                .then((res) => {
-                    const state = this.getState();
-                    if (!this.evaluationEvent) {
-                        this.evaluationEvent = {}
-                    }
-                    this.evaluationEvent[this.environmentID] = {}
-                    this.setState({
-                        ...state,
-                        evaluationEvent: this.evaluationEvent,
-                    });
-                    this.updateEventStorage();
-                }).catch((err) => {
-                    this.log("Exception fetching evaluationEvent", err);
-                });
-        }
-        return Promise.resolve()
-    };
-
     datadogRum: IDatadogRum | null = null;
     loadingState: LoadingState = {isLoading: true, isFetching: true, error: null, source: FlagSource.NONE}
     canUseStorage = false
@@ -529,15 +502,6 @@ const Flagsmith = class {
         }
     }
 
-    private _loadedState(error: any = null, source: FlagSource, isFetching = false) {
-        return {
-            error,
-            isFetching,
-            isLoading: false,
-            source
-        }
-    }
-
     getAllFlags() {
         return this.flags;
     }
@@ -710,14 +674,52 @@ const Flagsmith = class {
     trackEvent = (event: string)=> {
         if(!this.enableAnalytics) {
             console.error("In order to track events, please configure the enableAnalytics option. See https://docs.flagsmith.com/clients/javascript/#initialisation-options.")
+            return Promise.reject()
         } else if (!this.identity) {
             this.events.push(event)
             this.log("Waiting for user to be identified before tracking event", event )
+            return Promise.resolve()
         } else {
-            this.analyticsFlags().then(()=> {
-                this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
+            return this.analyticsFlags().then(()=> {
+               return this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
             })
         }
+    };
+
+    private _loadedState(error: any = null, source: FlagSource, isFetching = false) {
+        return {
+            error,
+            isFetching,
+            isLoading: false,
+            source
+        }
+    }
+
+    private analyticsFlags = () => {
+        const { api } = this;
+
+        if (!this.evaluationEvent|| !this.evaluationEvent[this.environmentID] || !api) {
+            return Promise.resolve()
+        }
+
+        if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
+            return this.getJSON(apiVersion(`${api}`, 2) + 'analytics/flags/', 'POST', JSON.stringify(this._parseEvaluations(this.evaluationEvent[this.environmentID])))
+                .then((res) => {
+                    const state = this.getState();
+                    if (!this.evaluationEvent) {
+                        this.evaluationEvent = {}
+                    }
+                    this.evaluationEvent[this.environmentID] = {}
+                    this.setState({
+                        ...state,
+                        evaluationEvent: this.evaluationEvent,
+                    });
+                    this.updateEventStorage();
+                }).catch((err) => {
+                    this.log("Exception fetching evaluationEvent", err);
+                });
+        }
+        return Promise.resolve()
     };
 
     private log(...args: (unknown)[]) {
