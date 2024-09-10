@@ -707,6 +707,19 @@ const Flagsmith = class {
         return res;
     };
 
+    trackEvent = (event: string)=> {
+        if(!this.enableAnalytics) {
+            console.error("In order to track events, please configure the enableAnalytics option. See https://docs.flagsmith.com/clients/javascript/#initialisation-options.")
+        } else if (!this.identity) {
+            this.events.push(event)
+            this.log("Waiting for user to be identified before tracking event", event )
+        } else {
+            this.analyticsFlags().then(()=> {
+                this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
+            })
+        }
+    };
+
     private log(...args: (unknown)[]) {
         if (this.enableLogs) {
             console.log.apply(this, ['FLAGSMITH:', new Date().valueOf() - (this.timer || 0), 'ms', ...args]);
@@ -817,19 +830,6 @@ const Flagsmith = class {
             this.loadingState = { ...loadingState };
             this.log('Loading state changed', loadingState);
             this._triggerLoadingState?.();
-        }
-    }
-
-    private trackEvent = (event: string)=> {
-        if(!this.enableAnalytics) {
-            console.error("In order to track events, please configure the enableAnalytics option. See https://docs.flagsmith.com/clients/javascript/#initialisation-options.")
-        } else if (!this.identity) {
-            this.events.push(event)
-            this.log("Waiting for user to be identified before tracking event", event )
-        } else {
-            this.analyticsFlags().then(()=> {
-                this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
-            })
         }
     }
 
