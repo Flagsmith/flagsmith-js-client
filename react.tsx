@@ -8,8 +8,8 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import Emitter from 'tiny-emitter';
-const events = new Emitter.TinyEmitter();
+import Emitter from './utils/emitter';
+const events = new Emitter();
 
 import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState } from './types'
 
@@ -111,7 +111,7 @@ export function useFlagsmithLoading() {
     }
 
     useEffect(() => {
-        if (!subscribed && flagsmith.initialised) {
+        if (!subscribed && flagsmith?.initialised) {
             events.on('loading_event', eventListener)
             setSubscribed(true)
         }
@@ -135,7 +135,6 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
     const traits = useConstant<string[]>(flagsAsArray(_traits))
     const flagsmith = useContext(FlagsmithContext)
     const [renderRef, setRenderRef] = useState(getRenderKey(flagsmith as IFlagsmith, flags, traits));
-
     const eventListener = useCallback(() => {
         const newRenderKey = getRenderKey(flagsmith as IFlagsmith, flags, traits)
         if (newRenderKey !== renderRef) {
@@ -143,13 +142,20 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
             setRenderRef(newRenderKey)
         }
     }, [renderRef])
+    const emitterRef = useRef(events.once('event', eventListener));
 
-    events.once('event', eventListener)
+
 
     if (firstRender.current) {
         firstRender.current = false;
         flagsmith?.log("React - Initialising event listeners")
     }
+
+    useEffect(()=>{
+        return () => {
+            emitterRef.current?.()
+        }
+    }, [])
 
     const res = useMemo(() => {
         const res: any = {}

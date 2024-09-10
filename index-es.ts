@@ -1,8 +1,7 @@
 import { IFlagsmith } from './types';
 
 import fetch from "unfetch"
-// @ts-expect-error
-import AsyncStorage from "@callstack/async-storage";
+import AsyncStorage from "./utils/async-storage";
 import core, { LikeFetch } from './flagsmith-core';
 // @ts-ignore
 globalThis.FlagsmithEventSource = typeof EventSource!== "undefined"? EventSource: null;
