@@ -399,27 +399,6 @@ const Flagsmith = class {
                 }
             }
 
-            const migrateAsyncStorageCache = async () => {
-                try {
-                    // Check if data exists under the old key using getItemSync or getItem
-                    const oldData = AsyncStorage?.getItemSync ?
-                        AsyncStorage.getItemSync(oldKey) :
-                        await AsyncStorage?.getItem(oldKey);
-
-                    if (oldData) {
-                        // Migrate the data to the new key
-                        await AsyncStorage?.setItem(newKey, oldData);
-
-                        // Optionally, you can remove the old key after migration
-                        await AsyncStorage?.removeItem(oldKey);
-
-                        console.log(`Cache migrated from '${oldKey}' to '${newKey}'.`);
-                    }
-                } catch (error) {
-                    console.error(`Failed to migrate cache from '${oldKey}' to '${newKey}':`, error);
-                }
-            }
-
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
                 if (AsyncStorage && this.canUseStorage) {
