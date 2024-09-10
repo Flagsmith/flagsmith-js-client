@@ -1,13 +1,13 @@
 // Sample test
-import { defaultState, getFlagsmith, getMockFetchWithValue, mockFetch, testIdentity } from './test-constants';
+import { getFlagsmith, getMockFetchWithValue, testIdentity } from './test-constants';
 
 describe.only('Analytics', () => {
 
     beforeEach(() => {
-        jest.useFakeTimers(); // Mock the timers
+        jest.useFakeTimers(); // Mocked to allow time to pass for analytics flush
     });
     afterEach(() => {
-        jest.useRealTimers(); // Restore real timers after each test
+        jest.useRealTimers();
     });
     test('should not attempt to track events when split testing is disabled', async () => {
         const { flagsmith } = getFlagsmith({
@@ -113,5 +113,4 @@ describe.only('Analytics', () => {
             },
         );
     });
-
 });

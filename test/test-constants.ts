@@ -65,7 +65,7 @@ export function getStateToCheck(_state: IState) {
     return state;
 }
 
-export function getFlagsmith(config: Partial<IInitConfig> = {}, mockFetch?:ModuleMocker['fn']) {
+export function getFlagsmith(config: Partial<IInitConfig> = {}, mockFetch?:any) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
     const _mockFetch = mockFetch || jest.fn(async (url:string, options) => {
