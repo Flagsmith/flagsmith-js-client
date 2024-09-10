@@ -1,7 +1,7 @@
 // Sample test
 import { getFlagsmith, getMockFetchWithValue, testIdentity } from './test-constants';
 
-describe.only('Analytics', () => {
+describe('Analytics', () => {
 
     beforeEach(() => {
         jest.useFakeTimers(); // Mocked to allow time to pass for analytics flush
