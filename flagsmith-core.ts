@@ -85,6 +85,8 @@ const Flagsmith = class {
 
     events: string[] = []
 
+    splitTestingAnalytics=false;
+
     getFlags = () => {
         const { identity, api } = this;
         this.log("Get Flags")
@@ -216,7 +218,10 @@ const Flagsmith = class {
         }
     };
 
-    _parseEvaluations = (evaluations: Record<string, number>|null)=> {
+    _parseV2Analytics = (evaluations: Record<string, number>|null)=> {
+        if(!this.splitTestingAnalytics) {
+            return evaluations || {}
+        }
         if(!evaluations) return {evaluations: []}
         return {
             evaluations:  Object.keys(evaluations).map((feature_name)=>(
@@ -258,31 +263,33 @@ const Flagsmith = class {
     async init(config: IInitConfig) {
         try {
             const {
-                environmentID,
-                api = defaultAPI,
-                headers,
-                onChange,
-                cacheFlags,
-                datadogRum,
-                onError,
-                defaultFlags,
-                fetch: fetchImplementation,
-                preventFetch,
-                enableLogs,
-                enableDynatrace,
-                enableAnalytics,
-                realtime,
-        eventSourceUrl= "https://realtime.flagsmith.com/",
                 AsyncStorage: _AsyncStorage,
-                identity,
-                traits,
-                state,
-                cacheOptions,
                 angularHttpClient,
+                api = defaultAPI,
+                cacheFlags,
+                cacheOptions,
+                datadogRum,
+                defaultFlags,
+                enableAnalytics,
+                enableDynatrace,
+                enableLogs,
+                environmentID,
+                eventSourceUrl= "https://realtime.flagsmith.com/",
+                fetch: fetchImplementation,
+                headers,
+                identity,
+                onChange,
+                onError,
+                preventFetch,
+                splitTestingAnalytics,
+                realtime,
+                state,
+                traits,
                 _trigger,
                 _triggerLoadingState,
             } = config;
             this.environmentID = environmentID;
+            this.splitTestingAnalytics = !!splitTestingAnalytics;
             this.api = api;
             this.headers = headers;
             this.getFlagInterval = null;
@@ -671,18 +678,22 @@ const Flagsmith = class {
         return res;
     };
 
-    trackEvent = (event: string)=> {
-        if(!this.enableAnalytics) {
-            console.error("In order to track events, please configure the enableAnalytics option. See https://docs.flagsmith.com/clients/javascript/#initialisation-options.")
-            return Promise.reject()
+    trackEvent = (event: string) => {
+        if (!this.splitTestingAnalytics) {
+            const error = new Error("This feature is only enabled for self-hosted customers using split testing.");
+            console.error(error.message);
+            return Promise.reject(error);
         } else if (!this.identity) {
-            this.events.push(event)
-            this.log("Waiting for user to be identified before tracking event", event )
-            return Promise.resolve()
+            this.events.push(event);
+            this.log("Waiting for user to be identified before tracking event", event);
+            return Promise.resolve();
         } else {
-            return this.analyticsFlags().then(()=> {
-               return this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({'identity_identifier': this.identity, 'type': event}))
-            })
+            return this.analyticsFlags().then(() => {
+                return this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({
+                    'identity_identifier': this.identity,
+                    'type': event
+                }));
+            });
         }
     };
 
@@ -703,7 +714,9 @@ const Flagsmith = class {
         }
 
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
-            return this.getJSON(apiVersion(`${api}`, 2) + 'analytics/flags/', 'POST', JSON.stringify(this._parseEvaluations(this.evaluationEvent[this.environmentID])))
+            return this.getJSON(apiVersion(`${api}`, this.splitTestingAnalytics?2:1) + 'analytics/flags/',
+                'POST',
+                JSON.stringify(this._parseV2Analytics(this.evaluationEvent[this.environmentID])))
                 .then((res) => {
                     const state = this.getState();
                     if (!this.evaluationEvent) {

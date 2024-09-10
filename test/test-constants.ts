@@ -2,6 +2,7 @@ import { IInitConfig, IState } from '../lib/flagsmith/types';
 import MockAsyncStorage from './mocks/async-storage-mock';
 import { createFlagsmithInstance } from '../lib/flagsmith';
 import fetch from 'isomorphic-unfetch';
+import type { ModuleMocker } from 'jest-mock';
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
 
 export const defaultState = {
@@ -64,10 +65,10 @@ export function getStateToCheck(_state: IState) {
     return state;
 }
 
-export function getFlagsmith(config: Partial<IInitConfig> = {}) {
+export function getFlagsmith(config: Partial<IInitConfig> = {}, mockFetch?:ModuleMocker['fn']) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
-    const mockFetch = jest.fn(async (url, options) => {
+    const _mockFetch = mockFetch || jest.fn(async (url:string, options) => {
         return fetch(url, options);
     });
     //@ts-ignore, we want to test storage even though flagsmith thinks there is none
@@ -75,8 +76,19 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     const initConfig: IInitConfig = {
         environmentID,
         AsyncStorage,
-        fetch: mockFetch,
+        fetch: _mockFetch,
         ...config,
     };
-    return { flagsmith, initConfig, mockFetch, AsyncStorage };
+    return { flagsmith, initConfig, mockFetch:_mockFetch, AsyncStorage };
+}
+
+
+export function getMockFetchWithValue(resolvedValue:object, status=200) {
+    return jest.fn(() =>
+        Promise.resolve({
+            status,
+            text: () => Promise.resolve(JSON.stringify(resolvedValue)), // Mock json() to return the mock response
+            json: () => Promise.resolve(resolvedValue), // Mock json() to return the mock response
+        })
+    );
 }
