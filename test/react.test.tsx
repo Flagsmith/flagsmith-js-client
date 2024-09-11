@@ -124,7 +124,7 @@ describe('FlagsmithProvider', () => {
             expect(JSON.parse(screen.getByTestId("flags").innerHTML)).toEqual(removeIds(defaultState.flags));
         });
     });
-    it('handles race condition of init returning after identify', async () => {
+    it('ignores init response if identify gets called and resolves first', async () => {
 
         const onChange = jest.fn();
         const {flagsmith,initConfig, mockFetch} = getFlagsmith({onChange})
@@ -135,7 +135,7 @@ describe('FlagsmithProvider', () => {
                 id: 1,
                 name: "hero"
             }
-        }],300) // never resolves
+        }],300) // resolves after flagsmith.identify, it should be ignored
 
         render(
             <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
