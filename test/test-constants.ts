@@ -2,6 +2,8 @@ import { IInitConfig, IState } from '../lib/flagsmith/types';
 import MockAsyncStorage from './mocks/async-storage-mock';
 import { createFlagsmithInstance } from '../lib/flagsmith';
 import fetch from 'isomorphic-unfetch';
+import type { ModuleMocker } from 'jest-mock';
+import Mock = jest.Mock;
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
 
 export const defaultState = {
@@ -79,4 +81,12 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
         ...config,
     };
     return { flagsmith, initConfig, mockFetch, AsyncStorage };
+}
+export const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));
+export function getMockFetchWithValue(mockFn:Mock, resolvedValue:object, ms=0) {
+    mockFn.mockReturnValueOnce(delay(ms).then(()=>Promise.resolve({
+        status:200,
+        text: () => Promise.resolve(JSON.stringify(resolvedValue)), // Mock json() to return the mock response
+        json: () => Promise.resolve(resolvedValue), // Mock json() to return the mock response
+    })))
 }

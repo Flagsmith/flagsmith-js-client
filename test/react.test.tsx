@@ -1,7 +1,14 @@
 import React, { FC } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react';
-import { defaultState, environmentID, getFlagsmith, identityState, testIdentity } from './test-constants';
+import {
+    defaultState, delay,
+    environmentID,
+    getFlagsmith,
+    getMockFetchWithValue,
+    identityState,
+    testIdentity,
+} from './test-constants';
 import removeIds from './test-utils/remove-ids';
 const FlagsmithPage: FC<any> = () => {
     const flags = useFlags(Object.keys(defaultState.flags))
@@ -116,5 +123,42 @@ describe('FlagsmithProvider', () => {
             expect(JSON.parse(screen.getByTestId("loading-state").innerHTML)).toEqual({"isLoading":false,"isFetching":false,"error":null,"source":"DEFAULT_FLAGS"});
             expect(JSON.parse(screen.getByTestId("flags").innerHTML)).toEqual(removeIds(defaultState.flags));
         });
+    });
+    it('handles race condition of init returning after identify', async () => {
+
+        const onChange = jest.fn();
+        const {flagsmith,initConfig, mockFetch} = getFlagsmith({onChange})
+        getMockFetchWithValue(mockFetch, [{
+            enabled: false,
+            feature_state_value: null,
+            feature: {
+                id: 1,
+                name: "hero"
+            }
+        }],300) // never resolves
+
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <FlagsmithPage/>
+            </FlagsmithProvider>
+        );
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        getMockFetchWithValue(mockFetch, {
+            flags: [{
+                enabled: true,
+                feature_state_value: null,
+                feature: {
+                    id: 1,
+                    name: "hero"
+                }
+            }]
+        },0)
+        await flagsmith.identify(testIdentity)
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId("flags").innerHTML).hero.enabled).toBe(true)
+        });
+        await delay(500)
+        expect(JSON.parse(screen.getByTestId("flags").innerHTML).hero.enabled).toBe(true)
     });
 });
