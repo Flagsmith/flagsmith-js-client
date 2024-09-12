@@ -3,8 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react';
 import {
     defaultState,
+    delay,
     FLAGSMITH_KEY,
     getFlagsmith,
+    getMockFetchWithValue,
     identityState,
     testIdentity,
 } from './test-constants';
@@ -151,5 +153,42 @@ describe('FlagsmithProvider', () => {
             expect(JSON.parse(screen.getByTestId("loading-state").innerHTML)).toEqual({"isLoading":false,"isFetching":false,"error":null,"source":"DEFAULT_FLAGS"});
             expect(JSON.parse(screen.getByTestId("flags").innerHTML)).toEqual(removeIds(defaultState.flags));
         });
+    });
+    it('ignores init response if identify gets called and resolves first', async () => {
+
+        const onChange = jest.fn();
+        const {flagsmith,initConfig, mockFetch} = getFlagsmith({onChange})
+        getMockFetchWithValue(mockFetch, [{
+            enabled: false,
+            feature_state_value: null,
+            feature: {
+                id: 1,
+                name: "hero"
+            }
+        }],300) // resolves after flagsmith.identify, it should be ignored
+
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <FlagsmithPage/>
+            </FlagsmithProvider>
+        );
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        getMockFetchWithValue(mockFetch, {
+            flags: [{
+                enabled: true,
+                feature_state_value: null,
+                feature: {
+                    id: 1,
+                    name: "hero"
+                }
+            }]
+        },0)
+        await flagsmith.identify(testIdentity)
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId("flags").innerHTML).hero.enabled).toBe(true)
+        });
+        await delay(500)
+        expect(JSON.parse(screen.getByTestId("flags").innerHTML).hero.enabled).toBe(true)
     });
 });

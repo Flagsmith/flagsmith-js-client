@@ -88,8 +88,9 @@ const Flagsmith = class {
                 isFetching: true
             })
         }
+        const previousIdentity = `${this.identity}`;
         const handleResponse = (response: IFlagsmithResponse | null) => {
-            if(!response) {
+            if(!response || previousIdentity !== `${this.identity}`) {
                 return // getJSON returned null due to request/response mismatch
             }
             let { flags: features, traits }: IFlagsmithResponse = response
@@ -427,7 +428,14 @@ const Flagsmith = class {
                                         cachePopulated = true;
                                         traitsChanged = getChanges(this.traits, json.traits)
                                         flagsChanged = getChanges(this.flags, json.flags)
-                                        this.setState(json);
+                                        // When populating state from cache, we merge traits passed in flagsmith.init
+                                        this.setState({
+                                            ...json,
+                                            traits: ({
+                                                ...(json.traits||{}),
+                                                ...(traits||{})
+                                            })
+                                        });
                                         this.log("Retrieved flags from cache", json);
                                     }
                                 }
