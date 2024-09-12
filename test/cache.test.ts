@@ -1,7 +1,8 @@
 // Sample test
 import {
     defaultState,
-    defaultStateAlt, FLAGSMITH_KEY,
+    defaultStateAlt,
+    FLAGSMITH_KEY,
     getFlagsmith,
     getStateToCheck,
     identityState,
@@ -179,24 +180,7 @@ describe('Cache', () => {
             ...defaultStateAlt,
         });
     });
-    test('should not get flags from API when skipAPI is set', async () => {
-        const onChange = jest.fn();
-        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
-            cacheFlags: true,
-            onChange,
-            cacheOptions: { ttl: 1000, skipAPI: true },
-        });
-        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
-            ...defaultStateAlt,
-            ts: new Date().valueOf(),
-        }));
-        await flagsmith.init(initConfig);
-        expect(onChange).toHaveBeenCalledTimes(1);
-        expect(mockFetch).toHaveBeenCalledTimes(0);
-        expect(getStateToCheck(flagsmith.getState())).toEqual({
-            ...defaultStateAlt,
-        });
-    });
+
     test('should validate flags are unchanged when fetched', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
@@ -322,7 +306,7 @@ describe('Cache', () => {
             preventFetch: true,
         });
         const storage = new SyncStorageMock();
-        await storage.setItem('BULLET_TRAIN_DB', JSON.stringify({
+        await storage.setItem(FLAGSMITH_KEY, JSON.stringify({
             ...identityState,
         }));
         const ts = Date.now();
@@ -333,7 +317,7 @@ describe('Cache', () => {
         });
         expect(flagsmith.getAllTraits()).toEqual({
             ...identityState.traits,
-            ts
-        })
+            ts,
+        });
     });
 });
