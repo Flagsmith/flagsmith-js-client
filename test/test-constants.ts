@@ -5,7 +5,7 @@ import fetch from 'isomorphic-unfetch';
 import type { ModuleMocker } from 'jest-mock';
 import Mock = jest.Mock;
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
-
+export const FLAGSMITH_KEY = 'FLAGSMITH_DB' + "_" + environmentID;
 export const defaultState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     environmentID,

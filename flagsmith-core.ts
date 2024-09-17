@@ -37,8 +37,10 @@ type RequestOptions = {
 }
 
 let AsyncStorage: AsyncStorageType = null;
-const FLAGSMITH_KEY = "BULLET_TRAIN_DB";
-const FLAGSMITH_EVENT = "BULLET_TRAIN_EVENT";
+const DEFAULT_FLAGSMITH_KEY = "FLAGSMITH_DB";
+const DEFAULT_FLAGSMITH_EVENT = "FLAGSMITH_EVENT";
+let FlagsmithKey = DEFAULT_FLAGSMITH_KEY;
+let FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT;
 const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
 let eventSource: typeof EventSource;
 const initError = function(caller: string) {
@@ -321,6 +323,10 @@ const Flagsmith = class {
             this.ticks = 10000;
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
+
+            FlagsmithKey = cacheOptions?.storageKey || DEFAULT_FLAGSMITH_KEY + "_" + environmentID;
+            FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT + "_" + environmentID;
+
             if (_AsyncStorage) {
                 AsyncStorage = _AsyncStorage;
             }
@@ -361,7 +367,7 @@ const Flagsmith = class {
             }
 
             if (AsyncStorage && this.canUseStorage) {
-                AsyncStorage.getItem(FLAGSMITH_EVENT)
+                AsyncStorage.getItem(FlagsmithEvent)
                     .then((res)=>{
                         try {
                             this.evaluationEvent = JSON.parse(res!) || {}
@@ -378,7 +384,7 @@ const Flagsmith = class {
                 }
 
                 if (AsyncStorage && this.canUseStorage) {
-                    AsyncStorage.getItem(FLAGSMITH_EVENT, (err, res) => {
+                    AsyncStorage.getItem(FlagsmithEvent, (err, res) => {
                         if (res) {
                             const json = JSON.parse(res);
                             if (json[this.environmentID]) {
@@ -477,7 +483,7 @@ const Flagsmith = class {
                         }
                     };
                     try {
-                        const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(FLAGSMITH_KEY) : await AsyncStorage.getItem(FLAGSMITH_KEY);
+                        const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(FlagsmithKey) : await AsyncStorage.getItem(FlagsmithKey);
                         await onRetrievedStorage(null, res)
                     } catch (e) {}
                 }
@@ -693,7 +699,7 @@ const Flagsmith = class {
             this.ts = new Date().valueOf();
             const state = JSON.stringify(this.getState());
             this.log('Setting storage', state);
-            AsyncStorage!.setItem(FLAGSMITH_KEY, state);
+            AsyncStorage!.setItem(FlagsmithKey, state);
         }
     }
 
@@ -757,7 +763,7 @@ const Flagsmith = class {
     private updateEventStorage() {
         if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
-            AsyncStorage!.setItem(FLAGSMITH_EVENT, events);
+            AsyncStorage!.setItem(FlagsmithEvent, events);
         }
     }
 
