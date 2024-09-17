@@ -46,6 +46,7 @@ export interface IState<F extends string = string, T extends string = string> {
 declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
+    loadStale?: boolean;
 };
 
 export declare type IDatadogRum = {
@@ -233,6 +234,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     cacheOptions: {
         ttl: number;
         skipAPI: boolean;
+        loadStale: boolean;
     };
     /**
      * Used internally, this is the api provided in flagsmith.init, defaults to our production API

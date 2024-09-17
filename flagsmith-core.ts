@@ -257,7 +257,7 @@ const Flagsmith = class {
     traits:ITraits|null= null
     dtrum= null
     withTraits?: ITraits|null= null
-    cacheOptions = {ttl:0, skipAPI: false}
+    cacheOptions = {ttl:0, skipAPI: false, loadStale: false}
     async init(config: IInitConfig) {
         try {
             const {
@@ -306,7 +306,7 @@ const Flagsmith = class {
             this.identity = identity;
             this.withTraits = traits;
             this.enableLogs = enableLogs || false;
-            this.cacheOptions = cacheOptions ? { skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0 } : this.cacheOptions;
+            this.cacheOptions = cacheOptions ? { skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0, loadStale: !!cacheOptions.loadStale } : this.cacheOptions;
             if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
                 console.warn("Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.")
             }
@@ -412,9 +412,13 @@ const Flagsmith = class {
                                     }
                                     if (this.cacheOptions.ttl) {
                                         if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
-                                            if (json.ts) {
+                                            if (json.ts && !this.cacheOptions.loadStale) {
                                                 this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
                                                 setState = false;
+                                            }
+                                            else if (json.ts && this.cacheOptions.loadStale) {
+                                                this.log("Loading stale cache, timestamp ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                                setState = true;
                                             }
                                         }
                                     }
