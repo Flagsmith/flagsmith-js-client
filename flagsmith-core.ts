@@ -90,9 +90,9 @@ const Flagsmith = class {
                 isFetching: true
             })
         }
-        const previousIdentity = `${this.identity}`;
+        const previousIdentity = `${this.getContext().identity}`;
         const handleResponse = (response: IFlagsmithResponse | null) => {
-            if(!response || previousIdentity !== `${this.identity}`) {
+            if(!response || previousIdentity !== `${this.getContext().identity}`) {
                 return // getJSON returned null due to request/response mismatch
             }
             let { flags: features, traits, identifier }: IFlagsmithResponse = response
