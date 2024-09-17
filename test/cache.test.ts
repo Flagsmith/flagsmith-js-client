@@ -127,6 +127,24 @@ describe('Cache', () => {
             ...defaultState,
         });
     });
+    test('should not ignore cache with expired ttl and loadStale is set', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            cacheFlags: true,
+            onChange,
+            cacheOptions: { ttl: 1, loadStale: true },
+        });
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
+            ...defaultStateAlt,
+            ts: new Date().valueOf() - 100,
+        }));
+        await flagsmith.init(initConfig);
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...defaultStateAlt,
+        });
+    });
     test('should not ignore cache with valid ttl', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
