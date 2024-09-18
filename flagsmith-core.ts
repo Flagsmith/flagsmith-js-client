@@ -699,7 +699,7 @@ const Flagsmith = class {
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.environmentID]).length !== 0) {
             return this.getJSON(apiVersion(`${api}`, this.splitTestingAnalytics?2:1) + 'analytics/flags/',
                 'POST',
-                JSON.stringify(this.parseV2Analytics(this.evaluationEvent[this.environmentID])))
+                JSON.stringify(this.toAnalyticsPayload(this.evaluationEvent[this.environmentID])))
                 .then((res) => {
                     const state = this.getState();
                     if (!this.evaluationEvent) {
@@ -724,7 +724,7 @@ const Flagsmith = class {
         }
     }
 
-    private parseV2Analytics = (evaluations: Record<string, number>|null)=> {
+    private toAnalyticsPayload = (evaluations: Record<string, number>|null)=> {
         if(!this.splitTestingAnalytics) {
             return evaluations || {}
         }
