@@ -404,6 +404,7 @@ const Flagsmith = class {
                             try {
                                 const json = JSON.parse(res);
                                 let cachePopulated = false;
+                                let staleCachePopulated = false;
                                 if (json && json.api === this.api && json.environmentID === this.environmentID) {
                                     let setState = true;
                                     if (this.identity && (json.identity !== this.identity)) {
@@ -418,6 +419,7 @@ const Flagsmith = class {
                                             }
                                             else if (json.ts && this.cacheOptions.loadStale) {
                                                 this.log("Loading stale cache, timestamp ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                                staleCachePopulated = true;
                                                 setState = true;
                                             }
                                         }
@@ -439,13 +441,14 @@ const Flagsmith = class {
                                 }
 
                                 if (cachePopulated) { // retrieved flags from local storage
-                                    const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI||!cachePopulated)
+                                    // fetch the flags if the cache is stale, or if we're not skipping api on cache hits
+                                    const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI || staleCachePopulated)
                                     this._onChange(null,
                                         { isFromServer: false, flagsChanged, traitsChanged },
                                         this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
                                     );
                                     this.oldFlags = this.flags;
-                                    if (this.cacheOptions.skipAPI && cachePopulated) {
+                                    if (this.cacheOptions.skipAPI && cachePopulated && !staleCachePopulated) {
                                         this.log("Skipping API, using cache")
                                     }
                                     if (shouldFetchFlags) {
