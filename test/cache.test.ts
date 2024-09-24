@@ -202,6 +202,24 @@ describe('Cache', () => {
             ...defaultStateAlt,
         });
     });
+    test('should get flags from API when stale cache is loaded and skipAPI is set', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            cacheFlags: true,
+            onChange,
+            cacheOptions: { ttl: 1, skipAPI: true, loadStale: true },
+        });
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
+            ...defaultStateAlt,
+            ts: new Date().valueOf() - 100,
+        }));
+        await flagsmith.init(initConfig);
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...defaultStateAlt,
+        });
+    });
     test('should validate flags are unchanged when fetched', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
