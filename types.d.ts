@@ -1,4 +1,4 @@
-import { EvaluationContext, TraitEvaluationContext } from "./evaluation-context";
+import { EvaluationContext, IdentityEvaluationContext, TraitEvaluationContext } from "./evaluation-context";
 
 type IFlagsmithValue<T = string | number | boolean | null> = T
 
@@ -18,6 +18,13 @@ export declare type IFlagsmithTrait = IFlagsmithValue | TraitEvaluationContext;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
 export declare type Traits<T extends string = string> = Record<T, TraitEvaluationContext | null>;
+
+export interface ClientIdentityEvaluationContext extends IdentityEvaluationContext {
+    traits?:     ITraits;
+}
+export interface ClientEvaluationContext extends EvaluationContext {
+    identity?: null | ClientIdentityEvaluationContext;
+}
 
 export declare type GetValueOptions<T = Array<any> | object> = {
     skipAnalytics?: boolean
@@ -84,7 +91,7 @@ export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | nu
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
-    evaluationContext: EvaluationContext;
+    evaluationContext: ClientEvaluationContext;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     datadogRum?: IDatadogRum;
@@ -142,7 +149,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Set evaluation context. Refresh the flags.
      */
-    setContext: (context: EvaluationContext) => Promise<void>;
+    setContext: (context: ClientEvaluationContext) => Promise<void>;
     /**
      * Merge current evaluation context with the provided one. Refresh the flags.
      */

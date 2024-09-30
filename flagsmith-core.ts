@@ -1,4 +1,5 @@
 import {
+    ClientEvaluationContext,
     DynatraceObject,
     GetValueOptions,
     HasFeatureOptions,
@@ -7,7 +8,6 @@ import {
     IFlagsmith,
     IFlagsmithResponse,
     IFlagsmithTrait,
-    IIdentity,
     IInitConfig,
     IState,
     ITraits,
@@ -22,7 +22,7 @@ import getChanges from './utils/get-changes';
 import angularFetch from './utils/angular-fetch';
 import setDynatraceValue from './utils/set-dynatrace-value';
 import { EvaluationContext } from './evaluation-context';
-import { isTraitEvaluationContext } from './utils/types';
+import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
 
 enum FlagSource {
     "NONE" = "NONE",
@@ -258,7 +258,7 @@ const Flagsmith = class {
     ts: number|null= null
     enableAnalytics= false
     enableLogs= false
-    evaluationContext: EvaluationContext = {}
+    evaluationContext: ClientEvaluationContext = {}
     evaluationEvent: Record<string, Record<string, number>> | null= null
     flags:IFlags|null= null
     getFlagInterval: NodeJS.Timer|null= null
@@ -273,11 +273,11 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false}
     async init(config: IInitConfig) {
+        const evaluationContext = toEvaluationContext(config.evaluationContext);
         try {
             const {
                 environmentID,
                 api = defaultAPI,
-                evaluationContext,
                 headers,
                 onChange,
                 cacheFlags,
@@ -451,9 +451,15 @@ const Flagsmith = class {
                                         // When populating state from cache, we merge traits passed in flagsmith.init
                                         this.setState({
                                             ...json,
-                                            traits: ({
-                                                ...(json.traits||{}),
-                                                ...(traits||{})
+                                            evaluationContext: toEvaluationContext({
+                                                ...json.evaluationContext,
+                                                identity: !!json.evaluationContext?.identity ? {
+                                                    ...json.evaluationContext?.identity,
+                                                    traits: {
+                                                        ...json.evaluationContext?.identity?.traits || {},
+                                                        ...traits || {},
+                                                    }
+                                                } : undefined,
                                             })
                                         });
                                         this.log("Retrieved flags from cache", json);
@@ -653,7 +659,8 @@ const Flagsmith = class {
         );
     }
 
-    setContext = (evaluationContext: EvaluationContext) => {
+    setContext = (clientEvaluationContext: ClientEvaluationContext) => {
+        let evaluationContext = toEvaluationContext(clientEvaluationContext);
         this.evaluationContext = {
             ...evaluationContext,
             environment: evaluationContext.environment || this.evaluationContext.environment,
@@ -690,9 +697,9 @@ const Flagsmith = class {
                 ...this.evaluationContext.identity,
                 traits: {
                     ...this.evaluationContext.identity?.traits,
-                    ...Object.fromEntries(
-                        [[key, isTraitEvaluationContext(trait_value) ? trait_value : {value: trait_value}]],
-                    )
+                    ...toTraitEvaluationContextObject(Object.fromEntries(
+                        [[key, trait_value]],
+                    ))
                 }
             }
         });
