@@ -9,7 +9,7 @@
     "deploy:beta": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta && cd ../../lib/flagsmith-es && npm publish --tag beta",
     "build": "npm run generatetypes && rollup -c && node ./move-react.js",
     "test": "jest --env=jsdom",
-    "generatetypes": "npm exec quicktype -- -o evaluation-context.ts --src-lang schema --just-types --prefer-types --nice-property-names https://raw.githubusercontent.com/Flagsmith/flagsmith/feat/evaluation-context-schema/sdk/evaluation-context.json"
+    "generatetypes": "npm exec quicktype -- -o evaluation-context.ts --src-lang schema --just-types --no-prefer-types --nice-property-names https://raw.githubusercontent.com/Flagsmith/flagsmith/feat/evaluation-context-schema/sdk/evaluation-context.json"
   },
   "repository": {
     "type": "git",

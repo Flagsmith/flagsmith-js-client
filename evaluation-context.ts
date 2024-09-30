@@ -1,28 +1,28 @@
-export type EvaluationContext = {
+export interface EvaluationContext {
     environment?: null | EnvironmentEvaluationContext;
     feature?:     null | FeatureEvaluationContext;
     identity?:    null | IdentityEvaluationContext;
     [property: string]: any;
 }
 
-export type EnvironmentEvaluationContext = {
+export interface EnvironmentEvaluationContext {
     apiKey: string;
     [property: string]: any;
 }
 
-export type FeatureEvaluationContext = {
+export interface FeatureEvaluationContext {
     name: string;
     [property: string]: any;
 }
 
-export type IdentityEvaluationContext = {
+export interface IdentityEvaluationContext {
     identifier?: null | string;
     traits?:     { [key: string]: null | TraitEvaluationContext };
     transient?:  boolean | null;
     [property: string]: any;
 }
 
-export type TraitEvaluationContext = {
+export interface TraitEvaluationContext {
     transient?: boolean;
     value:      any;
     [property: string]: any;
