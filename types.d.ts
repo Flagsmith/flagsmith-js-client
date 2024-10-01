@@ -104,17 +104,17 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     enableLogs?: boolean;
     angularHttpClient?: any;
     /**
-     * @deprecated in favour of `evaluationContext.environment.apiKey`.
-     */
+     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
+     * */
     environmentID?: string;
     headers?: object;
     /**
-    * @deprecated in favour of `evaluationContext.identity`.
-    */
+     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
+     * */
     identity?: IIdentity;
     /**
-    * @deprecated in favour of `evaluationContext.identity.traits`.
-    */
+     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
+     * */
     traits?: ITraits<T>;
     onChange?: OnChange<F>;
     onError?: (err: Error) => void;
@@ -155,7 +155,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     updateContext: () => Promise<void>;
     /**
-    /**
+     /**
      * Get current context.
      */
     getContext: () => EvaluationContext;
@@ -168,9 +168,8 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     getAllFlags: () => IFlags<F>;
     /**
-     * Identify user, triggers a call to get flags if `flagsmith.init` has been called
-     * @deprecated in favour of `setContext`.
-     */
+     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.setContext}.
+     * */
     identify: (userId: string, traits?: Record<T, IFlagsmithValue>) => Promise<void>;
     /**
      * Retrieves the current state of flagsmith
@@ -232,19 +231,17 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     getAllTraits: () => Record<string, IFlagsmithValue>;
     /**
-     * Set a specific trait for a given user id, triggers a call to get flags
-     * @deprecated in favour of `setContext`.
-    */
-    setTrait: (key: T, value: IFlagsmithValue) => Promise<void>;
+     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.setContext}.
+     * */
+    setTrait: (key: T, value: IFlagsmithTrait) => Promise<void>;
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
-     * @deprecated in favour of `setContext`.
+     * @deprecated in favour of {@link IFlagsmith.setContext}.
      */
-    setTraits: (traits: Record<T, IFlagsmithValue>) => Promise<void>;
+    setTraits: (traits: ITraits) => Promise<void>;
     /**
-     * The stored identity of the user
-     * @deprecated in favour of `getContext()?.identity?.identifier`
-     */
+     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.getContext}.
+     * */
     identity?: IIdentity;
     /**
      * Whether the flagsmith SDK is initialised
