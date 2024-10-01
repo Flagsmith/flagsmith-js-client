@@ -228,7 +228,11 @@ const Flagsmith = class {
     enableAnalytics= false
     enableLogs= false
     environmentID = ""
-    evaluationEvent: Record<string, Record<string, number>> | null= null
+    evaluationEvent: Record<string, Record<string, number | {
+        "identity_identifier": string,
+        "count": number,
+        "enabled_when_evaluated": boolean,
+    }>> | null= null
     flags:IFlags|null= null
     getFlagInterval: NodeJS.Timer|null= null
     headers?: object | null= null
@@ -831,6 +835,13 @@ const Flagsmith = class {
             if (!this.evaluationEvent) return;
             if (!this.evaluationEvent[this.environmentID]) {
                 this.evaluationEvent[this.environmentID] = {};
+            }
+            if(typeof this.evaluationEvent[this.environmentID][key] === 'number') {
+                this.evaluationEvent[this.environmentID][key] = {
+                    "identity_identifier": this.identity||null,
+                    "count":  this.evaluationEvent[this.environmentID][key] as number || 0 ,
+                    "enabled_when_evaluated": this.hasFeature(key),
+                }
             }
             if (this.evaluationEvent[this.environmentID][key] === undefined) {
                 this.evaluationEvent[this.environmentID][key] = 0;
