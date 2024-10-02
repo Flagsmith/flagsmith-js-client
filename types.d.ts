@@ -1,3 +1,5 @@
+import { EvaluationContext, IdentityEvaluationContext, TraitEvaluationContext } from "./evaluation-context";
+
 type IFlagsmithValue<T = string | number | boolean | null> = T
 
 export type DynatraceObject = {
@@ -12,9 +14,17 @@ export interface IFlagsmithFeature {
     value?: IFlagsmithValue;
 }
 
-export declare type IFlagsmithTrait = IFlagsmithValue;
+export declare type IFlagsmithTrait = IFlagsmithValue | TraitEvaluationContext;
 export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeature>;
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
+export declare type Traits<T extends string = string> = Record<T, TraitEvaluationContext | null>;
+
+export interface ClientIdentityEvaluationContext extends IdentityEvaluationContext {
+    traits?:     ITraits;
+}
+export interface ClientEvaluationContext extends EvaluationContext {
+    identity?: null | ClientIdentityEvaluationContext;
+}
 
 export declare type GetValueOptions<T = Array<any> | object> = {
     skipAnalytics?: boolean
@@ -28,19 +38,20 @@ export declare type HasFeatureOptions = {
 } | boolean
 
 
+export declare type IIdentity<T = string> = T;
+
 export interface IRetrieveInfo {
     isFromServer: boolean;
     flagsChanged: string[] | null;
     traitsChanged: string[] | null;
 }
 
-export interface IState<F extends string = string, T extends string = string> {
+export interface IState<F extends string = string> {
     api: string;
-    environmentID: string;
     flags?: IFlags<F>;
+    evaluationContext?: EvaluationContext;
     evaluationEvent?: Record<string, Record<string, number>> | null;
-    identity?: string;
-    traits: ITraits<T>;
+    ts?: number;
 }
 
 declare type ICacheOptions = {
@@ -80,6 +91,7 @@ export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | nu
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
+    evaluationContext?: ClientEvaluationContext;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     datadogRum?: IDatadogRum;
@@ -91,9 +103,18 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     enableDynatrace?: boolean;
     enableLogs?: boolean;
     angularHttpClient?: any;
-    environmentID: string;
+    /**
+     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
+     * */
+    environmentID?: string;
     headers?: object;
-    identity?: string;
+    /**
+     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
+     * */
+    identity?: IIdentity;
+    /**
+     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
+     * */
     traits?: ITraits<T>;
     onChange?: OnChange<F>;
     onError?: (err: Error) => void;
@@ -104,9 +125,11 @@ export interface IInitConfig<F extends string = string, T extends string = strin
 }
 
 export interface IFlagsmithResponse {
+    identifier?: string,
     traits?: {
         trait_key: string;
         trait_value: IFlagsmithValue;
+        transient?: boolean;
     }[];
     flags?: {
         enabled: boolean;
@@ -124,6 +147,19 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     init: (config: IInitConfig<F, T>) => Promise<void>;
     /**
+     * Set evaluation context. Refresh the flags.
+     */
+    setContext: (context: ClientEvaluationContext) => Promise<void>;
+    /**
+     * Merge current evaluation context with the provided one. Refresh the flags.
+     */
+    updateContext: () => Promise<void>;
+    /**
+     /**
+     * Get current context.
+     */
+    getContext: () => EvaluationContext;
+    /**
      * Trigger a manual fetch of the environment features
      */
     getFlags: () => Promise<void>;
@@ -132,8 +168,8 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     getAllFlags: () => IFlags<F>;
     /**
-     * Identify user, triggers a call to get flags if flagsmith.init has been called
-     */
+     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.setContext}.
+     * */
     identify: (userId: string, traits?: Record<T, IFlagsmithValue>) => Promise<void>;
     /**
      * Retrieves the current state of flagsmith
@@ -195,17 +231,18 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     getAllTraits: () => Record<string, IFlagsmithValue>;
     /**
-     * Set a specific trait for a given user id, triggers a call to get flags
-     */
-    setTrait: (key: T, value: IFlagsmithValue) => Promise<void>;
+     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.setContext}.
+     * */
+    setTrait: (key: T, value: IFlagsmithTrait) => Promise<void>;
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
+     * @deprecated in favour of {@link IFlagsmith.setContext}.
      */
-    setTraits: (traits: Record<T, IFlagsmithValue>) => Promise<void>;
+    setTraits: (traits: ITraits) => Promise<void>;
     /**
-     * The stored identity of the user
-     */
-    identity?: string;
+     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.getContext}.
+     * */
+    identity?: IIdentity;
     /**
      * Whether the flagsmith SDK is initialised
      */
@@ -225,10 +262,6 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     _triggerLoadingState?: () => void;
     /**
-     * Used internally, this function will console log if enableLogs is being set within flagsmith.init
-     */
-    log: (message?: any, ...optionalParams: any[]) => void;
-    /**
      * Used internally, this is the cache options provided in flagsmith.init
      */
     cacheOptions: {
@@ -240,10 +273,6 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * Used internally, this is the api provided in flagsmith.init, defaults to our production API
      */
     api: string
-    /**
-     * Used internally, this is the environmentID provided in flagsmith.init or as part of serverState
-     */
-    environmentID: string | null
 }
 
 export {};

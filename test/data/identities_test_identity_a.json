@@ -1,0 +1,56 @@
+{
+    "identifier": "test_identity_a",
+    "flags": [
+        {
+            "feature": {
+                "id": 1804,
+                "name": "hero",
+                "type": "STANDARD"
+            },
+            "enabled": true,
+            "feature_state_value": "https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg"
+        },
+        {
+            "feature": {
+                "id": 6149,
+                "name": "font_size",
+                "type": "STANDARD"
+            },
+            "enabled": true,
+            "feature_state_value": 16
+        },
+        {
+            "feature": {
+                "id": 80317,
+                "name": "json_value",
+                "type": "STANDARD"
+            },
+            "enabled": true,
+            "feature_state_value": "{\"title\":\"Hello World\"}"
+        },
+        {
+            "feature": {
+                "id": 80318,
+                "name": "number_value",
+                "type": "STANDARD"
+            },
+            "enabled": true,
+            "feature_state_value": 1
+        },
+        {
+            "feature": {
+                "id": 80319,
+                "name": "off_value",
+                "type": "STANDARD"
+            },
+            "enabled": false,
+            "feature_state_value": null
+        }
+    ],
+    "traits": [
+        {
+            "trait_key": "a",
+            "trait_value": "example"
+        }
+    ]
+}
