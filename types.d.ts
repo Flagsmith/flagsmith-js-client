@@ -91,7 +91,7 @@ export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | nu
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
-    evaluationContext: ClientEvaluationContext;
+    evaluationContext?: ClientEvaluationContext;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     datadogRum?: IDatadogRum;

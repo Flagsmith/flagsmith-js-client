@@ -258,7 +258,7 @@ const Flagsmith = class {
     ts: number|null= null
     enableAnalytics= false
     enableLogs= false
-    evaluationContext: ClientEvaluationContext = {}
+    evaluationContext: EvaluationContext= {}
     evaluationEvent: Record<string, Record<string, number>> | null= null
     flags:IFlags|null= null
     getFlagInterval: NodeJS.Timer|null= null
@@ -273,7 +273,7 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false}
     async init(config: IInitConfig) {
-        const evaluationContext = toEvaluationContext(config.evaluationContext);
+        const evaluationContext = toEvaluationContext(config.evaluationContext || {});
         try {
             const {
                 environmentID,
