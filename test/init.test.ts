@@ -149,4 +149,28 @@ describe('Flagsmith.init', () => {
               })}),
         )
     });
+    test('should not reject when the API cannot be reached but the cache is populated', async () => {
+        const { flagsmith, initConfig, AsyncStorage } = getFlagsmith({
+            cacheFlags: true,
+            fetch: async () => {
+                return Promise.resolve({ text: () => Promise.resolve('Mocked fetch error'), ok: false, status: 401 });
+            },
+        });
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify(defaultState));
+        await flagsmith.init(initConfig);
+
+        expect(getStateToCheck(flagsmith.getState())).toEqual(defaultState);
+    })
+    test('should not reject when the API cannot be reached but default flags are set', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            defaultFlags: defaultState.flags,
+            cacheFlags: true,
+            fetch: async () => {
+                return Promise.resolve({ text: () => Promise.resolve('Mocked fetch error'), ok: false, status: 401 });
+            },
+        });
+        await flagsmith.init(initConfig);
+
+        expect(getStateToCheck(flagsmith.getState())).toEqual(defaultState);
+    })
 });
