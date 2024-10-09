@@ -585,7 +585,7 @@ const Flagsmith = class {
             this.api = state.api || this.api || defaultAPI;
             this.flags = state.flags || this.flags;
             this.evaluationContext = state.evaluationContext || this.evaluationContext,
-                this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
+            this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
             this.log("setState called", this)
         }
     }
