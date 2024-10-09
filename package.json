@@ -7,7 +7,8 @@
     "prepublish": "npx in-publish && npm run build || echo",
     "deploy": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish && cd ../../lib/react-native-flagsmith && npm publish && cd ../../lib/flagsmith-es && npm publish",
     "deploy:beta": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta && cd ../../lib/flagsmith-es && npm publish --tag beta",
-    "build": "npm run generatetypes && rollup -c && node ./move-react.js",
+    "bundle": "rollup -c && node ./move-react.js",
+    "build": "npm run generatetypes && npm run bundle",
     "test": "jest --env=jsdom",
     "generatetypes": "curl https://raw.githubusercontent.com/Flagsmith/flagsmith/refs/heads/main/sdk/evaluation-context.json -o evaluation-context.json && npx quicktype -o evaluation-context.ts --src-lang schema --just-types --no-prefer-types --nice-property-names evaluation-context.json && rm evaluation-context.json"
   },
@@ -70,6 +71,7 @@
     "@babel/preset-react": "^7.24.1",
     "encoding": "^0.1.12",
     "fast-deep-equal": "^3.1.3",
+    "fs-extra": "^11.2.0",
     "isomorphic-unfetch": "^3.0.0",
     "react-native-sse": "^1.1.0",
     "reconnecting-eventsource": "^1.5.0"
