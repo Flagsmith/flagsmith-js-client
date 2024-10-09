@@ -43,7 +43,6 @@ type RequestOptions = {
 let AsyncStorage: AsyncStorageType = null;
 const DEFAULT_FLAGSMITH_KEY = "FLAGSMITH_DB";
 const DEFAULT_FLAGSMITH_EVENT = "FLAGSMITH_EVENT";
-let FlagsmithKey = DEFAULT_FLAGSMITH_KEY;
 let FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT;
 const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
 let eventSource: typeof EventSource;
@@ -82,7 +81,7 @@ const Flagsmith = class {
     }
 
     getFlags = () => {
-        let { api, evaluationContext } = this;
+        const { api, evaluationContext } = this;
         this.log("Get Flags")
         this.isLoading = true;
 
@@ -273,7 +272,7 @@ const Flagsmith = class {
     timer: number|null= null
     dtrum= null
     withTraits?: ITraits|null= null
-    cacheOptions = {ttl:0, skipAPI: false, loadStale: false}
+    cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || {});
         try {
@@ -292,7 +291,7 @@ const Flagsmith = class {
                 enableDynatrace,
                 enableAnalytics,
                 realtime,
-        eventSourceUrl= "https://realtime.flagsmith.com/",
+                eventSourceUrl= "https://realtime.flagsmith.com/",
                 AsyncStorage: _AsyncStorage,
                 identity,
                 traits,
@@ -333,7 +332,7 @@ const Flagsmith = class {
                 onError?.(message);
             };
             this.enableLogs = enableLogs || false;
-            this.cacheOptions = cacheOptions ? { skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0, loadStale: !!cacheOptions.loadStale } : this.cacheOptions;
+            this.cacheOptions = cacheOptions ? { skipAPI: !!cacheOptions.skipAPI, ttl: cacheOptions.ttl || 0, storageKey:cacheOptions.storageKey, loadStale: !!cacheOptions.loadStale } : this.cacheOptions;
             if (!this.cacheOptions.ttl && this.cacheOptions.skipAPI) {
                 console.warn("Flagsmith: you have set a cache ttl of 0 and are skipping API calls, this means the API will not be hit unless you clear local storage.")
             }
@@ -348,7 +347,6 @@ const Flagsmith = class {
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
 
-            FlagsmithKey = cacheOptions?.storageKey || DEFAULT_FLAGSMITH_KEY + "_" + evaluationContext.environment.apiKey;
             FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT + "_" + evaluationContext.environment.apiKey;
 
             if (_AsyncStorage) {
@@ -408,8 +406,8 @@ const Flagsmith = class {
                         if (res && this.evaluationContext.environment) {
                             const json = JSON.parse(res);
                             if (json[this.evaluationContext.environment.apiKey]) {
-                                    const state = this.getState();
-                                    this.log("Retrieved events from cache", res);
+                                const state = this.getState();
+                                this.log("Retrieved events from cache", res);
                                 this.setState({
                                     ...state,
                                     evaluationEvent: json[this.evaluationContext.environment.apiKey],
@@ -459,7 +457,7 @@ const Flagsmith = class {
                                             ...json,
                                             evaluationContext: toEvaluationContext({
                                                 ...json.evaluationContext,
-                                                identity: !!json.evaluationContext?.identity ? {
+                                                identity: json.evaluationContext?.identity ? {
                                                     ...json.evaluationContext?.identity,
                                                     traits: {
                                                         ...json.evaluationContext?.identity?.traits || {},
@@ -516,7 +514,7 @@ const Flagsmith = class {
                         }
                     };
                     try {
-                        const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(FlagsmithKey) : await AsyncStorage.getItem(FlagsmithKey);
+                        const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(this.getStorageKey()) : await AsyncStorage.getItem(this.getStorageKey());
                         await onRetrievedStorage(null, res)
                     } catch (e) {}
                 }
@@ -541,15 +539,6 @@ const Flagsmith = class {
             const typedError = error instanceof Error ? error : new Error(`${error}`);
             this.onError?.(typedError);
             throw error;
-        }
-    }
-
-    private _loadedState(error: any = null, source: FlagSource, isFetching = false) {
-        return {
-            error,
-            isFetching,
-            isLoading: false,
-            source
         }
     }
 
@@ -596,7 +585,7 @@ const Flagsmith = class {
             this.api = state.api || this.api || defaultAPI;
             this.flags = state.flags || this.flags;
             this.evaluationContext = state.evaluationContext || this.evaluationContext,
-            this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
+                this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
             this.log("setState called", this)
         }
     }
@@ -666,7 +655,7 @@ const Flagsmith = class {
     }
 
     setContext = (clientEvaluationContext: ClientEvaluationContext) => {
-        let evaluationContext = toEvaluationContext(clientEvaluationContext);
+        const evaluationContext = toEvaluationContext(clientEvaluationContext);
         this.evaluationContext = {
             ...evaluationContext,
             environment: evaluationContext.environment || this.evaluationContext.environment,
@@ -751,6 +740,19 @@ const Flagsmith = class {
         return res;
     };
 
+    private _loadedState(error: any = null, source: FlagSource, isFetching = false) {
+        return {
+            error,
+            isFetching,
+            isLoading: false,
+            source
+        }
+    }
+
+    private getStorageKey = ()=> {
+        return this.cacheOptions?.storageKey || DEFAULT_FLAGSMITH_KEY + "_" + this.evaluationContext.environment?.apiKey
+    }
+
     private log(...args: (unknown)[]) {
         if (this.enableLogs) {
             console.log.apply(this, ['FLAGSMITH:', new Date().valueOf() - (this.timer || 0), 'ms', ...args]);
@@ -762,7 +764,7 @@ const Flagsmith = class {
             this.ts = new Date().valueOf();
             const state = JSON.stringify(this.getState());
             this.log('Setting storage', state);
-            AsyncStorage!.setItem(FlagsmithKey, state);
+            AsyncStorage!.setItem(this.getStorageKey(), state);
         }
     }
 
