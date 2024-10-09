@@ -479,7 +479,9 @@ const Flagsmith = class {
                                     }
                                     if (shouldFetchFlags) {
                                         // We want to resolve init since we have cached flags
-                                        await this.getFlags();
+                                        this.getFlags().catch((e) => {
+                                            this.log("Exception fetching cached logs", e);
+                                        });
                                     }
                                 } else {
                                     if (!preventFetch) {
