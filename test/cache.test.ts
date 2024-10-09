@@ -1,4 +1,3 @@
-// Sample test
 import {
     defaultState,
     defaultStateAlt,
