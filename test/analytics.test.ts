@@ -46,7 +46,7 @@ describe('Analytics', () => {
                 }),
                 cache: 'no-cache',
                 headers: {
-                    'x-environment-key': flagsmith.environmentID,
+                    'X-Environment-Key': flagsmith.getContext().environment?.apiKey,
                     'Content-Type': 'application/json; charset=utf-8',
                 },
             },
@@ -80,7 +80,7 @@ describe('Analytics', () => {
                 }),
                 cache: 'no-cache',
                 headers: {
-                    'x-environment-key': flagsmith.environmentID,
+                    'X-Environment-Key': flagsmith.getContext().environment?.apiKey,
                     'Content-Type': 'application/json; charset=utf-8',
                 },
             },
@@ -107,7 +107,7 @@ describe('Analytics', () => {
                 }),
                 cache: 'no-cache',
                 headers: {
-                    'x-environment-key': flagsmith.environmentID,
+                    'X-Environment-Key': flagsmith.getContext().environment?.apiKey,
                     'Content-Type': 'application/json; charset=utf-8',
                 },
             },

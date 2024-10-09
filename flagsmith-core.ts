@@ -56,12 +56,23 @@ const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
 const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
 const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
 
+
+/*API configuration includes the /v1/
+This function replaces that version with another.
+In future, we may exclude /v1/ from api configuration however this would be a breaking change*/
+function apiVersion(api:string, version:number) {
+    return api.replace("/v1/",`/v${version}/`)
+}
+
 const Flagsmith = class {
     _trigger?:(()=>void)|null= null
     _triggerLoadingState?:(()=>void)|null= null
     timestamp: number|null = null
     isLoading = false
     eventSource:EventSource|null = null
+    events: string[] = []
+    splitTestingAnalytics=false;
+
     constructor(props: Config) {
         if (props.fetch) {
             _fetch = props.fetch as LikeFetch;
@@ -225,11 +236,11 @@ const Flagsmith = class {
         const { api } = this;
 
         if (!this.evaluationEvent || !this.evaluationContext.environment || !this.evaluationEvent[this.evaluationContext.environment.apiKey]) {
-            return
+            return Promise.resolve()
         }
 
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.evaluationContext.environment.apiKey]).length !== 0) {
-            return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.evaluationContext.environment.apiKey]))
+            return this.getJSON(apiVersion(`${api}`, this.splitTestingAnalytics?2:1) + 'analytics/flags/', 'POST', JSON.stringify(this.toAnalyticsPayload(this.evaluationEvent[this.evaluationContext.environment.apiKey])))
                 .then((res) => {
                     if (!this.evaluationContext.environment) {
                         return;
@@ -248,6 +259,7 @@ const Flagsmith = class {
                     this.log("Exception fetching evaluationEvent", err);
                 });
         }
+        return Promise.resolve()
     };
 
     datadogRum: IDatadogRum | null = null;
@@ -298,9 +310,11 @@ const Flagsmith = class {
                 state,
                 cacheOptions,
                 angularHttpClient,
+                splitTestingAnalytics,
                 _trigger,
                 _triggerLoadingState,
             } = config;
+            this.splitTestingAnalytics = !!splitTestingAnalytics;
             evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
             if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
                 throw new Error('Please provide `evaluationContext.environment` with non-empty `apiKey`');
@@ -553,6 +567,7 @@ const Flagsmith = class {
             // clear out old traits when switching identity
             traits: this.evaluationContext.identity && this.evaluationContext.identity.identifier == userId ? this.evaluationContext.identity.traits : {}
         }
+        this.events.map(this.trackEvent)
         this.evaluationContext.identity.identifier = userId;
         this.log("Identify: " + this.evaluationContext.identity.identifier)
 
@@ -723,6 +738,25 @@ const Flagsmith = class {
         });
     };
 
+    trackEvent = (event: string) => {
+        if (!this.splitTestingAnalytics) {
+            const error = new Error("This feature is only enabled for self-hosted customers using split testing.");
+            console.error(error.message);
+            return Promise.reject(error);
+        } else if (!this.evaluationContext.identity?.identifier) {
+            this.events.push(event);
+            this.log("Waiting for user to be identified before tracking event", event);
+            return Promise.resolve();
+        } else {
+            return this.analyticsFlags().then(() => {
+                return this.getJSON(this.api + 'split-testing/conversion-events/', "POST", JSON.stringify({
+                    'identity_identifier': this.evaluationContext.identity?.identifier,
+                    'type': event
+                }));
+            });
+        }
+    };
+
     hasFeature = (key: string, options?: HasFeatureOptions) => {
         // Support legacy skipAnalytics boolean parameter
         const usingNewOptions = typeof options === 'object'
@@ -758,6 +792,26 @@ const Flagsmith = class {
             console.log.apply(this, ['FLAGSMITH:', new Date().valueOf() - (this.timer || 0), 'ms', ...args]);
         }
     }
+
+
+
+    private toAnalyticsPayload = (evaluations: Record<string, number>|null)=> {
+        if(!this.splitTestingAnalytics) {
+            return evaluations || {}
+        }
+        if(!evaluations) return {evaluations: []}
+        return {
+            evaluations:  Object.keys(evaluations).map((feature_name)=>(
+                {
+                    feature_name,
+                    "identity_identifier": this.evaluationContext?.identity?.identifier||null,
+                    "count": evaluations[feature_name],
+                    "enabled_when_evaluated": this.hasFeature(feature_name),
+                }
+            ))
+        }
+    };
+
 
     private updateStorage() {
         if (this.cacheFlags) {

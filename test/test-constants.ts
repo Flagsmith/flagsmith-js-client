@@ -68,10 +68,10 @@ export function getStateToCheck(_state: IState) {
     return state;
 }
 
-export function getFlagsmith(config: Partial<IInitConfig> = {}, mockFetch?:any) {
+export function getFlagsmith(config: Partial<IInitConfig> = {}, _mockFetch?:any) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
-    const _mockFetch = mockFetch || jest.fn(async (url, options) => {
+    const mockFetch = _mockFetch||jest.fn(async (url, options) => {
         switch (url) {
             case 'https://edge.api.flagsmith.com/api/v1/flags/':
                 return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}
@@ -86,7 +86,7 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}, mockFetch?:any) 
     flagsmith.canUseStorage = true;
     const initConfig: IInitConfig = {
         AsyncStorage,
-        fetch: _mockFetch,
+        fetch: mockFetch,
         ...config,
     };
     initConfig.evaluationContext = {
