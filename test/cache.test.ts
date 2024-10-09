@@ -206,7 +206,7 @@ describe('Cache', () => {
             onChange,
             cacheOptions: { ttl: 1, skipAPI: true, loadStale: true },
         });
-        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
+        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
             ...defaultStateAlt,
             ts: new Date().valueOf() - 100,
         }));

@@ -348,8 +348,8 @@ const Flagsmith = class {
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
 
-            FlagsmithKey = cacheOptions?.storageKey || DEFAULT_FLAGSMITH_KEY + "_" + environmentID;
-            FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT + "_" + environmentID;
+            FlagsmithKey = cacheOptions?.storageKey || DEFAULT_FLAGSMITH_KEY + "_" + evaluationContext.environment.apiKey;
+            FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT + "_" + evaluationContext.environment.apiKey;
 
             if (_AsyncStorage) {
                 AsyncStorage = _AsyncStorage;
