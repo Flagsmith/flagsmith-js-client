@@ -1,7 +1,7 @@
+// Sample test
 import {
     defaultState,
     defaultStateAlt,
-    FLAGSMITH_KEY,
     getFlagsmith,
     getStateToCheck,
     identityState,
@@ -33,21 +33,7 @@ describe('Cache', () => {
             onChange,
         });
         await flagsmith.init(initConfig);
-        const cache = await AsyncStorage.getItem(FLAGSMITH_KEY);
-        expect(getStateToCheck(JSON.parse(`${cache}`))).toEqual(defaultState);
-    });
-    test('should set cache after init with custom key', async () => {
-        const onChange = jest.fn();
-        const customKey = 'custom_key';
-        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
-            cacheFlags: true,
-            cacheOptions: {
-                storageKey: customKey,
-            },
-            onChange,
-        });
-        await flagsmith.init(initConfig);
-        const cache = await AsyncStorage.getItem(customKey);
+        const cache = await AsyncStorage.getItem('BULLET_TRAIN_DB');
         expect(getStateToCheck(JSON.parse(`${cache}`))).toEqual(defaultState);
     });
     test('should call onChange with cache then eventually with an API response', async () => {
@@ -67,7 +53,7 @@ describe('Cache', () => {
             cacheFlags: true,
             onChange,
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify(defaultStateAlt));
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify(defaultStateAlt));
         await flagsmith.init(initConfig);
 
         // Flags retrieved from cache
@@ -100,7 +86,7 @@ describe('Cache', () => {
             identity: testIdentity,
             onChange,
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultStateAlt,
             identity: 'bad_identity',
         }));
@@ -116,7 +102,7 @@ describe('Cache', () => {
             onChange,
             cacheOptions: { ttl: 1 },
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultStateAlt,
             ts: new Date().valueOf() - 100,
         }));
@@ -134,7 +120,7 @@ describe('Cache', () => {
             onChange,
             cacheOptions: { ttl: 1, loadStale: true },
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultStateAlt,
             ts: new Date().valueOf() - 100,
         }));
@@ -152,7 +138,7 @@ describe('Cache', () => {
             onChange,
             cacheOptions: { ttl: 1000 },
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultStateAlt,
             ts: new Date().valueOf(),
         }));
@@ -169,7 +155,7 @@ describe('Cache', () => {
             cacheFlags: false,
             onChange,
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultStateAlt,
             ts: new Date().valueOf(),
         }));
@@ -187,7 +173,25 @@ describe('Cache', () => {
             onChange,
             cacheOptions: { ttl: 1000, skipAPI: true },
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
+            ...defaultStateAlt,
+            ts: new Date().valueOf(),
+        }));
+        await flagsmith.init(initConfig);
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledTimes(0);
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...defaultStateAlt,
+        });
+    });
+    test('should not get flags from API when skipAPI is set', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            cacheFlags: true,
+            onChange,
+            cacheOptions: { ttl: 1000, skipAPI: true },
+        });
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultStateAlt,
             ts: new Date().valueOf(),
         }));
@@ -205,7 +209,7 @@ describe('Cache', () => {
             onChange,
             cacheOptions: { ttl: 1, skipAPI: true, loadStale: true },
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultStateAlt,
             ts: new Date().valueOf() - 100,
         }));
@@ -216,7 +220,6 @@ describe('Cache', () => {
             ...defaultStateAlt,
         });
     });
-
     test('should validate flags are unchanged when fetched', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
@@ -224,7 +227,7 @@ describe('Cache', () => {
             cacheFlags: true,
             preventFetch: true,
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultState,
         }));
         await flagsmith.init(initConfig);
@@ -270,7 +273,7 @@ describe('Cache', () => {
             preventFetch: true,
             defaultFlags: defaultState.flags,
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultState,
         }));
         await flagsmith.init(initConfig);
@@ -316,7 +319,7 @@ describe('Cache', () => {
             preventFetch: true,
         });
         const storage = new SyncStorageMock();
-        await storage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await storage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultState,
         }));
         flagsmith.init({
@@ -342,7 +345,7 @@ describe('Cache', () => {
             preventFetch: true,
         });
         const storage = new SyncStorageMock();
-        await storage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await storage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...identityState,
         }));
         const ts = Date.now();
@@ -353,8 +356,8 @@ describe('Cache', () => {
         });
         expect(flagsmith.getAllTraits()).toEqual({
             ...identityState.traits,
-            ts,
-        });
+            ts
+        })
     });
     test('should cache transient traits correctly', async () => {
         const onChange = jest.fn();
