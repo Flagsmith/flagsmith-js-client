@@ -89,16 +89,15 @@ export declare type LoadingState = {
 
 export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
 export interface IInitConfig<F extends string = string, T extends string = string> {
+    environmentID: string;
     AsyncStorage?: any;
+    angularHttpClient?: any;
     api?: string;
     evaluationContext?: ClientEvaluationContext;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     datadogRum?: IDatadogRum;
     defaultFlags?: IFlags<F>;
-    fetch?: any;
-    realtime?: boolean;
-    eventSourceUrl?: string;
     enableAnalytics?: boolean;
     enableDynatrace?: boolean;
     enableLogs?: boolean;
@@ -107,6 +106,8 @@ export interface IInitConfig<F extends string = string, T extends string = strin
      * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
      * */
     environmentID?: string;
+    eventSourceUrl?: string;
+    fetch?: any;
     headers?: object;
     /**
      * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
@@ -119,7 +120,10 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     onChange?: OnChange<F>;
     onError?: (err: Error) => void;
     preventFetch?: boolean;
+    realtime?: boolean;
+    splitTestingAnalytics?: boolean;
     state?: IState;
+    traits?: ITraits<T>;
     _trigger?: () => void;
     _triggerLoadingState?: () => void;
 }
@@ -239,6 +243,11 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      * @deprecated in favour of {@link IFlagsmith.setContext}.
      */
     setTraits: (traits: ITraits) => Promise<void>;
+    /**
+     * Only available for self hosted split testing analytics.
+     * Track a conversion event within your application, used for split testing analytics.
+     */
+    trackEvent: (event: string) => Promise<void>;
     /**
      * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.getContext}.
      * */

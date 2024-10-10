@@ -1,9 +1,7 @@
 import { IInitConfig, IState } from '../lib/flagsmith/types';
 import MockAsyncStorage from './mocks/async-storage-mock';
 import { createFlagsmithInstance } from '../lib/flagsmith';
-import Mock = jest.Mock;
 import { promises as fs } from 'fs';
-
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
 
 export const defaultState = {
@@ -70,10 +68,10 @@ export function getStateToCheck(_state: IState) {
     return state;
 }
 
-export function getFlagsmith(config: Partial<IInitConfig> = {}) {
+export function getFlagsmith(config: Partial<IInitConfig> = {}, _mockFetch?:any) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
-    const mockFetch = jest.fn(async (url, options) => {
+    const mockFetch = _mockFetch||jest.fn(async (url, options) => {
         switch (url) {
             case 'https://edge.api.flagsmith.com/api/v1/flags/':
                 return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}
@@ -98,10 +96,12 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     return { flagsmith, initConfig, mockFetch, AsyncStorage };
 }
 export const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));
-export function getMockFetchWithValue(mockFn:Mock, resolvedValue:object, ms=0) {
-    mockFn.mockReturnValueOnce(delay(ms).then(()=>Promise.resolve({
-        status:200,
-        text: () => Promise.resolve(JSON.stringify(resolvedValue)), // Mock json() to return the mock response
-        json: () => Promise.resolve(resolvedValue), // Mock json() to return the mock response
-    })))
+export function getMockFetchWithValue(resolvedValue:object, status=200) {
+    return jest.fn(() =>
+        Promise.resolve({
+            status,
+            text: () => Promise.resolve(JSON.stringify(resolvedValue)), // Mock json() to return the mock response
+            json: () => Promise.resolve(resolvedValue), // Mock json() to return the mock response
+        })
+    );
 }
