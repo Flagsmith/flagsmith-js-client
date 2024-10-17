@@ -273,7 +273,7 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false}
     async init(config: IInitConfig) {
-        const evaluationContext = toEvaluationContext(config.evaluationContext || {});
+        const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
             const {
                 environmentID,
