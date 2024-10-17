@@ -677,7 +677,7 @@ const Flagsmith = class {
         return this.evaluationContext;
     }
 
-    updateContext = (evaluationContext: EvaluationContext) => {
+    updateContext = (evaluationContext: ClientEvaluationContext) => {
         return this.setContext({
             ...this.getContext(),
             ...evaluationContext,
