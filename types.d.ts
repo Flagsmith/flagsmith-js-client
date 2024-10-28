@@ -19,7 +19,7 @@ export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeat
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
 export declare type Traits<T extends string = string> = Record<T, TraitEvaluationContext | null>;
 
-export interface ClientIdentityEvaluationContext extends IdentityEvaluationContext {
+export interface ClientIdentityEvaluationContext extends Omit<IdentityEvaluationContext, "traits"> {
     traits?:     null | ITraits;
 }
 export interface ClientEvaluationContext extends Omit<EvaluationContext, "identity"> {
