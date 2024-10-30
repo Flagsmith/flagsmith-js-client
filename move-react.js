@@ -14,7 +14,12 @@ fs.copyFileSync(path.join(__dirname,"next-middleware.ts"),path.join(__dirname,"l
 fs.copyFileSync(path.join(__dirname,"isomorphic.ts"),path.join(__dirname,"lib/flagsmith/src/isomorphic.ts"))
 fs.copyFileSync(path.join(__dirname,"react.tsx"),path.join(__dirname,"lib/flagsmith/src/react.tsx"))
 fs.copyFileSync(path.join(__dirname,"react.tsx"),path.join(__dirname,"lib/react-native-flagsmith/src/react.tsx"))
-fs.copyFileSync(path.join(__dirname,"react.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/src/react.d.ts"))
+fs.copyFileSync(path.join(__dirname,"react.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/react.d.ts"))
+fs.copyFileSync(path.join(__dirname,"react.d.ts"),path.join(__dirname,"lib/flagsmith/react.d.ts"))
+fs.copyFileSync(path.join(__dirname,"react.d.ts"),path.join(__dirname,"lib/flagsmith-es/react.d.ts"))
+fs.copyFileSync(path.join(__dirname,"index.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/index.d.ts"))
+fs.copyFileSync(path.join(__dirname,"index.d.ts"),path.join(__dirname,"lib/flagsmith/index.d.ts"))
+fs.copyFileSync(path.join(__dirname,"index.d.ts"),path.join(__dirname,"lib/flagsmith-es/index.d.ts"))
 
 // Copy source files to lib/react-native-flagsmith/src
 fs.copyFileSync(path.join(__dirname,"index.react-native.ts"),path.join(__dirname,"lib/react-native-flagsmith/src/index.react-native.ts"))
