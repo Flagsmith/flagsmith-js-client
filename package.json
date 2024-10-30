@@ -3,11 +3,12 @@
   "description": "Feature flagging to support continuous development",
   "main": "./flagsmith/index.js",
   "scripts": {
+    "typecheck": "tsc",
     "postinstall": "patch-package",
     "prepublish": "npx in-publish && npm run build || echo",
     "deploy": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish && cd ../../lib/react-native-flagsmith && npm publish && cd ../../lib/flagsmith-es && npm publish",
     "deploy:beta": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta && cd ../../lib/flagsmith-es && npm publish --tag beta",
-    "build": "npm run generatetypes && rollup -c && node ./move-react.js",
+    "build": "npm run generatetypes && npm run typecheck && rollup -c && node ./move-react.js",
     "test": "jest --env=jsdom",
     "generatetypes": "curl https://raw.githubusercontent.com/Flagsmith/flagsmith/refs/heads/main/sdk/evaluation-context.json -o evaluation-context.json && npx quicktype -o evaluation-context.ts --src-lang schema --just-types --no-prefer-types --nice-property-names evaluation-context.json && rm evaluation-context.json"
   },
@@ -52,7 +53,7 @@
     "quicktype": "^23.0.170",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rollup": "^2.79.2",
+    "rollup": "^2.77.0",
     "rollup-plugin-dts": "^4.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-terser": "^7.0.2",

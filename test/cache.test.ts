@@ -344,18 +344,21 @@ describe('Cache', () => {
             cacheFlags: true,
             preventFetch: true,
         });
-        const storage = new SyncStorageMock();
-        await storage.setItem('BULLET_TRAIN_DB', JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...identityState,
         }));
+
+
         const ts = Date.now();
         await flagsmith.init({
             ...initConfig,
+            identity: identityState.evaluationContext.identity.identifier,
             traits: { ts },
-            AsyncStorage: storage,
+            AsyncStorage
         });
         expect(flagsmith.getAllTraits()).toEqual({
-            ...identityState.traits,
+            string_trait: 'Example',
+            number_trait:  1,
             ts
         })
     });

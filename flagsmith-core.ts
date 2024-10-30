@@ -80,7 +80,7 @@ const Flagsmith = class {
     }
 
     getFlags = () => {
-        let { api, evaluationContext } = this;
+        const { api, evaluationContext } = this;
         this.log("Get Flags")
         this.isLoading = true;
 
@@ -95,7 +95,8 @@ const Flagsmith = class {
             if(!response || previousIdentity !== `${this.getContext().identity}`) {
                 return // getJSON returned null due to request/response mismatch
             }
-            let { flags: features, traits, identifier }: IFlagsmithResponse = response
+            let { flags: features, traits }: IFlagsmithResponse = response
+            const {identifier} = response
             this.isLoading = false;
             // Handle server response
             const flags: IFlags = {};
@@ -453,7 +454,7 @@ const Flagsmith = class {
                                             ...json,
                                             evaluationContext: toEvaluationContext({
                                                 ...json.evaluationContext,
-                                                identity: !!json.evaluationContext?.identity ? {
+                                                identity: json.evaluationContext?.identity ? {
                                                     ...json.evaluationContext?.identity,
                                                     traits: {
                                                         ...json.evaluationContext?.identity?.traits || {},
@@ -660,7 +661,7 @@ const Flagsmith = class {
     }
 
     setContext = (clientEvaluationContext: ClientEvaluationContext) => {
-        let evaluationContext = toEvaluationContext(clientEvaluationContext);
+        const evaluationContext = toEvaluationContext(clientEvaluationContext);
         this.evaluationContext = {
             ...evaluationContext,
             environment: evaluationContext.environment || this.evaluationContext.environment,

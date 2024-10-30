@@ -12,7 +12,7 @@ describe('Flagsmith.init', () => {
         const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange})
         await flagsmith.init(initConfig);
 
-        expect(flagsmith.environmentID).toBe(initConfig.environmentID);
+        expect(flagsmith.getContext().environment!.apiKey).toBe(initConfig.evaluationContext?.environment?.apiKey);
         expect(flagsmith.api).toBe('https://edge.api.flagsmith.com/api/v1/'); // Assuming defaultAPI is globally defined
         expect(AsyncStorage.getItem).toHaveBeenCalledTimes(1);
         expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -29,7 +29,7 @@ describe('Flagsmith.init', () => {
         const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange, identity:"test_identity"})
         await flagsmith.init(initConfig);
 
-        expect(flagsmith.environmentID).toBe(initConfig.environmentID);
+        expect(flagsmith.getContext().environment!.apiKey).toBe(initConfig.evaluationContext?.environment?.apiKey);
         expect(flagsmith.api).toBe('https://edge.api.flagsmith.com/api/v1/'); // Assuming defaultAPI is globally defined
         expect(AsyncStorage.getItem).toHaveBeenCalledTimes(1);
         expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -49,7 +49,7 @@ describe('Flagsmith.init', () => {
 
         await flagsmith.init(initConfig);
 
-        expect(flagsmith.environmentID).toBe(initConfig.environmentID);
+        expect(flagsmith.getContext().environment!.apiKey).toBe(initConfig.evaluationContext?.environment?.apiKey);
         expect(flagsmith.api).toBe('https://edge.api.flagsmith.com/api/v1/'); // Assuming defaultAPI is globally defined
         expect(AsyncStorage.getItem).toHaveBeenCalledTimes(1);
         expect(mockFetch).toHaveBeenCalledTimes(1);
