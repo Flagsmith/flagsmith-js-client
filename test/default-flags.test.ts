@@ -1,5 +1,5 @@
 // Sample test
-import { defaultState, defaultStateAlt, FLAGSMITH_KEY, getFlagsmith, getStateToCheck } from './test-constants';
+import { defaultState, defaultStateAlt, getFlagsmith, getStateToCheck } from './test-constants';
 import { IFlags } from '../types';
 
 describe('Default Flags', () => {
@@ -51,7 +51,7 @@ describe('Default Flags', () => {
             cacheFlags: true,
             defaultFlags: {...defaultFlags, ...itemsToRemove},
         });
-        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify({
             ...defaultState,
             flags: {
                 ...defaultFlags,

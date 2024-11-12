@@ -19,10 +19,10 @@ export declare type IFlags<F extends string = string> = Record<F, IFlagsmithFeat
 export declare type ITraits<T extends string = string> = Record<T, IFlagsmithTrait>;
 export declare type Traits<T extends string = string> = Record<T, TraitEvaluationContext | null>;
 
-export interface ClientIdentityEvaluationContext extends IdentityEvaluationContext {
-    traits?:     ITraits;
+export interface ClientIdentityEvaluationContext extends Omit<IdentityEvaluationContext, "traits"> {
+    traits?:     null | ITraits;
 }
-export interface ClientEvaluationContext extends EvaluationContext {
+export interface ClientEvaluationContext extends Omit<EvaluationContext, "identity"> {
     identity?: null | ClientIdentityEvaluationContext;
 }
 
@@ -57,7 +57,6 @@ export interface IState<F extends string = string> {
 declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
-    storageKey?: string;
     loadStale?: boolean;
 };
 
@@ -154,7 +153,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
     /**
      * Merge current evaluation context with the provided one. Refresh the flags.
      */
-    updateContext: () => Promise<void>;
+    updateContext: (context: ClientEvaluationContext) => Promise<void>;
     /**
      /**
      * Get current context.
