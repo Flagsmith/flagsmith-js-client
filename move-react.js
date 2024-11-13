@@ -1,10 +1,11 @@
 const path = require("path")
 const fs = require("fs")
 const fsExtra = require('fs-extra')
-const replaceInFileSync = (file,from,to) => {
+
+const replaceInFileSync = (file, from, to) => {
     const data = fs.readFileSync(file, 'utf8');
-    const newData = data.replace(from, to)
-    fs.writeFileSync(file, newData, {encoding:"utf8"})
+    const newData = data.replace(new RegExp(from, 'g'), to);
+    fs.writeFileSync(file, newData, { encoding: "utf8" });
 }
 
 
@@ -55,6 +56,11 @@ files.forEach((fileName)=>{
 replaceInFileSync(path.join(__dirname, "lib/flagsmith/index.js.map"),"../../../flagsmith-core.ts","./src/flagsmith-core.ts"  )
 replaceInFileSync(path.join(__dirname, "lib/flagsmith/index.js.map"),"../../../index.ts","./src/index.ts"  )
 replaceInFileSync(path.join(__dirname, "lib/flagsmith/index.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/index.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/react-native-flagsmith/index.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/flagsmith/react.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/react.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/react-native-flagsmith/react.js.map"),"../../../utils","./src/utils"  )
 
 // fix paths in flagsmith-es/index.js sourcemaps
 replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/index.js.map"),"../../../flagsmith-core.ts","./src/flagsmith-core.ts"  )
@@ -140,7 +146,7 @@ function syncFolders(src, dest) {
             }
         }
 
-        console.log('Folders synchronized successfully!');
+        console.log('Folders synchronized successfully!', src, dest);
     } catch (err) {
         console.error('Error synchronizing folders:', err);
     }
