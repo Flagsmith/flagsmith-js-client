@@ -479,7 +479,10 @@ const Flagsmith = class {
                                     }
                                     if (shouldFetchFlags) {
                                         // We want to resolve init since we have cached flags
-                                        this.getFlags();
+
+                                        this.getFlags().catch((error) => {
+                                            this.onError?.(error)
+                                        })
                                     }
                                 } else {
                                     if (!preventFetch) {
