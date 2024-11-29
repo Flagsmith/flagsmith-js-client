@@ -36,16 +36,20 @@ class Emitter {
         return offFunction.bind(this) as () => this;
     }
 
-    once(name: EventName, callback: () => void, ctx?: any): () => this {
+    once(
+        name: string, // EventName inlined as string
+        callback: (...args: any[]) => void,
+        ctx?: any
+    ): () => this {
         const self = this;
         const id = this.generateCallbackId();
 
-        function listener(this: any) {
+        function listener(this: unknown, ...args: any[]) {
             self.off(name, id);
-            callback.apply(ctx, arguments);
+            callback.apply(ctx, args);
         }
 
-        listener._ = callback;
+        (listener as any)._ = callback;
 
         return this.on(name, listener, ctx) as () => this;
     }
