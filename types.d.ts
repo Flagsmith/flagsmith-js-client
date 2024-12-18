@@ -57,6 +57,7 @@ export interface IState<F extends string = string> {
 declare type ICacheOptions = {
     ttl?: number;
     skipAPI?: boolean;
+    storageKey?: string;
     loadStale?: boolean;
 };
 
