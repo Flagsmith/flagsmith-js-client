@@ -5,7 +5,7 @@ import Mock = jest.Mock;
 import { promises as fs } from 'fs';
 
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
-
+export const FLAGSMITH_KEY = 'FLAGSMITH_DB' + "_" + environmentID;
 export const defaultState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     evaluationContext: {
