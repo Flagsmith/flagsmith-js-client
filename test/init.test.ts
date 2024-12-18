@@ -1,6 +1,6 @@
 // Sample test
 import { waitFor } from '@testing-library/react';
-import { defaultState, getFlagsmith, getStateToCheck, identityState } from './test-constants';
+import {defaultState, FLAGSMITH_KEY, getFlagsmith, getStateToCheck, identityState} from './test-constants';
 import { promises as fs } from 'fs';
 
 describe('Flagsmith.init', () => {
@@ -206,7 +206,7 @@ describe('Flagsmith.init', () => {
             },
             onError,
         });
-        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify(defaultState));
+        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify(defaultState));
         await flagsmith.init(initConfig);
 
         expect(getStateToCheck(flagsmith.getState())).toEqual(defaultState);
@@ -238,7 +238,7 @@ describe('Flagsmith.init', () => {
             },
             onError,
         });
-        await AsyncStorage.setItem('BULLET_TRAIN_DB', JSON.stringify(identityState));
+        await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify(identityState));
         await flagsmith.init(initConfig);
 
         expect(getStateToCheck(flagsmith.getState())).toEqual(identityState);
