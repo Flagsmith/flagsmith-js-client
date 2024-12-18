@@ -1,10 +1,11 @@
 const path = require("path")
 const fs = require("fs")
+const fsExtra = require('fs-extra')
 
-const replaceInFileSync = (file,from,to) => {
+const replaceInFileSync = (file, from, to) => {
     const data = fs.readFileSync(file, 'utf8');
-    const newData = data.replace(from, to)
-    fs.writeFileSync(file, newData, {encoding:"utf8"})
+    const newData = data.replace(new RegExp(from, 'g'), to);
+    fs.writeFileSync(file, newData, { encoding: "utf8" });
 }
 
 
@@ -43,8 +44,6 @@ fs.copyFileSync(path.join(__dirname,"isomorphic-es.ts"),path.join(__dirname,"lib
 
 
 
-
-
 const files= fs.readdirSync(path.join(__dirname, "lib/flagsmith"));
 files.forEach((fileName)=>{
     console.log(fileName)
@@ -56,6 +55,12 @@ files.forEach((fileName)=>{
 // fix paths in flagsmith/index.js sourcemaps
 replaceInFileSync(path.join(__dirname, "lib/flagsmith/index.js.map"),"../../../flagsmith-core.ts","./src/flagsmith-core.ts"  )
 replaceInFileSync(path.join(__dirname, "lib/flagsmith/index.js.map"),"../../../index.ts","./src/index.ts"  )
+replaceInFileSync(path.join(__dirname, "lib/flagsmith/index.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/index.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/react-native-flagsmith/index.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/flagsmith/react.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/react.js.map"),"../../../utils","./src/utils"  )
+replaceInFileSync(path.join(__dirname, "lib/react-native-flagsmith/react.js.map"),"../../../utils","./src/utils"  )
 
 // fix paths in flagsmith-es/index.js sourcemaps
 replaceInFileSync(path.join(__dirname, "lib/flagsmith-es/index.js.map"),"../../../flagsmith-core.ts","./src/flagsmith-core.ts"  )
@@ -121,3 +126,32 @@ try {
 try {
     fs.rmdirSync(path.join(__dirname,"lib/react-native-flagsmith/test"), {recursive:true})
 } catch (e){}
+
+
+
+function syncFolders(src, dest) {
+    try {
+        // Ensure the destination folder exists
+        fsExtra.ensureDirSync(dest);
+
+        const entries = fs.readdirSync(src, { withFileTypes: true });
+
+        for (const entry of entries) {
+            const srcPath = path.join(src, entry.name);
+            const destPath = path.join(dest, entry.name);
+
+            if (entry.isFile()) {
+                // Copy only files to the destination, overwriting existing files
+                fs.copyFileSync(srcPath, destPath);
+            }
+        }
+
+        console.log('Folders synchronized successfully!', src, dest);
+    } catch (err) {
+        console.error('Error synchronizing folders:', err);
+    }
+}
+
+syncFolders(path.join(__dirname,'utils'),path.join(__dirname,'lib/flagsmith/src/utils'))
+syncFolders(path.join(__dirname,'utils'),path.join(__dirname,'lib/flagsmith-es/src/utils'))
+syncFolders(path.join(__dirname,'utils'),path.join(__dirname,'lib/react-native-flagsmith/src/utils'))

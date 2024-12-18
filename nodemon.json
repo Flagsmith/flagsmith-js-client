@@ -1,0 +1,6 @@
+{
+  "watch": ["."],
+  "ignore": ["node_modules", "lib", "examples"],
+  "ext": "js,ts,tsx,json",
+  "exec": "npm run bundle"
+}
