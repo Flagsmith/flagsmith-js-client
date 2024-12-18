@@ -121,7 +121,10 @@ const Flagsmith = class {
             const flagsChanged = getChanges(this.oldFlags, flags);
             const traitsChanged = getChanges(this.evaluationContext.identity?.traits, userTraits);
             if (identifier || Object.keys(userTraits).length) {
-                this.evaluationContext.identity = {traits: userTraits};
+                this.evaluationContext.identity = {
+                    ...this.evaluationContext.identity,
+                    traits: userTraits,
+                };
                 if (identifier) {
                     this.evaluationContext.identity.identifier = identifier;
                 }
