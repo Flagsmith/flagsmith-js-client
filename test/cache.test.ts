@@ -348,15 +348,13 @@ describe('Cache', () => {
         const ts = Date.now();
         await flagsmith.init({
             ...initConfig,
-            identity: identityState.evaluationContext.identity.identifier,
             traits: { ts },
-            AsyncStorage
+            AsyncStorage: storage,
         });
         expect(flagsmith.getAllTraits()).toEqual({
-            string_trait: 'Example',
-            number_trait:  1,
-            ts
-        })
+            ...identityState.traits,
+            ts,
+        });
     });
     test('should cache transient traits correctly', async () => {
         const onChange = jest.fn();
