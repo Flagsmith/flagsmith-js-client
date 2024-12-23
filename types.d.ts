@@ -168,7 +168,7 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     getAllFlags: () => IFlags<F>;
     /**
-     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.setContext}.
+     * Identify user, triggers a call to get flags if `flagsmith.init` has been called
      * */
     identify: (userId: string, traits?: Record<T, IFlagsmithValue>) => Promise<void>;
     /**
