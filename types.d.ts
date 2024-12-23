@@ -231,12 +231,11 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     getAllTraits: () => Record<string, IFlagsmithValue>;
     /**
-     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.setContext}.
+     * Set a specific trait for a given user id, triggers a call to get flags
      * */
     setTrait: (key: T, value: IFlagsmithTrait) => Promise<void>;
     /**
      * Set a key value set of traits for a given user, triggers a call to get flags
-     * @deprecated in favour of {@link IFlagsmith.setContext}.
      */
     setTraits: (traits: ITraits) => Promise<void>;
     /**
