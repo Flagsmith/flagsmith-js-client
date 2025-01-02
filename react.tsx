@@ -27,6 +27,7 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({
     const firstRenderRef = useRef(true)
     if (flagsmith && !flagsmith?._trigger) {
         flagsmith._trigger = () => {
+            // @ts-expect-error using internal function, consumers would never call this
             flagsmith.log("React - trigger event received")
             events.emit('event');
         }
@@ -138,6 +139,7 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
     const eventListener = useCallback(() => {
         const newRenderKey = getRenderKey(flagsmith as IFlagsmith, flags, traits)
         if (newRenderKey !== renderRef) {
+            // @ts-expect-error using internal function, consumers would never call this
             flagsmith?.log("React - useFlags flags and traits have changed")
             setRenderRef(newRenderKey)
         }
@@ -148,6 +150,7 @@ export function useFlags<F extends string=string, T extends string=string>(_flag
 
     if (firstRender.current) {
         firstRender.current = false;
+        // @ts-expect-error using internal function, consumers would never call this
         flagsmith?.log("React - Initialising event listeners")
     }
 

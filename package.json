@@ -3,7 +3,8 @@
   "description": "Feature flagging to support continuous development",
   "main": "./flagsmith/index.js",
   "scripts": {
-    "build": "npm run generatetypes && npm run bundle",
+    "typecheck": "tsc",
+    "build": "npm run generatetypes && npm run bundle && npm run typecheck",
     "bundle": "rollup -c && node ./move-react.js",
     "deploy": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish && cd ../../lib/react-native-flagsmith && npm publish && cd ../../lib/flagsmith-es && npm publish",
     "deploy:beta": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta && cd ../../lib/flagsmith-es && npm publish --tag beta",
@@ -55,7 +56,7 @@
     "quicktype": "^23.0.170",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rollup": "^2.79.2",
+    "rollup": "^2.77.0",
     "rollup-plugin-dts": "^4.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-terser": "^7.0.2",
