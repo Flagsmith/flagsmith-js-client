@@ -96,7 +96,8 @@ const Flagsmith = class {
             if(!response || previousIdentity !== `${this.getContext().identity}`) {
                 return // getJSON returned null due to request/response mismatch
             }
-            let { flags: features, traits, identifier }: IFlagsmithResponse = response
+            let { flags: features, traits }: IFlagsmithResponse = response
+            const {identifier} = response
             this.isLoading = false;
             // Handle server response
             const flags: IFlags = {};

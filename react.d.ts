@@ -14,3 +14,4 @@ export declare function useFlags<F extends string, T extends string>(_flags: rea
     [K in T]: IFlagsmithTrait;
 };
 export declare const useFlagsmith: () => IFlagsmith;
+export declare const useFlagsmithLoading: () => LoadingState | undefined;

@@ -5,14 +5,13 @@
     "skipLibCheck": true,
     "jsx": "react",
     "module": "ESNext",
-    "declaration": true,
+    "declaration": false,
     "strict": true,
-    "declarationDir": ".",
+    "noEmit": true,
     "sourceMap": true,
     "moduleResolution": "node",
-    "emitDeclarationOnly": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["examples","flagsmith"]
+  "exclude": ["lib"]
 }

@@ -352,6 +352,7 @@ describe('Cache', () => {
             AsyncStorage: storage,
         });
         expect(flagsmith.getAllTraits()).toEqual({
+            //@ts-ignore
             ...identityState.traits,
             ts,
         });
