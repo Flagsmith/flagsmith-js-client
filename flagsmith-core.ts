@@ -835,7 +835,8 @@ const Flagsmith = class {
     private updateEventStorage() {
         if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
-            AsyncStorage!.setItem(FlagsmithEvent, events);
+            AsyncStorage!.setItem(FlagsmithEvent, events)
+            .catch((e) => this.log("Exception setting item in async storage", e));
         }
     }
 
