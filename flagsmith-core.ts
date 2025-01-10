@@ -836,11 +836,11 @@ const Flagsmith = class {
         if (this.enableAnalytics) {
             const events = JSON.stringify(this.getState().evaluationEvent);
             AsyncStorage!.setItem(FlagsmithEvent, events)
-            .catch((e) => this.log("Exception setting item in async storage", e));
+            .catch((e) => console.error("Flagsmith: Error setting item in async storage", e));
         }
     }
 
-    private evaluateFlag = (key: string, method: 'VALUE' | 'ENABLED') => {
+    private evaluateFlag =(key: string, method: 'VALUE' | 'ENABLED') => {
         if (this.datadogRum) {
             if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
                 console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
