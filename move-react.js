@@ -2,12 +2,6 @@ const path = require("path")
 const fs = require("fs")
 const fsExtra = require('fs-extra')
 
-const replaceInFileSync = (file, from, to) => {
-    const data = fs.readFileSync(file, 'utf8');
-    const newData = data.replace(new RegExp(from, 'g'), to);
-    fs.writeFileSync(file, newData, { encoding: "utf8" });
-}
-
 // Copy source files to lib/flagsmith/src
 fs.copyFileSync(path.join(__dirname,"index.ts"),path.join(__dirname,"lib/flagsmith/src/index.ts"))
 fs.copyFileSync(path.join(__dirname,"flagsmith-core.ts"),path.join(__dirname,"lib/flagsmith/src/flagsmith-core.ts"))
@@ -45,7 +39,6 @@ try {
 try {
     fs.rmdirSync(path.join(__dirname,"lib/react-native-flagsmith/lib"), {recursive:true})
 } catch (e){}
-
 
 try {
     fs.rmdirSync(path.join(__dirname,"lib/flagsmith/test"), {recursive:true})
