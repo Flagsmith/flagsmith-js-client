@@ -5,7 +5,7 @@
   "main": "./index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "echo '\u001b[31m\u001b[1mimportant: flagsmith-es is deprecated\u001b[0m\n\nplease install the official flagsmith package instead:\n\n  \u001b[32m\u001b[1mnpm install flagsmith\u001b[0m\n\nfor more details, visit: https://github.com/Flagsmith/flagsmith-js-client\n' && exit 1"
+    "postinstall": "echo '\u001b[31m\u001b[1mimportant: flagsmith-es is deprecated\u001b[0m\n\nplease install the official flagsmith package instead:\n\n  \u001b[32m\u001b[1mnpm install flagsmith\u001b[0m\n\nfor more details, visit: https://github.com/Flagsmith/flagsmith-js-client\n'"
   },
   "repository": {
     "type": "git",
