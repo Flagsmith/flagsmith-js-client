@@ -1,18 +1,21 @@
 {
   "name": "flagsmith-es",
-  "version": "8.0.2",
+  "version": "8.1.0",
   "description": "Feature flagging to support continuous development. This is an esm equivalent of the standard flagsmith npm module.",
   "main": "./index.js",
   "type": "module",
+  "scripts": {
+    "preinstall": "echo 'Flagsmith-es is now deprecated, please install the official Flagsmith package using \"npm install flagsmith\" instead of flagsmith-es.' && exit 1"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Flagsmith/flagsmith-js-client"
   },
   "keywords": [
-    "feature flagger",
+    "feature flags",
     "continuous deployment"
   ],
-  "author": "Flagsmith Ltd",
+  "author": "Flagsmith",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"

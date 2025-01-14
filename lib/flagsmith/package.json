@@ -1,8 +1,33 @@
 {
   "name": "flagsmith",
-  "version": "8.0.2",
+  "version": "8.1.0",
   "description": "Feature flagging to support continuous development",
-  "main": "./index.js",
+  "main": "./index.cjs.js",
+  "module": "./index.es.js",
+  "browser": "./index.umd.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.es.js",
+      "require": "./index.cjs.js",
+      "browser": "./index.umd.js"
+    },
+    "./isomorphic": {
+      "import": "./isomorphic.es.js",
+      "require": "./isomorphic.cjs.js",
+      "browser": "./isomorphic.umd.js"
+    },
+    "./react": {
+      "import": "./react.es.js",
+      "require": "./react.cjs.js",
+      "browser": "./react.umd.js"
+    },
+    "./next-middleware": {
+      "import": "./next-middleware.es.js",
+      "require": "./next-middleware.cjs.js",
+      "browser": "./next-middleware.umd.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Flagsmith/flagsmith-js-client"
@@ -11,11 +36,10 @@
     "feature flagger",
     "continuous deployment"
   ],
-  "author": "Flagsmith Ltd",
+  "author": "Flagsmith",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"
   },
-  "homepage": "https://flagsmith.com",
-  "types": "./index.d.ts"
+  "homepage": "https://flagsmith.com"
 }
