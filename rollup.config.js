@@ -22,16 +22,14 @@ const sourcemapPathTransform = (relativeSourcePath) => {
     if(relativeSourcePath.includes("node_modules")) {
         return relativeSourcePath
     }
-    console.log(relativeSourcePath)
     return relativeSourcePath.replace("../../../", "./src/");
 }
 
 const generateConfig = (input, outputDir, name, exclude = []) => ({
     input,
     output: [
-        { file: path.join(outputDir, `${name}.umd.js`), format: "umd", name, sourcemap: true,sourcemapPathTransform },
+        { file: path.join(outputDir, `${name}.js`), format: "umd", name, sourcemap: true,sourcemapPathTransform },
         { file: path.join(outputDir, `${name}.es.js`), format: "es", sourcemap: true, sourcemapPathTransform },
-        { file: path.join(outputDir, `${name}.cjs.js`), format: "cjs", sourcemap: true, sourcemapPathTransform },
     ],
     plugins: createPlugins(exclude),
     external: externalDependencies,

@@ -2,30 +2,30 @@
   "name": "flagsmith",
   "version": "8.1.0",
   "description": "Feature flagging to support continuous development",
-  "main": "./index.cjs.js",
+  "main": "./index.js",
   "module": "./index.es.js",
-  "browser": "./index.umd.js",
+  "browser": "./index.js",
   "types": "./index.d.ts",
   "exports": {
     ".": {
       "import": "./index.es.js",
-      "require": "./index.cjs.js",
-      "browser": "./index.umd.js"
+      "require": "./index.js",
+      "browser": "./index.js"
     },
     "./isomorphic": {
       "import": "./isomorphic.es.js",
-      "require": "./isomorphic.cjs.js",
-      "browser": "./isomorphic.umd.js"
+      "require": "./isomorphic.js",
+      "browser": "./isomorphic.js"
     },
     "./react": {
       "import": "./react.es.js",
-      "require": "./react.cjs.js",
-      "browser": "./react.umd.js"
+      "require": "./react.js",
+      "browser": "./react.js"
     },
     "./next-middleware": {
       "import": "./next-middleware.es.js",
-      "require": "./next-middleware.cjs.js",
-      "browser": "./next-middleware.umd.js"
+      "require": "./next-middleware.js",
+      "browser": "./next-middleware.js"
     }
   },
   "repository": {

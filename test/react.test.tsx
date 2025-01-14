@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 // @ts-ignore
-import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react.cjs.js';
+import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react';
 import {
     defaultState,
     delay,
