@@ -456,7 +456,6 @@ const Flagsmith = class {
                                         cachePopulated = true;
                                         traitsChanged = getChanges(this.evaluationContext.identity?.traits, json.evaluationContext?.identity?.traits)
                                         flagsChanged = getChanges(this.flags, json.flags)
-                                        // When populating state from cache, we merge traits passed in flagsmith.init
                                         this.setState({
                                             ...json,
                                             evaluationContext: toEvaluationContext({
@@ -464,7 +463,7 @@ const Flagsmith = class {
                                                 identity: json.evaluationContext?.identity ? {
                                                     ...json.evaluationContext?.identity,
                                                     traits: {
-                                                        ...json.evaluationContext?.identity?.traits || {},
+                                                        // Traits passed in flagsmith.init will overwrite server values
                                                         ...traits || {},
                                                     }
                                                 } : undefined,
@@ -476,6 +475,7 @@ const Flagsmith = class {
 
                                 if (cachePopulated) { // retrieved flags from local storage
                                     // fetch the flags if the cache is stale, or if we're not skipping api on cache hits
+                                    this.log("cachePopulated", cachePopulated, preventFetch, this.cacheOptions.skipAPI,staleCachePopulated);
                                     const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI || staleCachePopulated)
                                     this._onChange(null,
                                         { isFromServer: false, flagsChanged, traitsChanged },
