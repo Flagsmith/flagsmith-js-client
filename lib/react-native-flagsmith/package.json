@@ -1,8 +1,8 @@
 {
   "name": "react-native-flagsmith",
-  "version": "8.1.0",
+  "version": "9.0.0",
   "description": "Feature flagging to support continuous development",
-  "main": "./index.es.js",
+  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Flagsmith/flagsmith-js-client/"

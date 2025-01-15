@@ -1,3 +1,5 @@
 *.js
 *.ts
+*.mjs
+*.mjs.map
 *.tsx

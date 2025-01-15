@@ -29,7 +29,7 @@ const generateConfig = (input, outputDir, name, exclude = []) => ({
     input,
     output: [
         { file: path.join(outputDir, `${name}.js`), format: "umd", name, sourcemap: true,sourcemapPathTransform },
-        { file: path.join(outputDir, `${name}.es.js`), format: "es", sourcemap: true, sourcemapPathTransform },
+        { file: path.join(outputDir, `${name}.mjs`), format: "es", sourcemap: true, sourcemapPathTransform },
     ],
     plugins: createPlugins(exclude),
     external: externalDependencies,
