@@ -475,7 +475,6 @@ const Flagsmith = class {
 
                                 if (cachePopulated) { // retrieved flags from local storage
                                     // fetch the flags if the cache is stale, or if we're not skipping api on cache hits
-                                    this.log("cachePopulated", cachePopulated, preventFetch, this.cacheOptions.skipAPI,staleCachePopulated);
                                     const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI || staleCachePopulated)
                                     this._onChange(null,
                                         { isFromServer: false, flagsChanged, traitsChanged },
