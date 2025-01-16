@@ -241,7 +241,16 @@ describe('Flagsmith.init', () => {
         await AsyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify(identityState));
         await flagsmith.init(initConfig);
 
-        expect(getStateToCheck(flagsmith.getState())).toEqual(identityState);
+        expect(getStateToCheck(flagsmith.getState())).toEqual({
+            ...identityState,
+            evaluationContext: {
+                ...identityState.evaluationContext,
+                identity: {
+                    ...identityState.evaluationContext.identity,
+                    traits: {},
+                },
+            },
+        });
 
         await waitFor(() => {
             expect(onError).toHaveBeenCalledTimes(1);
