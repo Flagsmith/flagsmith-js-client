@@ -454,7 +454,6 @@ const Flagsmith = class {
                                     }
                                     if (setState) {
                                         cachePopulated = true;
-                                        traitsChanged = getChanges(this.evaluationContext.identity?.traits, json.evaluationContext?.identity?.traits)
                                         flagsChanged = getChanges(this.flags, json.flags)
                                         this.setState({
                                             ...json,
