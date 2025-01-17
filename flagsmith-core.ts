@@ -454,9 +454,7 @@ const Flagsmith = class {
                                     }
                                     if (setState) {
                                         cachePopulated = true;
-                                        traitsChanged = getChanges(this.evaluationContext.identity?.traits, json.evaluationContext?.identity?.traits)
                                         flagsChanged = getChanges(this.flags, json.flags)
-                                        // When populating state from cache, we merge traits passed in flagsmith.init
                                         this.setState({
                                             ...json,
                                             evaluationContext: toEvaluationContext({
@@ -464,7 +462,7 @@ const Flagsmith = class {
                                                 identity: json.evaluationContext?.identity ? {
                                                     ...json.evaluationContext?.identity,
                                                     traits: {
-                                                        ...json.evaluationContext?.identity?.traits || {},
+                                                        // Traits passed in flagsmith.init will overwrite server values
                                                         ...traits || {},
                                                     }
                                                 } : undefined,
