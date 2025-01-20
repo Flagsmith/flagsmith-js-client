@@ -257,4 +257,10 @@ describe('Flagsmith.init', () => {
         });
         expect(onError).toHaveBeenCalledWith(new Error('Mocked fetch error'));
     });
+    test('should resolve analytics URL, if not specified, relative to API URL', async () => {
+        const { flagsmith, initConfig } = getFlagsmith()
+        initConfig.api = 'https://flagsmith.example.com'
+        await flagsmith.init(initConfig)
+        expect(flagsmith.analyticsUrl).toEqual('https://flagsmith.example.com/analytics/flags/')
+    })
 });

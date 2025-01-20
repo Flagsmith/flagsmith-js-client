@@ -91,7 +91,18 @@ export declare type LoadingState = {
 export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
+    /** Absolute and versioned URL of Flagsmith API to use, including a trailing slash.
+     * Defaults to {@link DEFAULT_API_URL}.
+     * @example "https://flagsmith.example.com/api/v1/
+     */
     api?: string;
+    /**
+     * Absolute or relative URL of the Flagsmith analytics events API endpoint. Use this if your analytics and flags API
+     * endpoints are on different domains, e.g. if you are fetching flags from an Edge Proxy.
+     * Defaults to {@link ANALYTICS_ENDPOINT} relative to {@link api}.
+     * @example "https://flagsmith.example.com/api/v1/analytics"
+     */
+    analyticsUrl?: string;
     evaluationContext?: ClientEvaluationContext;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
@@ -270,9 +281,13 @@ export interface IFlagsmith<F extends string = string, T extends string = string
         loadStale: boolean;
     };
     /**
-     * Used internally, this is the api provided in flagsmith.init, defaults to our production API
+     * @see IInitConfig.api
      */
     api: string
+    /**
+     * @see IInitConfig.analyticsUrl
+     */
+    analyticsUrl: string
 }
 
 export {};
