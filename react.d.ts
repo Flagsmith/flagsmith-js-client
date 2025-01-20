@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
-import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState } from '../types';
+import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState, LoadingState } from './types';
+export * from './types';
 export declare const FlagsmithContext: React.Context<IFlagsmith>;
 export declare type FlagsmithContextType<F extends string = string, T extends string = string> = {
     flagsmith: IFlagsmith<F, T>;
     options?: Parameters<IFlagsmith<F, T>['init']>[0];
-    serverState?: IState<F, T>;
+    serverState?: IState;
     children: React.ReactElement[] | React.ReactElement;
 };
 export declare const FlagsmithProvider: FC<FlagsmithContextType>;
