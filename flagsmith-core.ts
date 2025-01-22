@@ -44,7 +44,8 @@ let AsyncStorage: AsyncStorageType = null;
 const DEFAULT_FLAGSMITH_KEY = "FLAGSMITH_DB";
 const DEFAULT_FLAGSMITH_EVENT = "FLAGSMITH_EVENT";
 let FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT;
-const defaultAPI = 'https://edge.api.flagsmith.com/api/v1/';
+export const DEFAULT_API_URL = 'https://edge.api.flagsmith.com/api/v1/';
+export const ANALYTICS_ENDPOINT = "./analytics/flags/"
 let eventSource: typeof EventSource;
 const initError = function(caller: string) {
     return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
@@ -226,15 +227,15 @@ const Flagsmith = class {
     };
 
     analyticsFlags = () => {
-        const { api } = this;
+        const { analyticsUrl } = this;
 
-        if (!this.evaluationEvent || !this.evaluationContext.environment || !this.evaluationEvent[this.evaluationContext.environment.apiKey]) {
+        if (!analyticsUrl || !this.evaluationEvent || !this.evaluationContext.environment || !this.evaluationEvent[this.evaluationContext.environment.apiKey]) {
             return
         }
 
         if (this.evaluationEvent && Object.getOwnPropertyNames(this.evaluationEvent).length !== 0 && Object.getOwnPropertyNames(this.evaluationEvent[this.evaluationContext.environment.apiKey]).length !== 0) {
-            return this.getJSON(api + 'analytics/flags/', 'POST', JSON.stringify(this.evaluationEvent[this.evaluationContext.environment.apiKey]))
-                .then((res) => {
+            return this.getJSON(analyticsUrl, 'POST', JSON.stringify(this.evaluationEvent[this.evaluationContext.environment.apiKey]))
+                .then(() => {
                     if (!this.evaluationContext.environment) {
                         return;
                     }
@@ -259,6 +260,7 @@ const Flagsmith = class {
     canUseStorage = false
     analyticsInterval: NodeJS.Timer | null= null
     api: string|null= null
+    analyticsUrl: string | null = null
     cacheFlags= false
     ts: number|null= null
     enableAnalytics= false
@@ -282,7 +284,7 @@ const Flagsmith = class {
         try {
             const {
                 environmentID,
-                api = defaultAPI,
+                api = DEFAULT_API_URL,
                 headers,
                 onChange,
                 cacheFlags,
@@ -294,6 +296,7 @@ const Flagsmith = class {
                 enableLogs,
                 enableDynatrace,
                 enableAnalytics,
+                analyticsUrl,
                 realtime,
                 eventSourceUrl= "https://realtime.flagsmith.com/",
                 AsyncStorage: _AsyncStorage,
@@ -319,11 +322,12 @@ const Flagsmith = class {
             } : evaluationContext.identity;
             this.evaluationContext = evaluationContext;
             this.api = api;
+            this.analyticsUrl = analyticsUrl || new URL(ANALYTICS_ENDPOINT, new Request(api).url).href
             this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
             this.onChange = onChange;
-            const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided'
+            const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaultFlags provided'
             this._trigger = _trigger || this._trigger;
             this._triggerLoadingState = _triggerLoadingState || this._triggerLoadingState;
             this.onError = (message: Error) => {
@@ -587,7 +591,7 @@ const Flagsmith = class {
     setState(state: IState) {
         if (state) {
             this.initialised = true;
-            this.api = state.api || this.api || defaultAPI;
+            this.api = state.api || this.api || DEFAULT_API_URL;
             this.flags = state.flags || this.flags;
             this.evaluationContext = state.evaluationContext || this.evaluationContext,
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
