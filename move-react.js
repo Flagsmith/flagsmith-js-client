@@ -26,12 +26,14 @@ files.forEach((fileName)=>{
     }
 })
 
-// copy types.d
+// copy types and evaluation-context
 fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flagsmith/src/types.d.ts"))
 fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/src/types.d.ts"))
-
 fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/flagsmith/types.d.ts"))
 fs.copyFileSync(path.join(__dirname,"types.d.ts"),path.join(__dirname,"lib/react-native-flagsmith/types.d.ts"))
+fs.copyFileSync(path.join(__dirname,"evaluation-context.ts"),path.join(__dirname,"lib/flagsmith/evaluation-context.ts"))
+fs.copyFileSync(path.join(__dirname,"evaluation-context.ts"),path.join(__dirname,"lib/react-native-flagsmith/evaluation-context.ts"))
+
 
 try {
     fs.rmdirSync(path.join(__dirname,"lib/flagsmith/lib"), {recursive:true})

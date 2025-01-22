@@ -1,12 +1,17 @@
 {
   "name": "flagsmith",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "module": "./index.mjs",
   "browser": "./index.js",
   "types": "./index.d.ts",
   "exports": {
+    "./types": {
+      "import": "./types.d.ts",
+      "require": "./types.d.ts",
+      "browser": "./types.d.ts"
+    },
     ".": {
       "import": "./index.mjs",
       "require": "./index.js",

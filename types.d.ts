@@ -104,18 +104,9 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     enableDynatrace?: boolean;
     enableLogs?: boolean;
     angularHttpClient?: any;
-    /**
-     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
-     * */
     environmentID?: string;
     headers?: object;
-    /**
-     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
-     * */
     identity?: IIdentity;
-    /**
-     * * @deprecated Please consider using evaluationContext.identity: {@link IInitConfig.evaluationContext}.
-     * */
     traits?: ITraits<T>;
     onChange?: OnChange<F>;
     onError?: (err: Error) => void;
@@ -240,8 +231,8 @@ export interface IFlagsmith<F extends string = string, T extends string = string
      */
     setTraits: (traits: ITraits) => Promise<void>;
     /**
-     * * @deprecated Please consider using evaluationContext.identity: {@link IFlagsmith.getContext}.
-     * */
+     * The stored identity of the user
+    */
     identity?: IIdentity;
     /**
      * Whether the flagsmith SDK is initialised
