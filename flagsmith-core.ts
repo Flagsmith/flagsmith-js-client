@@ -23,7 +23,7 @@ import angularFetch from './utils/angular-fetch';
 import setDynatraceValue from './utils/set-dynatrace-value';
 import { EvaluationContext } from './evaluation-context';
 import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
-import { ensureTrailingSlash } from "./utils/ensureTrailingSlash";
+import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
 
 enum FlagSource {
     "NONE" = "NONE",
