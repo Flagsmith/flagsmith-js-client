@@ -1,3 +1,3 @@
 export function ensureTrailingSlash(str: string): string {
-    return str.replace(/\/+$/, '') + '/';
+    return str.endsWith('/') ? str : str + '/';
 }
