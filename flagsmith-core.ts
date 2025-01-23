@@ -23,6 +23,7 @@ import angularFetch from './utils/angular-fetch';
 import setDynatraceValue from './utils/set-dynatrace-value';
 import { EvaluationContext } from './evaluation-context';
 import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
+import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
 
 enum FlagSource {
     "NONE" = "NONE",
@@ -318,7 +319,7 @@ const Flagsmith = class {
                 ) : {},
             } : evaluationContext.identity;
             this.evaluationContext = evaluationContext;
-            this.api = api;
+            this.api = ensureTrailingSlash(api);
             this.headers = headers;
             this.getFlagInterval = null;
             this.analyticsInterval = null;
