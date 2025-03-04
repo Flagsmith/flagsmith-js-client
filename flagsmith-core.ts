@@ -261,7 +261,7 @@ const Flagsmith = class {
     analyticsInterval: NodeJS.Timer | null= null
     api: string|null= null
     cacheFlags= false
-    ts: number|null= null
+    ts?: number
     enableAnalytics= false
     enableLogs= false
     evaluationContext: EvaluationContext= {}
