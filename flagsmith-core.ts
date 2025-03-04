@@ -364,6 +364,8 @@ const Flagsmith = class {
             this.ticks = 10000;
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
+            this.appName = appName;
+            this.appVersion = appVersion;
 
             FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT + "_" + evaluationContext.environment.apiKey;
 
@@ -553,9 +555,6 @@ const Flagsmith = class {
                     }
                 }
             }
-
-            this.appName = appName;
-            this.appVersion = appVersion;
         } catch (error) {
             this.log('Error during initialisation ', error);
             const typedError = error instanceof Error ? error : new Error(`${error}`);
@@ -805,6 +804,7 @@ const Flagsmith = class {
             options.headers['Content-Type'] = 'application/json; charset=utf-8';
 
 
+        console.log({ appName: this.appName, appVersion: this.appVersion })
         if (this.appName) {
             options.headers['X-Customer-Application-Name'] = this.appName;
         }
