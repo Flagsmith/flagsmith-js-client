@@ -114,6 +114,14 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     state?: IState;
     _trigger?: () => void;
     _triggerLoadingState?: () => void;
+    /**
+     * Customer application name
+     */
+    appName?: string;
+    /**
+     * Customer application version
+     */
+    appVersion?: string;
 }
 
 export interface IFlagsmithResponse {

@@ -51,7 +51,14 @@ const initError = function(caller: string) {
     return "Attempted to " + caller + " a user before calling flagsmith.init. Call flagsmith.init first, if you wish to prevent it sending a request for flags, call init with preventFetch:true."
 }
 
-type Config = { browserlessStorage?: boolean, fetch?: LikeFetch, AsyncStorage?: AsyncStorageType, eventSource?: any };
+type Config = {
+    browserlessStorage?: boolean,
+    fetch?: LikeFetch,
+    AsyncStorage?: AsyncStorageType,
+    eventSource?: any,
+    appName?: IInitConfig['appName'],
+    appVersion?: IInitConfig['appVersion']
+};
 
 const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
 const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
@@ -63,6 +70,8 @@ const Flagsmith = class {
     timestamp: number|null = null
     isLoading = false
     eventSource:EventSource|null = null
+    appName: IInitConfig['appName'];
+    appVersion: IInitConfig['appVersion'];
     constructor(props: Config) {
         if (props.fetch) {
             _fetch = props.fetch as LikeFetch;
@@ -71,6 +80,8 @@ const Flagsmith = class {
         }
 
         this.canUseStorage = typeof window !== 'undefined' || !!props.browserlessStorage;
+        this.appName = props.appName;
+        this.appVersion = props.appVersion;
 
         this.log("Constructing flagsmith instance " + props)
         if (props.eventSource) {
@@ -305,6 +316,8 @@ const Flagsmith = class {
                 angularHttpClient,
                 _trigger,
                 _triggerLoadingState,
+                appName,
+                appVersion,
             } = config;
             evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
             if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
@@ -351,6 +364,8 @@ const Flagsmith = class {
             this.ticks = 10000;
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
+            this.appName = appName;
+            this.appVersion = appVersion;
 
             FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT + "_" + evaluationContext.environment.apiKey;
 
@@ -775,7 +790,7 @@ const Flagsmith = class {
     }
 
     private getJSON = (url: string, method?: 'GET' | 'POST' | 'PUT', body?: string) => {
-        const { evaluationContext, headers } = this;
+        const { headers } = this;
         const options: RequestOptions = {
             method: method || 'GET',
             body,
@@ -787,6 +802,15 @@ const Flagsmith = class {
             options.headers['X-Environment-Key'] = this.evaluationContext.environment.apiKey;
         if (method && method !== 'GET')
             options.headers['Content-Type'] = 'application/json; charset=utf-8';
+
+
+        if (this.appName) {
+            options.headers['X-Customer-Application-Name'] = this.appName;
+        }
+
+        if (this.appVersion) {
+            options.headers['X-Customer-Application-Version'] = this.appVersion;
+        }
 
         if (headers) {
             Object.assign(options.headers, headers);
