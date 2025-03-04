@@ -804,7 +804,6 @@ const Flagsmith = class {
             options.headers['Content-Type'] = 'application/json; charset=utf-8';
 
 
-        console.log({ appName: this.appName, appVersion: this.appVersion })
         if (this.appName) {
             options.headers['X-Customer-Application-Name'] = this.appName;
         }
