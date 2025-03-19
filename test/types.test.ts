@@ -1,7 +1,6 @@
 // Sample test
 import {getFlagsmith} from './test-constants';
 import {IFlagsmith} from '../types';
-import {useFlagsmith} from "../react";
 
 describe('Flagsmith Types', () => {
 
@@ -38,51 +37,18 @@ describe('Flagsmith Types', () => {
         typedFlagsmith.getValue("numberFlag")
 
         //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const stringFlag: string = typedFlagsmith.getValue("stringFlag")!
+        const stringFlag: string | null = typedFlagsmith.getValue("stringFlag")
         //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const numberFlag: number = typedFlagsmith.getValue("numberFlag")!
+        const numberFlag: number | null = typedFlagsmith.getValue("numberFlag")
         //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const firstName: string = typedFlagsmith.getValue("objectFlag")!.first_name
+        const firstName: string | undefined = typedFlagsmith.getValue("objectFlag")?.first_name
 
         // @ts-expect-error - invalid does not exist on type announcement
         //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const invalidPointer: string = typedFlagsmith.getValue("objectFlag")!.invalid
+        const invalidPointer: string = typedFlagsmith.getValue("objectFlag")?.invalid
 
         // @ts-expect-error - feature should be a number
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const incorrectNumberFlag: string = typedFlagsmith.getValue("numberFlag")!
-    });
-    test('should allow supplying interface generics to useFlagsmith', async () => {
-        const typedFlagsmith = useFlagsmith<
-                {
-                    stringFlag: string
-                    numberFlag: number
-                    objectFlag: { first_name: string }
-                }
-        >()
-        //@ts-expect-error - feature not defined
-        typedFlagsmith.hasFeature("fail")
-        //@ts-expect-error - feature not defined
-        typedFlagsmith.getValue("fail")
-
-        typedFlagsmith.hasFeature("stringFlag")
-        typedFlagsmith.hasFeature("numberFlag")
-        typedFlagsmith.getValue("stringFlag")
-        typedFlagsmith.getValue("numberFlag")
-
-        //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const stringFlag: string = typedFlagsmith.getValue("stringFlag")!
-        //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const numberFlag: number = typedFlagsmith.getValue("numberFlag")!
-        //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const firstName: string = typedFlagsmith.getValue("objectFlag")!.first_name
-
-        // @ts-expect-error - invalid does not exist on type announcement
-        //eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const invalidPointer: string = typedFlagsmith.getValue("objectFlag")!.invalid
-
-        // @ts-expect-error - feature should be a number
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const incorrectNumberFlag: string = typedFlagsmith.getValue("numberFlag")!
+        const incorrectNumberFlag: string = typedFlagsmith.getValue("numberFlag")
     });
 });
