@@ -51,7 +51,7 @@ export interface IState<F extends string = string> {
     flags?: IFlags<F>;
     evaluationContext?: EvaluationContext;
     evaluationEvent?: Record<string, Record<string, number>> | null;
-    ts?: number;
+    ts?: number | null;
 }
 
 declare type ICacheOptions = {
