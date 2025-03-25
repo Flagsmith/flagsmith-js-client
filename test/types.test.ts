@@ -5,6 +5,7 @@ import {IFlagsmith} from '../types';
 describe('Flagsmith Types', () => {
 
     // The following tests will fail to compile if any of the types fail / expect-error has no type issues
+    // Therefor all of the following ts-expect-errors and eslint-disable-lines are by design
     test('should allow supplying string generics to a flagsmith instance', async () => {
         const { flagsmith,  } = getFlagsmith({ });
         const typedFlagsmith = flagsmith as IFlagsmith<"flag1"|"flag2">

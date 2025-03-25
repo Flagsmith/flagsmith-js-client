@@ -1,4 +1,3 @@
-// Sample test
 import { waitFor } from '@testing-library/react';
 import {defaultState, FLAGSMITH_KEY, getFlagsmith, getStateToCheck, identityState} from './test-constants';
 import { promises as fs } from 'fs';
