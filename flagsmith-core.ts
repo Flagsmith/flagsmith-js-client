@@ -129,6 +129,7 @@ const Flagsmith = class {
                 };
                 if (identifier) {
                     this.evaluationContext.identity.identifier = identifier;
+                    this.identity = identifier;
                 }
             }
             this.flags = flags;
@@ -269,6 +270,7 @@ const Flagsmith = class {
     flags:IFlags|null= null
     getFlagInterval: NodeJS.Timer|null= null
     headers?: object | null= null
+    identity:string|null|undefined = null
     initialised= false
     oldFlags:IFlags|null= null
     onChange:IInitConfig['onChange']|null= null
@@ -429,7 +431,7 @@ const Flagsmith = class {
                     const onRetrievedStorage = async (error: Error | null, res: string | null) => {
                         if (res) {
                             let flagsChanged = null
-                            let traitsChanged = null
+                            const traitsChanged = null
                             try {
                                 const json = JSON.parse(res) as IState;
                                 let cachePopulated = false;
@@ -553,6 +555,7 @@ const Flagsmith = class {
     }
 
     identify(userId?: string | null, traits?: ITraits, transient?: boolean) {
+        this.identity = userId
         this.evaluationContext.identity = {
             identifier: userId,
             transient: transient,
@@ -592,11 +595,13 @@ const Flagsmith = class {
             this.flags = state.flags || this.flags;
             this.evaluationContext = state.evaluationContext || this.evaluationContext,
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
+            this.identity = this.getContext()?.identity?.identifier
             this.log("setState called", this)
         }
     }
 
     logout() {
+        this.identity = null
         this.evaluationContext.identity = null;
         if (this.initialised) {
             return this.getFlags();
@@ -666,6 +671,7 @@ const Flagsmith = class {
             ...evaluationContext,
             environment: evaluationContext.environment || this.evaluationContext.environment,
         };
+        this.identity = this.getContext()?.identity?.identifier
 
         if (this.initialised) {
             return this.getFlags();

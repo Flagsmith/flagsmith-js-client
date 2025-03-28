@@ -136,7 +136,9 @@ describe('Flagsmith.init', () => {
             status: 200,
             text: () => fs.readFile(`./test/data/identities_${identityB}.json`, 'utf8'),
         });
+        expect(flagsmith.identity).toEqual(identityA);
         await flagsmith.identify(identityB);
+        expect(flagsmith.identity).toEqual(identityB);
         expect(flagsmith.getTrait('a')).toEqual(undefined);
         mockFetch.mockResolvedValueOnce({
             status: 200,
