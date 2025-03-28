@@ -1,6 +1,6 @@
 {
   "name": "flagsmith",
-  "version": "9.0.5",
+  "version": "9.0.6",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "module": "./index.mjs",
