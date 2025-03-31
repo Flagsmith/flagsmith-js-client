@@ -272,4 +272,65 @@ describe('Flagsmith.init', () => {
         });
         expect(onError).toHaveBeenCalledWith(new Error('Mocked fetch error'));
     });
+    test('should send app name and version headers when provided', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            onChange,
+            appName: 'Test App',
+            appVersion: '1.2.3',
+        });
+
+        await flagsmith.init(initConfig);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    'X-Customer-Application-Name': 'Test App',
+                    'X-Customer-Application-Version': '1.2.3',
+                }),
+            }),
+        );
+
+    });
+    test('should send app name and version headers when provided', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            onChange,
+            appName: 'Test App',
+            appVersion: '1.2.3',
+        });
+
+        await flagsmith.init(initConfig);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    'X-Customer-Application-Name': 'Test App',
+                    'X-Customer-Application-Version': '1.2.3',
+                }),
+            }),
+        );
+
+    });
+    test('should not send app name and version headers when not provided', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            onChange,
+        });
+
+        await flagsmith.init(initConfig);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                headers: expect.not.objectContaining({
+                    'X-Customer-Application-Name': 'Test App',
+                    'X-Customer-Application-Version': '1.2.3',
+                }),
+            }),
+        );
+    });
+
 });
