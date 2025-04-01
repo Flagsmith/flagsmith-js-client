@@ -95,6 +95,21 @@ describe('Flagsmith.init', () => {
         });
         await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
     });
+    test('should sanitise api url', async () => {
+        const onChange = jest.fn();
+        const { flagsmith,initConfig } = getFlagsmith({
+            api:'https://edge.api.flagsmith.com/api/v1/',
+            onChange,
+        });
+        await flagsmith.init(initConfig)
+        expect(flagsmith.getState().api).toBe('https://edge.api.flagsmith.com/api/v1/');
+        const { flagsmith:flagsmith2 } = getFlagsmith({
+            api:'https://edge.api.flagsmith.com/api/v1',
+            onChange,
+        });
+        await flagsmith2.init(initConfig)
+        expect(flagsmith2.getState().api).toBe('https://edge.api.flagsmith.com/api/v1/');
+    });
     test('should reject initialize with identity bad key', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, mockFetch } = getFlagsmith({ onChange, environmentID: 'bad' });
