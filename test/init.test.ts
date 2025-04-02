@@ -276,8 +276,10 @@ describe('Flagsmith.init', () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
             onChange,
-            appName: 'Test App',
-            appVersion: '1.2.3',
+             applicationMetadata: {
+                name: 'Test App',
+                version: '1.2.3',
+            },
         });
 
         await flagsmith.init(initConfig);
