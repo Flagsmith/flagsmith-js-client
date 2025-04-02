@@ -56,8 +56,7 @@ type Config = {
     fetch?: LikeFetch,
     AsyncStorage?: AsyncStorageType,
     eventSource?: any,
-    appName?: IInitConfig['appName'],
-    appVersion?: IInitConfig['appVersion']
+    applicationMetadata?: IInitConfig['applicationMetadata'],
 };
 
 const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
@@ -70,8 +69,7 @@ const Flagsmith = class {
     timestamp: number|null = null
     isLoading = false
     eventSource:EventSource|null = null
-    appName: IInitConfig['appName'];
-    appVersion: IInitConfig['appVersion'];
+    applicationMetadata: IInitConfig['applicationMetadata'];
     constructor(props: Config) {
         if (props.fetch) {
             _fetch = props.fetch as LikeFetch;
@@ -80,8 +78,7 @@ const Flagsmith = class {
         }
 
         this.canUseStorage = typeof window !== 'undefined' || !!props.browserlessStorage;
-        this.appName = props.appName;
-        this.appVersion = props.appVersion;
+        this.applicationMetadata = props.applicationMetadata;
 
         this.log("Constructing flagsmith instance " + props)
         if (props.eventSource) {
@@ -316,8 +313,7 @@ const Flagsmith = class {
                 angularHttpClient,
                 _trigger,
                 _triggerLoadingState,
-                appName,
-                appVersion,
+                applicationMetadata,
             } = config;
             evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
             if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
@@ -364,8 +360,7 @@ const Flagsmith = class {
             this.ticks = 10000;
             this.timer = this.enableLogs ? new Date().valueOf() : null;
             this.cacheFlags = typeof AsyncStorage !== 'undefined' && !!cacheFlags;
-            this.appName = appName;
-            this.appVersion = appVersion;
+            this.applicationMetadata = applicationMetadata;
 
             FlagsmithEvent = DEFAULT_FLAGSMITH_EVENT + "_" + evaluationContext.environment.apiKey;
 
@@ -804,12 +799,12 @@ const Flagsmith = class {
             options.headers['Content-Type'] = 'application/json; charset=utf-8';
 
 
-        if (this.appName) {
-            options.headers['X-Customer-Application-Name'] = this.appName;
+        if (this.applicationMetadata?.name) {
+            options.headers['Flagsmith-Application-Name'] = this.applicationMetadata.name;
         }
 
-        if (this.appVersion) {
-            options.headers['X-Customer-Application-Version'] = this.appVersion;
+        if (this.applicationMetadata?.version) {
+            options.headers['Flagsmith-Application-Version'] = this.applicationMetadata.version;
         }
 
         if (headers) {

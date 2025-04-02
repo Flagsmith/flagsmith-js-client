@@ -89,6 +89,12 @@ export declare type LoadingState = {
 }
 
 export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
+
+export type ApplicationMetadata = {
+    name: string;
+    version: string;
+}
+
 export interface IInitConfig<F extends string = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
@@ -115,13 +121,9 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     _trigger?: () => void;
     _triggerLoadingState?: () => void;
     /**
-     * Customer application name
+     * Customer application metadata
      */
-    appName?: string;
-    /**
-     * Customer application version
-     */
-    appVersion?: string;
+    applicationMetadata?: ApplicationMetadata;
 }
 
 export interface IFlagsmithResponse {
