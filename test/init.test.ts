@@ -295,6 +295,28 @@ describe('Flagsmith.init', () => {
         );
 
     });
+    test('should send app name headers when provided', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
+            onChange,
+             applicationMetadata: {
+                name: 'Test App',
+            },
+        });
+
+        await flagsmith.init(initConfig);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    'Flagsmith-Application-Name': 'Test App',
+                }),
+            }),
+        );
+
+    });
+
     test('should not send app name and version headers when not provided', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({

@@ -92,7 +92,7 @@ export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | nu
 
 export type ApplicationMetadata = {
     name: string;
-    version: string;
+    version?: string;
 }
 
 export interface IInitConfig<F extends string = string, T extends string = string> {
