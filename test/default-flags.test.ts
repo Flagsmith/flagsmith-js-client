@@ -1,4 +1,3 @@
-// Sample test
 import { defaultState, defaultStateAlt, FLAGSMITH_KEY, getFlagsmith, getStateToCheck } from './test-constants';
 import { IFlags } from '../types';
 
