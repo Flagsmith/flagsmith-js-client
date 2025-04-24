@@ -8,25 +8,24 @@ export declare type FlagsmithContextType<F extends string = string, T extends st
     serverState?: IState;
     children: React.ReactElement[] | React.ReactElement;
 };
-type UseFlagsReturn<
-    F extends string | Record<string, any>,
-    T extends string
-> = F extends string
+type UseFlagsReturn<F extends string | Record<string, any>, T extends string> = F extends string
     ? {
-    [K in F]: IFlagsmithFeature;
-} & {
-    [K in T]: IFlagsmithTrait;
-}
+          [K in F]: IFlagsmithFeature;
+      } & {
+          [K in T]: IFlagsmithTrait;
+      }
     : {
-    [K in keyof F]: IFlagsmithFeature<F[K]>;
-} & {
-    [K in T]: IFlagsmithTrait;
-};
+          [K in keyof F]: IFlagsmithFeature<F[K]>;
+      } & {
+          [K in T]: IFlagsmithTrait;
+      };
 export declare const FlagsmithProvider: FC<FlagsmithContextType>;
-export declare function useFlags<
-    F extends string | Record<string, any>,
-    T extends string = string
->(_flags: readonly F[], _traits?: readonly T[]): UseFlagsReturn<F, T>;
-export declare const useFlagsmith: <F extends string | Record<string, any>,
-    T extends string = string>() => IFlagsmith<F, T>;
+export declare function useFlags<F extends string | Record<string, any>, T extends string = string>(
+    _flags: [F] extends [string] ? readonly F[] : readonly (keyof F)[],
+    _traits?: readonly T[],
+): UseFlagsReturn<F, T>;
+export declare const useFlagsmith: <F extends string | Record<string, any>, T extends string = string>() => IFlagsmith<
+    F,
+    T
+>;
 export declare const useFlagsmithLoading: () => LoadingState | undefined;

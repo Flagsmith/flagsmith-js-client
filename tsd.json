@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "types": []
+    },
+    "entry": "./index.d.ts",
+    "files": ["./test-dts/useFlags.test-d.ts"],
+    "not-real": true
+}

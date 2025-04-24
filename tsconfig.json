@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "outDir": "./flagsmith/",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "jsx": "react",
-    "module": "ESNext",
-    "declaration": true,
-    "strict": true,
-    "noEmit": true,
-    "sourceMap": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "exclude": ["lib"]
+    "compilerOptions": {
+        "outDir": "./flagsmith/",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "jsx": "react",
+        "module": "ESNext",
+        "declaration": true,
+        "strict": true,
+        "noEmit": true,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "exclude": ["lib", "**/*.test-d.*"]
 }

@@ -12,7 +12,8 @@
     "generatetypes": "curl https://raw.githubusercontent.com/Flagsmith/flagsmith/refs/heads/main/sdk/evaluation-context.json -o evaluation-context.json && npx quicktype -o evaluation-context.ts --src-lang schema --just-types --no-prefer-types --nice-property-names evaluation-context.json && rm evaluation-context.json",
     "postinstall": "patch-package",
     "prepublish": "npx in-publish && npm run build || echo",
-    "test": "jest --env=jsdom"
+    "test": "jest --env=jsdom",
+    "test:types": "npx tsd"
   },
   "repository": {
     "type": "git",
@@ -63,6 +64,7 @@
     "tiny-replace-files": "^1.0.2",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.2.7",
+    "tsd": "^0.32.0",
     "tslib": "^2.4.0",
     "typescript": "^4.6.2"
   },
