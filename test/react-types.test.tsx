@@ -49,6 +49,7 @@ describe.only('FlagsmithProvider', () => {
             </FlagsmithProvider>
         );
     });
+
     it('should allow supplying interface generics to useFlags', () => {
         const FlagsmithPage = ()=> {
             const typedFlagsmith = useFlags<
