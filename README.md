@@ -15,6 +15,15 @@ For full documentation visit [https://docs.flagsmith.com/clients/javascript/](ht
 
 Please read [CONTRIBUTING.md](https://gist.github.com/kyle-ssg/c36a03aebe492e45cbd3eefb21cb0486) for details on our code of conduct, and the process for submitting pull requests to us.
 
+### Development
+
+1. Install Node >= v14.4
+1. Clone the repo
+1. Install dependencies: `npm install`
+1. Generate files: `npm run build`
+1. Make your code changes
+1. Ensure the project builds with `npm run build` and all tests are passing with `npm run test` before submitting a pull request
+
 ## Getting Help
 
 If you encounter a bug or feature request we would like to hear about it. Before you submit an issue please search existing issues in order to prevent duplicates. 

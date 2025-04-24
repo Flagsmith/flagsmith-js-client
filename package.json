@@ -12,7 +12,8 @@
     "generatetypes": "curl https://raw.githubusercontent.com/Flagsmith/flagsmith/refs/heads/main/sdk/evaluation-context.json -o evaluation-context.json && npx quicktype -o evaluation-context.ts --src-lang schema --just-types --no-prefer-types --nice-property-names evaluation-context.json && rm evaluation-context.json",
     "postinstall": "patch-package",
     "prepublish": "npx in-publish && npm run build || echo",
-    "test": "jest --env=jsdom"
+    "test": "jest --env=jsdom",
+    "checknodeversion": "npx ls-engines"
   },
   "repository": {
     "type": "git",
@@ -79,5 +80,8 @@
     "react-native-sse": "^1.1.0",
     "reconnecting-eventsource": "^1.5.0"
   },
-  "types": "./index.d.ts"
+  "types": "./index.d.ts",
+  "engines": {
+    "node": ">= 14.14"
+  }
 }
