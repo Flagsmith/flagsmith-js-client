@@ -133,9 +133,9 @@ type UseFlagsReturn<F extends string | Record<string, any>, T extends string> = 
  * useFlags<MyFeatureInterface>(["featureOne", "featureTwo"]);
  */
 export function useFlags<F extends string | Record<string, any>, T extends string = string>(
-    _flags: [F] extends [string] ? readonly F[] : readonly (keyof F)[],
-    _traits?: readonly T[],
-): UseFlagsReturn<F, T> {
+    _flags: readonly (F | keyof F)[],
+    _traits: readonly T[] = [],
+) {
     const firstRender = useRef(true);
     const flags = useConstant<string[]>(flagsAsArray(_flags));
     const traits = useConstant<string[]>(flagsAsArray(_traits));

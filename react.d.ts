@@ -21,7 +21,7 @@ type UseFlagsReturn<F extends string | Record<string, any>, T extends string> = 
       };
 export declare const FlagsmithProvider: FC<FlagsmithContextType>;
 export declare function useFlags<F extends string | Record<string, any>, T extends string = string>(
-    _flags: [F] extends [string] ? readonly F[] : readonly (keyof F)[],
+    _flags: readonly (F | keyof F)[],
     _traits?: readonly T[],
 ): UseFlagsReturn<F, T>;
 export declare const useFlagsmith: <F extends string | Record<string, any>, T extends string = string>() => IFlagsmith<
