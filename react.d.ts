@@ -26,7 +26,7 @@ export declare const FlagsmithProvider: FC<FlagsmithContextType>;
 export declare function useFlags<
     F extends string | Record<string, any>,
     T extends string = string
->(_flags: readonly F[], _traits?: readonly T[]): UseFlagsReturn<F, T>;
+>(_flags: readonly (F | keyof F)[], _traits?: readonly T[]): UseFlagsReturn<F, T>;
 export declare const useFlagsmith: <F extends string | Record<string, any>,
     T extends string = string>() => IFlagsmith<F, T>;
 export declare const useFlagsmithLoading: () => LoadingState | undefined;

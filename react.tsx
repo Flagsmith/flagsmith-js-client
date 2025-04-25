@@ -158,7 +158,7 @@ export function useFlags<
     F extends string | Record<string, any>,
     T extends string = string
 >(
-    _flags: readonly F[], _traits: readonly T[] = []
+    _flags: readonly (F | keyof F)[], _traits: readonly T[] = []
 ){
     const firstRender = useRef(true)
     const flags = useConstant<string[]>(flagsAsArray(_flags))
