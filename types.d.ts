@@ -49,7 +49,7 @@ export interface IRetrieveInfo {
 
 export interface IState<F extends string = string> {
     api: string;
-    flags?: IFlags<F>;
+    flags?: IFlags<FKey<F>>;
     evaluationContext?: EvaluationContext;
     evaluationEvent?: Record<string, Record<string, number>> | null;
     ts?: number;
@@ -89,7 +89,7 @@ export declare type LoadingState = {
     source: FlagSource //Indicates freshness of flags
 }
 
-export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
+export type OnChange<F extends string = string> = (previousFlags: IFlags<FKey<F>> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
 
 export type ApplicationMetadata = {
     name: string;
@@ -103,7 +103,7 @@ export interface IInitConfig<F extends string = string, T extends string = strin
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     datadogRum?: IDatadogRum;
-    defaultFlags?: IFlags<F>;
+    defaultFlags?: IFlags<FKey<F>>;
     fetch?: any;
     realtime?: boolean;
     eventSourceUrl?: string;
@@ -189,7 +189,7 @@ T extends string = string
     /**
      * Returns the current flags
      */
-    getAllFlags: () => IFlags<F>;
+    getAllFlags: () => IFlags<FKey<F>>;
     /**
      * Identify user, triggers a call to get flags if `flagsmith.init` has been called
      * */
