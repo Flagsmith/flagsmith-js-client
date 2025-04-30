@@ -115,7 +115,7 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
     headers?: object;
     identity?: IIdentity;
     traits?: ITraits<T>;
-    onChange?: OnChange<F>;
+    onChange?: OnChange<FKey<F>>;
     onError?: (err: Error) => void;
     preventFetch?: boolean;
     state?: IState;
@@ -144,9 +144,10 @@ export interface IFlagsmithResponse {
     }[];
 }
 type FKey<F> = F extends string ? F : keyof F;
-type FValue<F, K extends FKey<F>> = F extends string
-    ? IFlagsmithValue
-    : F[K] | null;
+type FValue<F, K extends FKey<F>> = F extends Record<string, any>
+    ? F[K] | null
+    : IFlagsmithValue;
+  
 /**
  * Example usage:
  *
