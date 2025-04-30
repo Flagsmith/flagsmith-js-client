@@ -96,7 +96,7 @@ export type ApplicationMetadata = {
     version?: string;
 }
 
-export interface IInitConfig<F extends string = string, T extends string = string> {
+export interface IInitConfig<F extends string | Record<string, any> = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
     evaluationContext?: ClientEvaluationContext;
@@ -168,7 +168,7 @@ T extends string = string
     /**
      * Initialise the sdk against a particular environment
      */
-    init: (config: IInitConfig<F, T>) => Promise<void>;
+    init: (config: IInitConfig<FKey<F>, T>) => Promise<void>;
     /**
      * Set evaluation context. Refresh the flags.
      */
