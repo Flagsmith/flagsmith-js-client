@@ -49,7 +49,7 @@ export interface IRetrieveInfo {
 
 export interface IState<F extends string = string> {
     api: string;
-    flags?: IFlags<F>;
+    flags?: IFlags<FKey<F>>;
     evaluationContext?: EvaluationContext;
     evaluationEvent?: Record<string, Record<string, number>> | null;
     ts?: number;
@@ -89,21 +89,21 @@ export declare type LoadingState = {
     source: FlagSource //Indicates freshness of flags
 }
 
-export type OnChange<F extends string = string> = (previousFlags: IFlags<F> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
+export type OnChange<F extends string = string> = (previousFlags: IFlags<FKey<F>> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
 
 export type ApplicationMetadata = {
     name: string;
     version?: string;
 }
 
-export interface IInitConfig<F extends string = string, T extends string = string> {
+export interface IInitConfig<F extends string | Record<string, any> = string, T extends string = string> {
     AsyncStorage?: any;
     api?: string;
     evaluationContext?: ClientEvaluationContext;
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     datadogRum?: IDatadogRum;
-    defaultFlags?: IFlags<F>;
+    defaultFlags?: IFlags<FKey<F>>;
     fetch?: any;
     realtime?: boolean;
     eventSourceUrl?: string;
@@ -168,7 +168,7 @@ T extends string = string
     /**
      * Initialise the sdk against a particular environment
      */
-    init: (config: IInitConfig<F, T>) => Promise<void>;
+    init: (config: IInitConfig<FKey<F>, T>) => Promise<void>;
     /**
      * Set evaluation context. Refresh the flags.
      */
@@ -189,7 +189,7 @@ T extends string = string
     /**
      * Returns the current flags
      */
-    getAllFlags: () => IFlags<F>;
+    getAllFlags: () => IFlags<FKey<F>>;
     /**
      * Identify user, triggers a call to get flags if `flagsmith.init` has been called
      * */
