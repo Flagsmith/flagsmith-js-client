@@ -1,4 +1,3 @@
-// Sample test
 import { getFlagsmith } from './test-constants';
 
 describe('Flagsmith.functions', () => {
