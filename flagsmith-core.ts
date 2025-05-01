@@ -594,6 +594,7 @@ const Flagsmith = class {
             flags: this.flags,
             ts: this.ts,
             evaluationContext: this.evaluationContext,
+            identity: this.identity,
             evaluationEvent: this.evaluationEvent,
         } as IState
     }

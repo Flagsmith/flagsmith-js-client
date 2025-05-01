@@ -78,6 +78,7 @@ describe('Flagsmith.init', () => {
         );
         expect(getStateToCheck(flagsmith.getState())).toEqual({
             ...identityState,
+            identity: testIdentityWithTraits,
             evaluationContext: {
                 ...identityState.evaluationContext,
                 identity: {

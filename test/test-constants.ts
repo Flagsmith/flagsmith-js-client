@@ -27,6 +27,7 @@ export const defaultState = {
 export const testIdentity = 'test_identity'
 export const identityState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
+    identity: testIdentity,
     evaluationContext: {
         environment: {apiKey: environmentID},
         identity: {
@@ -63,6 +64,7 @@ export const defaultStateAlt = {
 export function getStateToCheck(_state: IState) {
     const state = {
         ..._state,
+        identity: _state.evaluationContext?.identity?.identifier,
     };
     delete state.evaluationEvent;
     // @ts-ignore internal property
