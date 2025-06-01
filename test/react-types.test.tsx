@@ -122,4 +122,15 @@ describe.only('FlagsmithProvider', () => {
             </FlagsmithProvider>
         );
     });
+    it('should compile if children prop is React.ReactNode', () => {
+        const { flagsmith, initConfig } = getFlagsmith();
+        const children: React.ReactNode = "I am a ReactNode child";
+        const { container } = render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                {children}
+            </FlagsmithProvider>
+        );
+
+        expect(container.textContent).toBe(children);
+    });
 });
