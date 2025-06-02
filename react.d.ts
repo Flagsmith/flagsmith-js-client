@@ -6,7 +6,7 @@ export declare type FlagsmithContextType<F extends string = string, T extends st
     flagsmith: IFlagsmith<F, T>;
     options?: Parameters<IFlagsmith<F, T>['init']>[0];
     serverState?: IState;
-    children: React.ReactElement[] | React.ReactElement;
+    children: React.ReactNode;
 };
 type UseFlagsReturn<
     F extends string | Record<string, any>,
