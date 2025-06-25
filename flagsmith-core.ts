@@ -167,21 +167,6 @@ const Flagsmith = class {
                     console.error(e)
                 }
             }
-            if(this.sentryClient) {
-                try {
-                    const flagsIntegration =
-                        this.sentryClient.getIntegrationByName(
-                            "FeatureFlags",
-                        );
-                    if (flagsIntegration) {
-                        Object.keys(this.flags).map((key) => {
-                            flagsIntegration.addFeatureFlag(key, this.hasFeature(key))
-                        })
-                    }
-                } catch (e) {
-                    console.error(e)
-                }
-            }
             if (this.dtrum) {
                 try {
                     const traits: DynatraceObject = {
@@ -777,6 +762,15 @@ const Flagsmith = class {
         }
         if ((usingNewOptions && !options.skipAnalytics) || !options) {
             this.evaluateFlag(key, "ENABLED");
+        }
+        if(this.sentryClient) {
+          try {
+              this.sentryClient.getIntegrationByName(
+                  "FeatureFlags",
+              )?.addFeatureFlag?.(key, res);
+          } catch (e) {
+              console.error(e)
+          }
         }
 
         return res;

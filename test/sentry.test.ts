@@ -15,6 +15,9 @@ describe('Flagsmith.init', () => {
             getIntegrationByName: jest.fn().mockReturnValue(integration),
         };
         await flagsmith.init({...initConfig, sentryClient: client});
+        flagsmith.hasFeature("zero")
+        flagsmith.hasFeature("hero")
+        expect(addFeatureFlag).toHaveBeenCalledWith('zero', false);
         expect(addFeatureFlag).toHaveBeenCalledWith('hero', true);
 
     });
