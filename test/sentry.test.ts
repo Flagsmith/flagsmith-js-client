@@ -19,6 +19,5 @@ describe('Flagsmith.init', () => {
         flagsmith.hasFeature("hero")
         expect(addFeatureFlag).toHaveBeenCalledWith('zero', false);
         expect(addFeatureFlag).toHaveBeenCalledWith('hero', true);
-
     });
 });
