@@ -8,7 +8,7 @@ import {
     IFlagsmith,
     IFlagsmithResponse,
     IFlagsmithTrait,
-    IInitConfig,
+    IInitConfig, ISentry,
     IState,
     ITraits,
     LoadingState,
@@ -167,7 +167,17 @@ const Flagsmith = class {
                     console.error(e)
                 }
             }
-
+            if(this.sentry) {
+                const flagsIntegration =
+                    this.sentry.getClient()?.getIntegrationByName(
+                        "FeatureFlags",
+                    );
+                if (flagsIntegration) {
+                    Object.keys(this.flags).map((key) => {
+                        flagsIntegration.addFeatureFlag(key, this.hasFeature(key))
+                    })
+                }
+            }
             if (this.dtrum) {
                 try {
                     const traits: DynatraceObject = {
@@ -286,36 +296,38 @@ const Flagsmith = class {
     ticks: number|null= null
     timer: number|null= null
     dtrum= null
+    sentry: ISentry | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
             const {
-                environmentID,
-                api = defaultAPI,
-                headers,
-                onChange,
-                cacheFlags,
-                datadogRum,
-                onError,
-                defaultFlags,
-                fetch: fetchImplementation,
-                preventFetch,
-                enableLogs,
-                enableDynatrace,
-                enableAnalytics,
-                realtime,
-                eventSourceUrl= "https://realtime.flagsmith.com/",
                 AsyncStorage: _AsyncStorage,
-                identity,
-                traits,
-                state,
-                cacheOptions,
-                angularHttpClient,
                 _trigger,
                 _triggerLoadingState,
+                angularHttpClient,
+                api = defaultAPI,
                 applicationMetadata,
+                cacheFlags,
+                cacheOptions,
+                datadogRum,
+                defaultFlags,
+                enableAnalytics,
+                enableDynatrace,
+                enableLogs,
+                environmentID,
+                eventSourceUrl= "https://realtime.flagsmith.com/",
+                fetch: fetchImplementation,
+                headers,
+                identity,
+                onChange,
+                onError,
+                preventFetch,
+                realtime,
+                sentry,
+                state,
+                traits,
             } = config;
             evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
             if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
@@ -396,6 +408,9 @@ const Flagsmith = class {
                 }
             }
 
+            if(sentry) {
+                this.sentry = sentry
+            }
             if (angularHttpClient) {
                 // @ts-expect-error
                 _fetch = angularFetch(angularHttpClient);
