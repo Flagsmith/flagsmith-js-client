@@ -77,13 +77,12 @@ export declare type IDatadogRum = {
 }
 
 
-export interface ISentry {
-    getClient(): {
-        getIntegrationByName(name:"FeatureFlags"): {
-            addFeatureFlag(flag: string, enabled: boolean): void;
-        } | undefined;
+export type ISentry = {
+    getIntegrationByName(name:"FeatureFlags"): {
+        addFeatureFlag(flag: string, enabled: boolean): void;
     } | undefined;
-}
+} | undefined;
+
 
 export declare enum FlagSource {
     "NONE" = "NONE",
@@ -113,7 +112,7 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
     cacheFlags?: boolean;
     cacheOptions?: ICacheOptions;
     datadogRum?: IDatadogRum;
-    sentry?: ISentry;
+    sentryClient?: ISentryClient;
     defaultFlags?: IFlags<FKey<F>>;
     fetch?: any;
     realtime?: boolean;

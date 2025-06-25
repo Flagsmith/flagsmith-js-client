@@ -167,15 +167,19 @@ const Flagsmith = class {
                     console.error(e)
                 }
             }
-            if(this.sentry) {
-                const flagsIntegration =
-                    this.sentry.getClient()?.getIntegrationByName(
-                        "FeatureFlags",
-                    );
-                if (flagsIntegration) {
-                    Object.keys(this.flags).map((key) => {
-                        flagsIntegration.addFeatureFlag(key, this.hasFeature(key))
-                    })
+            if(this.sentryClient) {
+                try {
+                    const flagsIntegration =
+                        this.sentryClient.getIntegrationByName(
+                            "FeatureFlags",
+                        );
+                    if (flagsIntegration) {
+                        Object.keys(this.flags).map((key) => {
+                            flagsIntegration.addFeatureFlag(key, this.hasFeature(key))
+                        })
+                    }
+                } catch (e) {
+                    console.error(e)
                 }
             }
             if (this.dtrum) {
@@ -296,7 +300,7 @@ const Flagsmith = class {
     ticks: number|null= null
     timer: number|null= null
     dtrum= null
-    sentry: ISentry | null = null
+    sentryClient: ISentry | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     async init(config: IInitConfig) {
@@ -325,7 +329,7 @@ const Flagsmith = class {
                 onError,
                 preventFetch,
                 realtime,
-                sentry,
+                sentryClient,
                 state,
                 traits,
             } = config;
@@ -408,8 +412,8 @@ const Flagsmith = class {
                 }
             }
 
-            if(sentry) {
-                this.sentry = sentry
+            if(sentryClient) {
+                this.sentryClient = sentryClient
             }
             if (angularHttpClient) {
                 // @ts-expect-error
