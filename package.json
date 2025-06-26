@@ -5,7 +5,9 @@
   "scripts": {
     "typecheck": "tsc",
     "build": "npm run generatetypes && npm run bundle && npm run typecheck",
+    "build:dev": "npm run generatetypes && npm run bundle:dev && npm run typecheck",
     "bundle": "rollup -c && node ./move-react.js",
+    "bundle:dev": "rollup -c rollup.config.dev.js && node ./move-react.js",
     "deploy": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish && cd ../../lib/react-native-flagsmith && npm publish",
     "deploy:beta": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta",
     "dev": "nodemon",
