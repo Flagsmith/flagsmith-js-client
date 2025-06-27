@@ -17,13 +17,13 @@ import {
 } from './types';
 // @ts-ignore
 import deepEqual from 'fast-deep-equal';
-import { AsyncStorageType } from './utils/async-storage';
-import getChanges from './utils/get-changes';
-import angularFetch from './utils/angular-fetch';
-import setDynatraceValue from './utils/set-dynatrace-value';
 import { EvaluationContext } from './evaluation-context';
-import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
+import angularFetch from './utils/angular-fetch';
+import { AsyncStorageType } from './utils/async-storage';
 import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
+import getChanges from './utils/get-changes';
+import setDynatraceValue from './utils/set-dynatrace-value';
+import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
 
 enum FlagSource {
     "NONE" = "NONE",
@@ -113,14 +113,14 @@ const Flagsmith = class {
             const userTraits: Traits = {};
             features = features || [];
             traits = traits || [];
-            features.forEach(feature => {
+            features?.forEach(feature => {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     id: feature.feature.id,
                     enabled: feature.enabled,
                     value: feature.feature_state_value
                 };
             });
-            traits.forEach(trait => {
+            traits?.forEach(trait => {
                 userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = {
                     transient: trait.transient,
                     value: trait.trait_value,
@@ -221,11 +221,12 @@ const Flagsmith = class {
                     this.getJSON(api + 'identities/?identifier=' + encodeURIComponent(evaluationContext.identity.identifier) + (evaluationContext.identity.transient ? '&transient=true' : '')),
             ])
                 .then((res) => {
-                    this.evaluationContext.identity = {...this.evaluationContext.identity, traits: {}}
-                    return handleResponse(res?.[0] as IFlagsmithResponse | null)
-                }).catch(({ message }) => {
-                    const error = new Error(message)
-                    return Promise.reject(error)
+                    this.evaluationContext.identity = { ...this.evaluationContext.identity, traits: {} };
+                    return handleResponse(res?.[0] as IFlagsmithResponse | null);
+                })
+                .catch((err) => {
+                    const error = new Error(err.message);
+                    throw error;
                 });
         } else {
             return this.getJSON(api + "flags/")
@@ -238,7 +239,7 @@ const Flagsmith = class {
     analyticsFlags = () => {
         const { api } = this;
 
-        if (!this.evaluationEvent || !this.evaluationContext.environment || !this.evaluationEvent[this.evaluationContext.environment.apiKey]) {
+        if (!this.evaluationEvent || !this.evaluationContext.environment || !this.evaluationEvent[this.evaluationContext.environment.apiKey] || !this.initialised) {
             return
         }
 
@@ -317,6 +318,9 @@ const Flagsmith = class {
                 _triggerLoadingState,
                 applicationMetadata,
             } = config;
+            if (!environmentID || !api) {
+                throw new Error('Please provide `environmentID` and `api`');
+            }
             evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
             if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
                 throw new Error('Please provide `evaluationContext.environment` with non-empty `apiKey`');
@@ -498,10 +502,12 @@ const Flagsmith = class {
                                     }
                                     if (shouldFetchFlags) {
                                         // We want to resolve init since we have cached flags
-
-                                        this.getFlags().catch((error) => {
-                                            this.onError?.(error)
-                                        })
+                                        try {
+                                            await this.getFlags();
+                                        } catch (e) {
+                                            this.log('Error fetching initial cached flags', e);
+                                            throw new Error('Error initializing cached flags');
+                                        }
                                     }
                                 } else {
                                     if (!preventFetch) {
@@ -513,7 +519,12 @@ const Flagsmith = class {
                             }
                         } else {
                             if (!preventFetch) {
-                                await this.getFlags();
+                                try {
+                                    await this.getFlags();
+                                } catch (e) {
+                                    this.log('Exception fetching flags', e);
+                                    throw new Error('Error fetching initial flags');
+                                }
                             } else {
                                 if (defaultFlags) {
                                     this._onChange(null,
@@ -533,8 +544,16 @@ const Flagsmith = class {
                     };
                     try {
                         const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(this.getStorageKey()) : await AsyncStorage.getItem(this.getStorageKey());
-                        await onRetrievedStorage(null, res)
-                    } catch (e) {}
+                        try {
+                            await onRetrievedStorage(null, res)
+                        } catch (e) {
+                            this.log('Error fetching retrieving storage', e);
+                            throw e;
+                        }
+                    } catch (e) {
+                        this.log('Error getting item from storage', e);
+                        throw e;
+                    }
                 }
             } else if (!preventFetch) {
                 await this.getFlags();
@@ -554,6 +573,7 @@ const Flagsmith = class {
             }
         } catch (error) {
             this.log('Error during initialisation ', error);
+            this.initialised = false;
             const typedError = error instanceof Error ? error : new Error(`${error}`);
             this.onError?.(typedError);
             throw error;
