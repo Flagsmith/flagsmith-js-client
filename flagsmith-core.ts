@@ -319,7 +319,7 @@ const Flagsmith = class {
                 applicationMetadata,
             } = config;
             if (!environmentID || !api) {
-                throw new Error('Please provide `environmentID` and `api`');
+                throw new Error('`environmentID` and `api` cannot be empty');
             }
             evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
             if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
