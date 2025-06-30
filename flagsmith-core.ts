@@ -225,8 +225,8 @@ const Flagsmith = class {
                     return handleResponse(res?.[0] as IFlagsmithResponse | null);
                 })
                 .catch((err) => {
-                    const error = new Error(err.message);
-                    throw error;
+                    const error = new Error(err.message)
+                    return Promise.reject(error)
                 });
         } else {
             return this.getJSON(api + "flags/")
@@ -318,9 +318,11 @@ const Flagsmith = class {
                 _triggerLoadingState,
                 applicationMetadata,
             } = config;
-            if (!environmentID || !api) {
+
+            if (!environmentID) {
                 throw new Error('`environmentID` and `api` cannot be empty');
             }
+
             evaluationContext.environment = environmentID ? {apiKey: environmentID} : evaluationContext.environment;
             if (!evaluationContext.environment || !evaluationContext.environment.apiKey) {
                 throw new Error('Please provide `evaluationContext.environment` with non-empty `apiKey`');
@@ -502,16 +504,20 @@ const Flagsmith = class {
                                     }
                                     if (shouldFetchFlags) {
                                         // We want to resolve init since we have cached flags
-                                        try {
-                                            await this.getFlags();
-                                        } catch (e) {
-                                            this.log('Error fetching initial cached flags', e);
-                                            throw new Error('Error initializing cached flags');
-                                        }
+                                        this.getFlags().catch((error) => {
+                                            this.onError?.(error)
+                                            if (this.api !== defaultAPI) {
+                                                this.log('Error fetching initial cached flags', error)
+                                                throw new Error('Error fetching initial flags');
+                                            }
+                                        })
                                     }
                                 } else {
-                                    if (!preventFetch) {
+                                    try {
                                         await this.getFlags();
+                                    } catch (e) {
+                                        this.log('Exception fetching flags', e);
+                                        throw new Error('Error fetching initial flags');
                                     }
                                 }
                             } catch (e) {
@@ -544,15 +550,12 @@ const Flagsmith = class {
                     };
                     try {
                         const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(this.getStorageKey()) : await AsyncStorage.getItem(this.getStorageKey());
-                        try {
-                            await onRetrievedStorage(null, res)
-                        } catch (e) {
-                            this.log('Error fetching retrieving storage', e);
+                        await onRetrievedStorage(null, res)
+                    } catch (e) {
+                        if (!defaultFlags) {
+                            this.log('Error getting item from storage', e);
                             throw e;
                         }
-                    } catch (e) {
-                        this.log('Error getting item from storage', e);
-                        throw e;
                     }
                 }
             } else if (!preventFetch) {

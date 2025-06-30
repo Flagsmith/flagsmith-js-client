@@ -93,7 +93,7 @@ describe('Flagsmith.init', () => {
         const { flagsmith, initConfig } = getFlagsmith({
             onChange,
             evaluationContext: { environment: { apiKey: '' } },
-        });
+        }, true);
         await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
     });
     test('should sanitise api url', async () => {

@@ -72,7 +72,7 @@ export function getStateToCheck(_state: IState) {
     return state;
 }
 
-export function getFlagsmith(config: Partial<IInitConfig> = {}) {
+export function getFlagsmith(config: Partial<IInitConfig> = {}, forceNoKey = false) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
     const mockFetch = jest.fn(async (url, options) => {
@@ -91,6 +91,7 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     const initConfig: IInitConfig = {
         AsyncStorage,
         fetch: mockFetch,
+        environmentID: forceNoKey ? '' : environmentID,
         ...config,
     };
     initConfig.evaluationContext = {
