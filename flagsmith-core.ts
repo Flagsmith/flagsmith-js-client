@@ -513,11 +513,13 @@ const Flagsmith = class {
                                         })
                                     }
                                 } else {
-                                    try {
-                                        await this.getFlags();
-                                    } catch (e) {
-                                        this.log('Exception fetching flags', e);
-                                        throw new Error('Error fetching initial flags');
+                                    if (!preventFetch) {
+                                        try {
+                                            await this.getFlags();
+                                        } catch (e) {
+                                            this.log('Exception fetching flags', e);
+                                            throw new Error('Error fetching initial flags');
+                                        }
                                     }
                                 }
                             } catch (e) {
