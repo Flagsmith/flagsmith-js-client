@@ -11,7 +11,7 @@ export declare type FlagsmithContextType<F extends string = string, T extends st
 type UseFlagsReturn<
     F extends string | Record<string, any>,
     T extends string
-> = F extends string
+> = [F] extends [string]
     ? {
     [K in F]: IFlagsmithFeature;
 } & {
