@@ -1,5 +1,5 @@
 import { waitFor } from '@testing-library/react';
-import {defaultState, FLAGSMITH_KEY, getFlagsmith, getStateToCheck, identityState} from './test-constants';
+import { defaultState, FLAGSMITH_KEY, getFlagsmith, getStateToCheck, identityState } from './test-constants';
 import { promises as fs } from 'fs';
 
 describe('Flagsmith.init', () => {
@@ -90,25 +90,28 @@ describe('Flagsmith.init', () => {
     });
     test('should reject initialize with identity no key', async () => {
         const onChange = jest.fn();
-        const { flagsmith, initConfig } = getFlagsmith({
-            onChange,
-            evaluationContext: { environment: { apiKey: '' } },
-        }, true);
+        const { flagsmith, initConfig } = getFlagsmith(
+            {
+                onChange,
+                evaluationContext: { environment: { apiKey: '' } },
+            },
+            true,
+        );
         await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
     });
     test('should sanitise api url', async () => {
         const onChange = jest.fn();
-        const { flagsmith,initConfig } = getFlagsmith({
-            api:'https://edge.api.flagsmith.com/api/v1/',
+        const { flagsmith, initConfig } = getFlagsmith({
+            api: 'https://edge.api.flagsmith.com/api/v1/',
             onChange,
         });
-        await flagsmith.init(initConfig)
+        await flagsmith.init(initConfig);
         expect(flagsmith.getState().api).toBe('https://edge.api.flagsmith.com/api/v1/');
-        const { flagsmith:flagsmith2 } = getFlagsmith({
-            api:'https://edge.api.flagsmith.com/api/v1',
+        const { flagsmith: flagsmith2 } = getFlagsmith({
+            api: 'https://edge.api.flagsmith.com/api/v1',
             onChange,
         });
-        await flagsmith2.init(initConfig)
+        await flagsmith2.init(initConfig);
         expect(flagsmith2.getState().api).toBe('https://edge.api.flagsmith.com/api/v1/');
     });
     test('should reject initialize with identity bad key', async () => {
@@ -278,7 +281,7 @@ describe('Flagsmith.init', () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
             onChange,
-             applicationMetadata: {
+            applicationMetadata: {
                 name: 'Test App',
                 version: '1.2.3',
             },
@@ -295,13 +298,12 @@ describe('Flagsmith.init', () => {
                 }),
             }),
         );
-
     });
     test('should send app name headers when provided', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
             onChange,
-             applicationMetadata: {
+            applicationMetadata: {
                 name: 'Test App',
             },
         });
@@ -316,7 +318,6 @@ describe('Flagsmith.init', () => {
                 }),
             }),
         );
-
     });
 
     test('should not send app name and version headers when not provided', async () => {
@@ -338,4 +339,34 @@ describe('Flagsmith.init', () => {
         );
     });
 
+    test('should throw an environmentID missing error on init', async () => {
+        const onChange = jest.fn();
+        const { flagsmith, initConfig } = getFlagsmith(
+            {
+                onChange,
+                environmentID: '',
+            },
+            true,
+        );
+
+        await expect(flagsmith.init(initConfig)).rejects.toThrow(Error);
+    });
+
+    test('should throw an error and call onError when API is not reachable with custom api URL', async () => {
+        const onError = jest.fn();
+        const customApi = 'https://wrong-host.com';
+        const { flagsmith, initConfig } = getFlagsmith({
+            api: customApi,
+            cacheFlags: false,
+            fetch: async () => {
+                return Promise.resolve(new Error('Mocked fetch error'));
+            },
+            onError,
+        });
+
+        const initPromise = flagsmith.init(initConfig);
+        await expect(initPromise).rejects.toThrow(new Error(`Error querying ${customApi}/ for flags`));
+        expect(onError).toHaveBeenCalledTimes(1);
+        expect(onError).toHaveBeenCalledWith(new Error(`Error querying ${customApi}/ for flags`));
+    });
 });

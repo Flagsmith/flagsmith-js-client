@@ -508,7 +508,7 @@ const Flagsmith = class {
                                             this.onError?.(error)
                                             if (this.api !== defaultAPI) {
                                                 this.log('Error fetching initial cached flags', error)
-                                                throw new Error('Error fetching initial flags');
+                                                throw new Error(`Error querying ${this.api} for flags`);
                                             }
                                         })
                                     }
@@ -518,7 +518,7 @@ const Flagsmith = class {
                                             await this.getFlags();
                                         } catch (e) {
                                             this.log('Exception fetching flags', e);
-                                            throw new Error('Error fetching initial flags');
+                                            throw new Error(`Error querying ${this.api} for flags`);
                                         }
                                     }
                                 }
@@ -531,7 +531,10 @@ const Flagsmith = class {
                                     await this.getFlags();
                                 } catch (e) {
                                     this.log('Exception fetching flags', e);
-                                    throw new Error('Error fetching initial flags');
+                                    if (this.api !== defaultAPI) {
+                                        this.log('Error fetching flags', e);
+                                        throw new Error(`Error querying ${this.api} for flags`);
+                                    }
                                 }
                             } else {
                                 if (defaultFlags) {
@@ -552,7 +555,12 @@ const Flagsmith = class {
                     };
                     try {
                         const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(this.getStorageKey()) : await AsyncStorage.getItem(this.getStorageKey());
-                        await onRetrievedStorage(null, res)
+                        try {
+                            await onRetrievedStorage(null, res)
+                        } catch (e) {
+                            this.log("Error retrieving item from storage", e);
+                            throw e;
+                        }
                     } catch (e) {
                         if (!defaultFlags) {
                             this.log('Error getting item from storage', e);
@@ -561,7 +569,12 @@ const Flagsmith = class {
                     }
                 }
             } else if (!preventFetch) {
-                await this.getFlags();
+                try {
+                    await this.getFlags();
+                } catch (e) {
+                    this.log('Error fetching flags', e);
+                    throw new Error(`Error querying ${this.api} for flags`);
+                }
             } else {
                 if (defaultFlags) {
                     this._onChange(null, { isFromServer: false, flagsChanged: getChanges({}, defaultFlags), traitsChanged: getChanges({}, evaluationContext.identity?.traits) }, this._loadedState(null, FlagSource.DEFAULT_FLAGS));

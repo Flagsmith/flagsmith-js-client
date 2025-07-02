@@ -5,11 +5,11 @@ import Mock = jest.Mock;
 import { promises as fs } from 'fs';
 
 export const environmentID = 'QjgYur4LQTwe5HpvbvhpzK'; // Flagsmith Demo Projects
-export const FLAGSMITH_KEY = 'FLAGSMITH_DB' + "_" + environmentID;
+export const FLAGSMITH_KEY = 'FLAGSMITH_DB' + '_' + environmentID;
 export const defaultState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     evaluationContext: {
-        environment: {apiKey: environmentID},
+        environment: { apiKey: environmentID },
     },
     flags: {
         hero: {
@@ -24,25 +24,25 @@ export const defaultState = {
     },
 };
 
-export const testIdentity = 'test_identity'
+export const testIdentity = 'test_identity';
 export const identityState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     identity: testIdentity,
     evaluationContext: {
-        environment: {apiKey: environmentID},
+        environment: { apiKey: environmentID },
         identity: {
             identifier: testIdentity,
             traits: {
-                string_trait: {value: 'Example'},
-                number_trait: {value: 1},
-            }
-        }
+                string_trait: { value: 'Example' },
+                number_trait: { value: 1 },
+            },
+        },
     },
     flags: {
         hero: {
             id: 1804,
             enabled: true,
-            value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg'
+            value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg',
         },
         font_size: { id: 6149, enabled: true, value: 16 },
         json_value: { id: 80317, enabled: true, value: '{"title":"Hello World"}' },
@@ -53,10 +53,10 @@ export const identityState = {
 export const defaultStateAlt = {
     ...defaultState,
     flags: {
-        'example': {
-            'id': 1,
-            'enabled': true,
-            'value': 'a',
+        example: {
+            id: 1,
+            enabled: true,
+            value: 'a',
         },
     },
 };
@@ -78,12 +78,12 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}, forceNoKey = fal
     const mockFetch = jest.fn(async (url, options) => {
         switch (url) {
             case 'https://edge.api.flagsmith.com/api/v1/flags/':
-                return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}
+                return { status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8') };
             case 'https://edge.api.flagsmith.com/api/v1/identities/?identifier=' + testIdentity:
-                return {status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentity}.json`, 'utf8')}
+                return { status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentity}.json`, 'utf8') };
         }
 
-        throw new Error('Please mock the call to ' + url)
+        throw new Error('Please mock the call to ' + url);
     });
 
     //@ts-ignore, we want to test storage even though flagsmith thinks there is none
@@ -95,16 +95,20 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}, forceNoKey = fal
         ...config,
     };
     initConfig.evaluationContext = {
-        environment: {apiKey: environmentID},
+        environment: { apiKey: environmentID },
         ...config?.evaluationContext,
-    }
+    };
     return { flagsmith, initConfig, mockFetch, AsyncStorage };
 }
-export const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));
-export function getMockFetchWithValue(mockFn:Mock, resolvedValue:object, ms=0) {
-    mockFn.mockReturnValueOnce(delay(ms).then(()=>Promise.resolve({
-        status:200,
-        text: () => Promise.resolve(JSON.stringify(resolvedValue)), // Mock json() to return the mock response
-        json: () => Promise.resolve(resolvedValue), // Mock json() to return the mock response
-    })))
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export function getMockFetchWithValue(mockFn: Mock, resolvedValue: object, ms = 0) {
+    mockFn.mockReturnValueOnce(
+        delay(ms).then(() =>
+            Promise.resolve({
+                status: 200,
+                text: () => Promise.resolve(JSON.stringify(resolvedValue)), // Mock json() to return the mock response
+                json: () => Promise.resolve(resolvedValue), // Mock json() to return the mock response
+            }),
+        ),
+    );
 }
