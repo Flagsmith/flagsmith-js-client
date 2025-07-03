@@ -2,7 +2,7 @@ import React from 'react';
 import {render} from '@testing-library/react';
 import {FlagsmithProvider, useFlags, useFlagsmith} from '../lib/flagsmith/react';
 import {getFlagsmith,} from './test-constants';
-import { IFlagsmithTrait } from '../types';
+import { IFlagsmithFeature } from '../types';
 
 
 describe.only('FlagsmithProvider', () => {
@@ -106,11 +106,11 @@ describe.only('FlagsmithProvider', () => {
             const wrongTypedFlagsmith = useFlags<StringTypes>(["non-existing-flag"])
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const stringFlag: IFlagsmithTrait = typedFlagsmith.stringFlag
+            const stringFlag: IFlagsmithFeature = typedFlagsmith.stringFlag
             //eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const numberFlag: IFlagsmithTrait = typedFlagsmith.numberFlag
+            const numberFlag: IFlagsmithFeature = typedFlagsmith.numberFlag
             //eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const firstName: IFlagsmithTrait = typedFlagsmith.objectFlag
+            const firstName: IFlagsmithFeature = typedFlagsmith.objectFlag
 
             return <></>
         }

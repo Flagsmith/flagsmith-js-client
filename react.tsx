@@ -129,7 +129,7 @@ export function useFlagsmithLoading() {
 type UseFlagsReturn<
     F extends string | Record<string, any>,
     T extends string
-> = F extends string
+> = [F] extends [string]
     ? {
     [K in F]: IFlagsmithFeature;
 } & {
