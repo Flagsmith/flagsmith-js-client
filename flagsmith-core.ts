@@ -447,7 +447,6 @@ const Flagsmith = class {
                 if (AsyncStorage && this.canUseStorage) {
                     const onRetrievedStorage = async (error: Error | null, res: string | null) => {
                         try {
-
                             if (res) {
                                 let flagsChanged = null
                                 const traitsChanged = null
