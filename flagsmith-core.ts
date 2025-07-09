@@ -290,6 +290,7 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     async init(config: IInitConfig) {
+        console.log("init", config)
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
             const {
@@ -445,112 +446,119 @@ const Flagsmith = class {
             if (cacheFlags) {
                 if (AsyncStorage && this.canUseStorage) {
                     const onRetrievedStorage = async (error: Error | null, res: string | null) => {
-                        if (res) {
-                            let flagsChanged = null
-                            const traitsChanged = null
-                            try {
-                                const json = JSON.parse(res) as IState;
-                                let cachePopulated = false;
-                                let staleCachePopulated = false;
-                                if (json && json.api === this.api && json.evaluationContext?.environment?.apiKey === this.evaluationContext.environment?.apiKey) {
-                                    let setState = true;
-                                    if (this.evaluationContext.identity && (json.evaluationContext?.identity?.identifier !== this.evaluationContext.identity.identifier)) {
-                                        this.log("Ignoring cache, identity has changed from " + json.evaluationContext?.identity?.identifier + " to " + this.evaluationContext.identity.identifier )
-                                        setState = false;
-                                    }
-                                    if (this.cacheOptions.ttl) {
-                                        if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
-                                            if (json.ts && !this.cacheOptions.loadStale) {
-                                                this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
-                                                setState = false;
+                        try {
+
+                            if (res) {
+                                let flagsChanged = null
+                                const traitsChanged = null
+                                try {
+                                    const json = JSON.parse(res) as IState;
+                                    let cachePopulated = false;
+                                    let staleCachePopulated = false;
+                                    if (json && json.api === this.api && json.evaluationContext?.environment?.apiKey === this.evaluationContext.environment?.apiKey) {
+                                        let setState = true;
+                                        if (this.evaluationContext.identity && (json.evaluationContext?.identity?.identifier !== this.evaluationContext.identity.identifier)) {
+                                            this.log("Ignoring cache, identity has changed from " + json.evaluationContext?.identity?.identifier + " to " + this.evaluationContext.identity.identifier )
+                                            setState = false;
+                                        }
+                                        if (this.cacheOptions.ttl) {
+                                            if (!json.ts || (new Date().valueOf() - json.ts > this.cacheOptions.ttl)) {
+                                                if (json.ts && !this.cacheOptions.loadStale) {
+                                                    this.log("Ignoring cache, timestamp is too old ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                                    setState = false;
+                                                }
+                                                else if (json.ts && this.cacheOptions.loadStale) {
+                                                    this.log("Loading stale cache, timestamp ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
+                                                    staleCachePopulated = true;
+                                                    setState = true;
+                                                }
                                             }
-                                            else if (json.ts && this.cacheOptions.loadStale) {
-                                                this.log("Loading stale cache, timestamp ts:" + json.ts + " ttl: " + this.cacheOptions.ttl + " time elapsed since cache: " + (new Date().valueOf()-json.ts)+"ms")
-                                                staleCachePopulated = true;
-                                                setState = true;
+                                        }
+                                        if (setState) {
+                                            cachePopulated = true;
+                                            flagsChanged = getChanges(this.flags, json.flags)
+                                            this.setState({
+                                                ...json,
+                                                evaluationContext: toEvaluationContext({
+                                                    ...json.evaluationContext,
+                                                    identity: json.evaluationContext?.identity ? {
+                                                        ...json.evaluationContext?.identity,
+                                                        traits: {
+                                                            // Traits passed in flagsmith.init will overwrite server values
+                                                            ...traits || {},
+                                                        }
+                                                    } : undefined,
+                                                })
+                                            });
+                                            this.log("Retrieved flags from cache", json);
+                                        }
+                                    }
+    
+                                    if (cachePopulated) { // retrieved flags from local storage
+                                        // fetch the flags if the cache is stale, or if we're not skipping api on cache hits
+                                        const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI || staleCachePopulated)
+                                        this._onChange(null,
+                                            { isFromServer: false, flagsChanged, traitsChanged },
+                                            this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
+                                        );
+                                        this.oldFlags = this.flags;
+                                        if (this.cacheOptions.skipAPI && cachePopulated && !staleCachePopulated) {
+                                            this.log("Skipping API, using cache")
+                                        }
+                                        if (shouldFetchFlags) {
+                                            // We want to resolve init since we have cached flags
+                                            this.getFlags().catch((error) => {
+                                                this.onError?.(error)
+                                                if (this.api !== defaultAPI) {
+                                                    this.log('Error fetching initial cached flags', error)
+                                                    throw new Error(`Error querying ${this.api} for flags`);
+                                                }
+                                            })
+                                        }
+                                    } else {
+                                        if (!preventFetch) {
+                                            try {
+                                                await this.getFlags();
+                                            } catch (e) {
+                                                this.log('Exception fetching flags', e);
+                                                throw new Error(`Error querying ${this.api} for flags`);
                                             }
                                         }
                                     }
-                                    if (setState) {
-                                        cachePopulated = true;
-                                        flagsChanged = getChanges(this.flags, json.flags)
-                                        this.setState({
-                                            ...json,
-                                            evaluationContext: toEvaluationContext({
-                                                ...json.evaluationContext,
-                                                identity: json.evaluationContext?.identity ? {
-                                                    ...json.evaluationContext?.identity,
-                                                    traits: {
-                                                        // Traits passed in flagsmith.init will overwrite server values
-                                                        ...traits || {},
-                                                    }
-                                                } : undefined,
-                                            })
-                                        });
-                                        this.log("Retrieved flags from cache", json);
-                                    }
+                                } catch (e) {
+                                    this.log("Exception fetching cached logs", e);
+                                    throw e;
                                 }
-
-                                if (cachePopulated) { // retrieved flags from local storage
-                                    // fetch the flags if the cache is stale, or if we're not skipping api on cache hits
-                                    const shouldFetchFlags = !preventFetch && (!this.cacheOptions.skipAPI || staleCachePopulated)
-                                    this._onChange(null,
-                                        { isFromServer: false, flagsChanged, traitsChanged },
-                                        this._loadedState(null, FlagSource.CACHE, shouldFetchFlags)
-                                    );
-                                    this.oldFlags = this.flags;
-                                    if (this.cacheOptions.skipAPI && cachePopulated && !staleCachePopulated) {
-                                        this.log("Skipping API, using cache")
-                                    }
-                                    if (shouldFetchFlags) {
-                                        // We want to resolve init since we have cached flags
-                                        this.getFlags().catch((error) => {
-                                            this.onError?.(error)
-                                            if (this.api !== defaultAPI) {
-                                                this.log('Error fetching initial cached flags', error)
-                                                throw new Error(`Error querying ${this.api} for flags`);
-                                            }
-                                        })
-                                    }
-                                } else {
-                                    if (!preventFetch) {
-                                        try {
-                                            await this.getFlags();
-                                        } catch (e) {
-                                            this.log('Exception fetching flags', e);
+                            } else {
+                                if (!preventFetch) {
+                                    try {
+                                        await this.getFlags();
+                                    } catch (e) {
+                                        this.log('Exception fetching flags', e);
+                                        if (this.api !== defaultAPI) {
+                                            this.log('Error fetching flags', e);
                                             throw new Error(`Error querying ${this.api} for flags`);
                                         }
                                     }
-                                }
-                            } catch (e) {
-                                this.log("Exception fetching cached logs", e);
-                            }
-                        } else {
-                            if (!preventFetch) {
-                                try {
-                                    await this.getFlags();
-                                } catch (e) {
-                                    this.log('Exception fetching flags', e);
-                                    if (this.api !== defaultAPI) {
-                                        this.log('Error fetching flags', e);
-                                        throw new Error(`Error querying ${this.api} for flags`);
+                                } else {
+                                    if (defaultFlags) {
+                                        this._onChange(null,
+                                            { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.evaluationContext.identity?.traits) },
+                                            this._loadedState(null, FlagSource.DEFAULT_FLAGS),
+                                        );
+                                    } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
+                                        this._onChange(null,
+                                            { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.evaluationContext.identity?.traits) },
+                                            this._loadedState(null, FlagSource.DEFAULT_FLAGS),
+                                        );
+                                    } else {
+                                        throw new Error(WRONG_FLAGSMITH_CONFIG);
                                     }
                                 }
-                            } else {
-                                if (defaultFlags) {
-                                    this._onChange(null,
-                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.evaluationContext.identity?.traits) },
-                                        this._loadedState(null, FlagSource.DEFAULT_FLAGS),
-                                    );
-                                } else if (this.flags) { // flags exist due to set state being called e.g. from nextJS serverState
-                                    this._onChange(null,
-                                        { isFromServer: false, flagsChanged: getChanges({}, this.flags), traitsChanged: getChanges({}, this.evaluationContext.identity?.traits) },
-                                        this._loadedState(null, FlagSource.DEFAULT_FLAGS),
-                                    );
-                                } else {
-                                    throw new Error(WRONG_FLAGSMITH_CONFIG);
-                                }
                             }
+                        } catch (e) {
+                            this.log("onRetrievedStorage error", e);
+                            throw e;
                         }
                     };
                     try {
@@ -590,6 +598,7 @@ const Flagsmith = class {
                 }
             }
         } catch (error) {
+            console.log("yolo")
             this.log('Error during initialisation ', error);
             this.initialised = false;
             const typedError = error instanceof Error ? error : new Error(`${error}`);
