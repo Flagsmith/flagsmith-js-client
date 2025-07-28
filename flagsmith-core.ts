@@ -24,6 +24,7 @@ import setDynatraceValue from './utils/set-dynatrace-value';
 import { EvaluationContext } from './evaluation-context';
 import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
 import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
+import { SDK_VERSION } from './utils/version';
 
 enum FlagSource {
     "NONE" = "NONE",
@@ -812,6 +813,10 @@ const Flagsmith = class {
 
         if (this.applicationMetadata?.version) {
             options.headers['Flagsmith-Application-Version'] = this.applicationMetadata.version;
+        }
+
+        if (SDK_VERSION) {
+            options.headers['Flagsmith-SDK-user-agent'] = `flagsmith-js-sdk/${SDK_VERSION}`
         }
 
         if (headers) {
