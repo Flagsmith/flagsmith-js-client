@@ -5,7 +5,7 @@
   "scripts": {
     "typecheck": "tsc",
     "prebuild": "node scripts/write-version.js",
-    "build": "npm run prebuild && npm run bundle && npm run typecheck",
+    "build": "npm run prebuild && npm run generatetypes && npm run bundle && npm run typecheck",
     "bundle": "rollup -c && node ./move-react.js",
     "deploy": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish && cd ../../lib/react-native-flagsmith && npm publish",
     "deploy:beta": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta",
