@@ -1,7 +1,7 @@
 import { waitFor } from '@testing-library/react';
 import {defaultState, FLAGSMITH_KEY, getFlagsmith, getStateToCheck, identityState} from './test-constants';
 import { promises as fs } from 'fs';
-
+import { SDK_VERSION } from '../utils/version'
 describe('Flagsmith.init', () => {
     beforeEach(() => {
         // Avoid mocks, but if you need to add them here
@@ -292,6 +292,7 @@ describe('Flagsmith.init', () => {
                 headers: expect.objectContaining({
                     'Flagsmith-Application-Name': 'Test App',
                     'Flagsmith-Application-Version': '1.2.3',
+                    'Flagsmith-SDK-user-agent': `flagsmith-js-sdk/${SDK_VERSION}`,
                 }),
             }),
         );
