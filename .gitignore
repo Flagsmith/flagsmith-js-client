@@ -40,3 +40,6 @@ buck-out/
 android/app/libs
 android/keystores/debug.keystore
 *.js.map
+
+# Utils
+utils/version.ts
