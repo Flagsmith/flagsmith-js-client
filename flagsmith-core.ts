@@ -9,7 +9,7 @@ import {
     IFlagsmithResponse,
     IFlagsmithTrait,
     IInitConfig,
-    ISentry,
+    ISentryClient,
     IState,
     ITraits,
     LoadingState,
@@ -287,7 +287,7 @@ const Flagsmith = class {
     ticks: number|null= null
     timer: number|null= null
     dtrum= null
-    sentryClient: ISentry | null = null
+    sentryClient: ISentryClient | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     async init(config: IInitConfig) {
