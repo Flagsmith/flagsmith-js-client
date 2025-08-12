@@ -10,7 +10,7 @@ export type DynatraceObject = {
 }
 
 export interface IFlagsmithFeature<Value = IFlagsmithValue> {
-    id: number;
+    id?: number;
     enabled: boolean;
     value: Value;
 }
