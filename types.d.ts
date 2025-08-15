@@ -77,7 +77,7 @@ export declare type IDatadogRum = {
 }
 
 
-export type ISentry = {
+export type ISentryClient = {
     getIntegrationByName(name:"FeatureFlags"): {
         addFeatureFlag(flag: string, enabled: boolean): void;
     } | undefined;
