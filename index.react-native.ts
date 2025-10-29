@@ -14,3 +14,4 @@ export const createFlagsmithInstance = ()=>{
         eventSource: _EventSource
     })
 }
+export { FlagSource } from './flagsmith-core';

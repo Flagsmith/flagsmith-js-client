@@ -84,12 +84,7 @@ export type ISentryClient = {
 } | undefined;
 
 
-export declare enum FlagSource {
-    "NONE" = "NONE",
-    "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
-    "CACHE" = "CACHE",
-    "SERVER" = "SERVER",
-}
+export { FlagSource } from './flagsmith-core';
 
 export declare type LoadingState = {
     error: Error | null, // Current error, resets on next attempt to fetch flags

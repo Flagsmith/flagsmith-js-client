@@ -27,7 +27,7 @@ import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContext
 import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
 import { SDK_VERSION } from './utils/version';
 
-enum FlagSource {
+export enum FlagSource {
     "NONE" = "NONE",
     "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
     "CACHE" = "CACHE",
