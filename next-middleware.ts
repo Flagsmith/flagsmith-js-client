@@ -5,3 +5,4 @@ export default flagsmith;
 export const createFlagsmithInstance = ():IFlagsmith=>{
     return core({})
 }
+export { FlagSource } from './flagsmith-core';

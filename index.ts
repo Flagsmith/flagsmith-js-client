@@ -19,3 +19,4 @@ export default flagsmith;
 export const createFlagsmithInstance = ():IFlagsmith=>{
     return core({ AsyncStorage, fetch:_fetch, eventSource:_EventSource})
 }
+export { FlagSource } from './flagsmith-core';
