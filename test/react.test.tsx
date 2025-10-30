@@ -192,3 +192,42 @@ describe('FlagsmithProvider', () => {
         expect(JSON.parse(screen.getByTestId("flags").innerHTML).hero.enabled).toBe(true)
     });
 });
+
+it('should not crash when server returns 500 error', async () => {
+    const onChange = jest.fn();
+    const onError = jest.fn();
+    
+    const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+        onChange,
+        onError,
+    });
+    
+    mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+            status: 500,
+            headers: { get: () => null },
+            text: () => Promise.resolve('API Response: 500')
+        })
+    );
+    
+    expect(() => {
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <FlagsmithPage/>
+            </FlagsmithProvider>
+        );
+    }).not.toThrow();
+    
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    
+    await waitFor(() => {
+        // Loading should complete with error
+        const loadingState = JSON.parse(screen.getByTestId("loading-state").innerHTML);
+        expect(loadingState.isLoading).toBe(false);
+        expect(loadingState.isFetching).toBe(false);
+        expect(loadingState.error).toBeTruthy();
+    });
+    
+    // onError callback should have been called
+    expect(onError).toHaveBeenCalledTimes(1);
+});
