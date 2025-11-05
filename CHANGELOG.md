@@ -1,5 +1,24 @@
+# Changelog
+
+## [9.3.3](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.2...v9.3.3) (2025-11-05)
+
+
+### Bug Fixes
+
+* export FlagSource enum as runtime value ([#349](https://github.com/Flagsmith/flagsmith-js-client/issues/349)) ([d480bb9](https://github.com/Flagsmith/flagsmith-js-client/commit/d480bb96cf893c2cea532e44b1053cb019213fdd))
+
+
+### CI
+
+* add release please ([#353](https://github.com/Flagsmith/flagsmith-js-client/issues/353)) ([353dbf7](https://github.com/Flagsmith/flagsmith-js-client/commit/353dbf7a8421a83840e869c2a64d39dcc1019fcf))
+
+
+### Other
+
+* **deps-dev:** bump form-data from 4.0.0 to 4.0.4 ([#331](https://github.com/Flagsmith/flagsmith-js-client/issues/331)) ([187feda](https://github.com/Flagsmith/flagsmith-js-client/commit/187feda63c94bfa20956e1ae473a53a5df8b62a1))
+
 <a id="9.3.2-post0"></a>
-# [9.3.2 (9.3.2-post0)](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.3.2-post0) - 2025-09-03
+## [9.3.2 (9.3.2-post0)](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.3.2-post0) - 2025-09-03
 
 ## What's Changed
 * fix: CORS errors due to header changes by [@khvn26](https://github.com/khvn26) in [#342](https://github.com/Flagsmith/flagsmith-js-client/pull/342)
@@ -12,7 +31,7 @@
 
 
 <a id="9.3.1"></a>
-# [9.3.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.3.1) - 2025-08-19
+## [9.3.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.3.1) - 2025-08-19
 
 ## What's Changed
 * fix: typescript type generation when array of fields is passed. by [@rushib1](https://github.com/rushib1) in [#325](https://github.com/Flagsmith/flagsmith-js-client/pull/325)
@@ -30,7 +49,7 @@
 
 
 <a id="9.3.0"></a>
-# [9.3.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.3.0) - 2025-07-01
+## [9.3.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.3.0) - 2025-07-01
 
 ## What's Changed
 Adds the [Sentry integration](https://docs.flagsmith.com/integrations/apm/sentry)
@@ -41,7 +60,7 @@ Adds the [Sentry integration](https://docs.flagsmith.com/integrations/apm/sentry
 
 
 <a id="9.2.2"></a>
-# [9.2.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.2.2) - 2025-05-13
+## [9.2.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.2.2) - 2025-05-13
 
 ## What's Changed
 * fix: re-add support for ``flagsmith.identity`` by [@kyle-ssg](https://github.com/kyle-ssg)  in [#301](https://github.com/Flagsmith/flagsmith-js-client/issues/301)
@@ -53,7 +72,7 @@ Adds the [Sentry integration](https://docs.flagsmith.com/integrations/apm/sentry
 
 
 <a id="9.2.1"></a>
-# [9.2.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.2.1) - 2025-05-05
+## [9.2.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.2.1) - 2025-05-05
 
 ## What's Changed
 * fix: updated-interface-flags-for-javascript-client by [@Zaimwa9](https://github.com/Zaimwa9) in [#315](https://github.com/Flagsmith/flagsmith-js-client/pull/315)
@@ -66,7 +85,7 @@ Adds the [Sentry integration](https://docs.flagsmith.com/integrations/apm/sentry
 
 
 <a id="9.2.0"></a>
-# [9.2.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.2.0) - 2025-04-28
+## [9.2.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.2.0) - 2025-04-28
 
 ## What's Changed
 * feat: send client info to Flagsmith by [@tiagoapolo](https://github.com/tiagoapolo) in [#293](https://github.com/Flagsmith/flagsmith-js-client/pull/293)
@@ -84,7 +103,7 @@ Adds the [Sentry integration](https://docs.flagsmith.com/integrations/apm/sentry
 
 
 <a id="9.1.0"></a>
-# [9.1.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.1.0) - 2025-04-08
+## [9.1.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.1.0) - 2025-04-08
 
 Allows specifying a type definition for all feature flags [#298](https://github.com/Flagsmith/flagsmith-js-client/pull/298), a pre-requisite for [Flagsmith/flagsmith-cli#24](https://github.com/Flagsmith/flagsmith-cli/pull/24)
 
@@ -92,7 +111,7 @@ Allows specifying a type definition for all feature flags [#298](https://github.
 
 
 <a id="9.0.5"></a>
-# [9.0.5](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.5) - 2025-03-13
+## [9.0.5](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.5) - 2025-03-13
 
 ## What's Changed
 * fix: conflicting ts field type by [@tiagoapolo](https://github.com/tiagoapolo) in [#294](https://github.com/Flagsmith/flagsmith-js-client/pull/294)
@@ -104,7 +123,7 @@ Allows specifying a type definition for all feature flags [#298](https://github.
 
 
 <a id="9.0.4"></a>
-# [9.0.4](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.4) - 2025-02-12
+## [9.0.4](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.4) - 2025-02-12
 
 fixes [#289](https://github.com/Flagsmith/flagsmith-js-client/issues/289)
 
@@ -118,7 +137,7 @@ fixes [#289](https://github.com/Flagsmith/flagsmith-js-client/issues/289)
 
 
 <a id="9.0.3"></a>
-# [9.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.3) - 2025-01-23
+## [9.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.3) - 2025-01-23
 
 Closes [#287](https://github.com/Flagsmith/flagsmith-js-client/issues/287)
 
@@ -126,7 +145,7 @@ Closes [#287](https://github.com/Flagsmith/flagsmith-js-client/issues/287)
 
 
 <a id="9.0.2"></a>
-# [9.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.2) - 2025-01-22
+## [9.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.2) - 2025-01-22
 
 Closes [#283](https://github.com/Flagsmith/flagsmith-js-client/issues/283)
 
@@ -134,7 +153,7 @@ Closes [#283](https://github.com/Flagsmith/flagsmith-js-client/issues/283)
 
 
 <a id="9.0.1"></a>
-# [9.0.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.1) - 2025-01-20
+## [9.0.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.1) - 2025-01-20
 
 ## What's Changed
 * fix: Don't use cached traits to initialize sdk state by [@tiagoapolo](https://github.com/tiagoapolo) in [#282](https://github.com/Flagsmith/flagsmith-js-client/pull/282)
@@ -147,7 +166,7 @@ Closes [#283](https://github.com/Flagsmith/flagsmith-js-client/issues/283)
 
 
 <a id="9.0.0"></a>
-# [9.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.0) - 2025-01-15
+## [9.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/9.0.0) - 2025-01-15
 
 This release removes [flagsmith-es](https://www.npmjs.com/package/flagsmith-es) and makes the flagsmith npm package both umd and es module compatible. Closes [#226](https://github.com/Flagsmith/flagsmith-js-client/issues/226)
 
@@ -155,7 +174,7 @@ This release removes [flagsmith-es](https://www.npmjs.com/package/flagsmith-es) 
 
 
 <a id="8.0.3"></a>
-# [8.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.3) - 2025-01-15
+## [8.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.3) - 2025-01-15
 
 ## What's Changed
 * chore: typecheck on build by [@kyle-ssg](https://github.com/kyle-ssg) in [#267](https://github.com/Flagsmith/flagsmith-js-client/pull/267)
@@ -169,7 +188,7 @@ This release removes [flagsmith-es](https://www.npmjs.com/package/flagsmith-es) 
 
 
 <a id="8.0.2"></a>
-# [8.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.2) - 2025-01-02
+## [8.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.2) - 2025-01-02
 
 ## What's Changed
 * fix: Un-deprecate `setTrait`, `setTraits` and `identify` by [@tiagoapolo](https://github.com/tiagoapolo) in [#276](https://github.com/Flagsmith/flagsmith-js-client/pull/276)
@@ -183,7 +202,7 @@ This release removes [flagsmith-es](https://www.npmjs.com/package/flagsmith-es) 
 
 
 <a id="8.0.1"></a>
-# [8.0.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.1) - 2024-12-18
+## [8.0.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.1) - 2024-12-18
 
 Fixes sourcemaps ([#239](https://github.com/Flagsmith/flagsmith-js-client/issues/239))
 Fixes ReactNode type ([#268](https://github.com/Flagsmith/flagsmith-js-client/issues/268))
@@ -193,7 +212,7 @@ Fixes identifier being removed from context in getFlagsResponse ([#262](https://
 
 
 <a id="8.0.0"></a>
-# [8.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.0) - 2024-12-18
+## [8.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/8.0.0) - 2024-12-18
 
 ## What's Changed
 * fix: Handle uncaught fetch exception by [@frankieyan](https://github.com/frankieyan) in [#256](https://github.com/Flagsmith/flagsmith-js-client/pull/256)
@@ -212,7 +231,7 @@ This release reintroduces the changes originally added in Version 6.0.0. This ch
 
 
 <a id="7.0.2"></a>
-# [Version 7.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/7.0.2) - 2024-11-05
+## [Version 7.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/7.0.2) - 2024-11-05
 
 ## What's Changed
 * fix: Incorrect argument type, interface extension by [@khvn26](https://github.com/khvn26) in [#261](https://github.com/Flagsmith/flagsmith-js-client/pull/261)
@@ -225,7 +244,7 @@ This release reintroduces the changes originally added in Version 6.0.0. This ch
 
 
 <a id="7.0.1"></a>
-# [Version 7.0.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/7.0.1) - 2024-10-17
+## [Version 7.0.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/7.0.1) - 2024-10-17
 
 Allows ``flagsmith.setContext({...})`` prior to init.
 
@@ -233,7 +252,7 @@ Allows ``flagsmith.setContext({...})`` prior to init.
 
 
 <a id="7.0.0"></a>
-# [7.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/7.0.0) - 2024-10-10
+## [7.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/7.0.0) - 2024-10-10
 
 This is a temporary release that reverts the changes in 6.0.0.
 
@@ -248,7 +267,7 @@ This is a temporary release that reverts the changes in 6.0.0.
 
 
 <a id="6.0.0"></a>
-# [Version 6.0.0 - Adjust cache keys to be unique per environment](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/6.0.0) - 2024-10-09
+## [Version 6.0.0 - Adjust cache keys to be unique per environment](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/6.0.0) - 2024-10-09
 
 Closes [#201](https://github.com/Flagsmith/flagsmith-js-client/issues/201). The local storage keys for the SDK cache are now unique for each environment. This is being released as a breaking change because, upon upgrading to this version, the cache will be missed the first time due to the previous key ('BULLET_TRAIN_DB') being ignored
 
@@ -259,7 +278,7 @@ Thank you very much for the great PR [@oluizcarvalho](https://github.com/oluizca
 
 
 <a id="5.0.0"></a>
-# [Version 5.0.0 - Support context, transient identities and traits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/5.0.0) - 2024-10-02
+## [Version 5.0.0 - Support context, transient identities and traits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/5.0.0) - 2024-10-02
 
 ## Transient traits
 This release supports the concept of transient traits, setting this will mean the trait is not stored within Flagsmith and evaluated just in that request.
@@ -298,7 +317,7 @@ flagsmith.setContext({
 
 
 <a id="4.1.4"></a>
-# [Version 4.1.4](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.4) - 2024-09-24
+## [Version 4.1.4](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.4) - 2024-09-24
 
 Closes [#253](https://github.com/Flagsmith/flagsmith-js-client/pull/253)
 
@@ -306,7 +325,7 @@ Closes [#253](https://github.com/Flagsmith/flagsmith-js-client/pull/253)
 
 
 <a id="4.1.3"></a>
-# [Version 4.1.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.3) - 2024-09-17
+## [Version 4.1.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.3) - 2024-09-17
 
 Closes [#250](https://github.com/Flagsmith/flagsmith-js-client/issues/250) - thank you [@blackjid](https://github.com/blackjid) 🚀
 
@@ -314,7 +333,7 @@ Closes [#250](https://github.com/Flagsmith/flagsmith-js-client/issues/250) - tha
 
 
 <a id="4.1.2"></a>
-# [Version 4.1.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.2) - 2024-09-11
+## [Version 4.1.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.2) - 2024-09-11
 
 Closes [#238](https://github.com/Flagsmith/flagsmith-js-client/issues/238)
 
@@ -324,7 +343,7 @@ Fixes a race condition whereby flag state returns as ``{}`` if ``flagsmith.init`
 
 
 <a id="4.1.1"></a>
-# [Version 4.1.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.1) - 2024-09-10
+## [Version 4.1.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.1) - 2024-09-10
 
 Solves [#242](https://github.com/Flagsmith/flagsmith-js-client/issues/242). When calling flagsmith.init with traits they will now be merged with any cached traits.
 
@@ -332,7 +351,7 @@ Solves [#242](https://github.com/Flagsmith/flagsmith-js-client/issues/242). When
 
 
 <a id="4.1.0"></a>
-# [Version 4.1.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.0) - 2024-09-04
+## [Version 4.1.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.1.0) - 2024-09-04
 
 Resolves [#243](https://github.com/Flagsmith/flagsmith-js-client/issues/243)
 
@@ -346,7 +365,7 @@ flagsmith.hasFeature("deleted_feature",{fallback:true})
 
 
 <a id="4.0.3"></a>
-# [Version 4.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.3) - 2024-07-03
+## [Version 4.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.3) - 2024-07-03
 
 Closes [#235](https://github.com/Flagsmith/flagsmith-js-client/pull/235)
 
@@ -354,7 +373,7 @@ Closes [#235](https://github.com/Flagsmith/flagsmith-js-client/pull/235)
 
 
 <a id="4.0.2"></a>
-# [Version 4.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.2) - 2024-05-17
+## [Version 4.0.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.2) - 2024-05-17
 
 ## What's Changed
 * fix: clear traits when identifying over previous identity by [@kyle-ssg](https://github.com/kyle-ssg) in [#229](https://github.com/Flagsmith/flagsmith-js-client/pull/229)
@@ -366,7 +385,7 @@ Closes [#235](https://github.com/Flagsmith/flagsmith-js-client/pull/235)
 
 
 <a id="4.0.1"></a>
-# [v4.0.1 Fix onChange Generic Types](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.1) - 2024-04-24
+## [v4.0.1 Fix onChange Generic Types](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.1) - 2024-04-24
 
 Closes [#224](https://github.com/Flagsmith/flagsmith-js-client/issues/224)
 
@@ -374,7 +393,7 @@ Closes [#224](https://github.com/Flagsmith/flagsmith-js-client/issues/224)
 
 
 <a id="4.0.0"></a>
-# [v4.0.0 - add list of changed flags/traits, improve resolve/reject of init](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.0) - 2024-04-08
+## [v4.0.0 - add list of changed flags/traits, improve resolve/reject of init](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/4.0.0) - 2024-04-08
 
 This will be the first version compatible with [OpenFeature](https://openfeature.dev/). Merges [#223](https://github.com/Flagsmith/flagsmith-js-client/pull/223)
 
@@ -395,7 +414,7 @@ Other changes
 
 
 <a id="3.24.0"></a>
-# [3.24.0 - Read cache synchronously](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.24.0) - 2024-03-28
+## [3.24.0 - Read cache synchronously](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.24.0) - 2024-03-28
 
 Closes [#222](https://github.com/Flagsmith/flagsmith-js-client/pull/222)
 
@@ -405,7 +424,7 @@ The SDK will now synchronously read cache rather than fetching it asynchronously
 
 
 <a id="3.23.2"></a>
-# [3.23.2 - Remove busy logs, fix onChange event](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.23.2) - 2024-03-01
+## [3.23.2 - Remove busy logs, fix onChange event](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.23.2) - 2024-03-01
 
 Merges [#207](https://github.com/Flagsmith/flagsmith-js-client/pull/207)
 Closes [#217](https://github.com/Flagsmith/flagsmith-js-client/issues/217)
@@ -414,7 +433,7 @@ Closes [#217](https://github.com/Flagsmith/flagsmith-js-client/issues/217)
 
 
 <a id="3.23.1"></a>
-# [3.23.1 - Prevent Nextjs caching behaviour](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.23.1) - 2024-03-01
+## [3.23.1 - Prevent Nextjs caching behaviour](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.23.1) - 2024-03-01
 
 Merges [#216](https://github.com/Flagsmith/flagsmith-js-client/pull/216)
 
@@ -422,7 +441,7 @@ Merges [#216](https://github.com/Flagsmith/flagsmith-js-client/pull/216)
 
 
 <a id="3.23.0"></a>
-# [3.23.0 - Fix missed events in useFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.23.0) - 2024-02-29
+## [3.23.0 - Fix missed events in useFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.23.0) - 2024-02-29
 
 Closes [#214](https://github.com/Flagsmith/flagsmith-js-client/issues/214)
 
@@ -433,7 +452,7 @@ Closes [#214](https://github.com/Flagsmith/flagsmith-js-client/issues/214)
 
 
 <a id="3.22.1"></a>
-# [3.22.1 - Support fallback for non-JSON evaluations](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.22.1) - 2024-02-20
+## [3.22.1 - Support fallback for non-JSON evaluations](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.22.1) - 2024-02-20
 
 Merges [#213](https://github.com/Flagsmith/flagsmith-js-client/pull/213), thanks to [@levrik](https://github.com/levrik)
 
@@ -441,7 +460,7 @@ Merges [#213](https://github.com/Flagsmith/flagsmith-js-client/pull/213), thanks
 
 
 <a id="3.22.0"></a>
-# [3.22.0 - Prevent race condition between identify/getFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.22.0) - 2024-01-10
+## [3.22.0 - Prevent race condition between identify/getFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.22.0) - 2024-01-10
 
 Prior to this release, clients that request identified/unidentified flags simultaneously could see the wrong results due to a race condition. Although this signifies incorrect usage of the SDK, this will no longer occur.
 
@@ -451,7 +470,7 @@ For more information see [#205](https://github.com/Flagsmith/flagsmith-js-client
 
 
 <a id="3.19.0"></a>
-# [3.19.0 - Access Flagsmith loading state](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.19.0) - 2023-06-23
+## [3.19.0 - Access Flagsmith loading state](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.19.0) - 2023-06-23
 
 This introduces a strategy to responding to loading state changes in flagsmith
 
@@ -486,7 +505,7 @@ It can be consumed via the [onChange](https://github.com/Flagsmith/flagsmith-js-
 
 
 <a id="3.18.4"></a>
-# [3.18.4 - Audit fix](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.4) - 2023-06-20
+## [3.18.4 - Audit fix](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.4) - 2023-06-20
 
 This version includes an npm audit fix.
 
@@ -494,7 +513,7 @@ This version includes an npm audit fix.
 
 
 <a id="3.18.3"></a>
-# [3.18.3 - Ignore undefined traits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.3) - 2023-04-05
+## [3.18.3 - Ignore undefined traits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.3) - 2023-04-05
 
 Closes [#167](https://github.com/Flagsmith/flagsmith-js-client/issues/167)
 
@@ -502,7 +521,7 @@ Closes [#167](https://github.com/Flagsmith/flagsmith-js-client/issues/167)
 
 
 <a id="3.18.2"></a>
-# [3.18.2 - Adds Datadog RUM](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.2) - 2023-03-20
+## [3.18.2 - Adds Datadog RUM](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.2) - 2023-03-20
 
 This release adds an integration to Datadog RUM, it focuses on the new experimental feature_flags feature, you can read more about it here https://docs.datadoghq.com/real_user_monitoring/guide/setup-feature-flag-data-collection/?tab=npm.
 
@@ -525,7 +544,7 @@ You can find an example of this integration [here](https://github.com/Flagsmith/
 
 
 <a id="3.18.1"></a>
-# [3.18.1 - Realtime features](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.1) - 2023-03-20
+## [3.18.1 - Realtime features](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.18.1) - 2023-03-20
 
 This release adds a stable implementation of realtime features and is used on app.flagsmith.com.
 
@@ -535,7 +554,7 @@ Flagsmith projects that are opted into realtime are able to enable realtime with
 
 
 <a id="3.16.0"></a>
-# [3.16.0 - Always send an Error object to onError](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.16.0) - 2023-01-30
+## [3.16.0 - Always send an Error object to onError](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.16.0) - 2023-01-30
 
 Closes [#93](https://github.com/Flagsmith/flagsmith-js-client/issues/93). This aims to make the type of onError more predictable by always sending it as an Error object. Thank you to [@gfrancischini](https://github.com/gfrancischini) for the sensible suggestion!
 
@@ -543,7 +562,7 @@ Closes [#93](https://github.com/Flagsmith/flagsmith-js-client/issues/93). This a
 
 
 <a id="3.15.1"></a>
-# [3.15.1 - Fix Promise return from setTrait(s)](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.15.1) - 2022-12-19
+## [3.15.1 - Fix Promise return from setTrait(s)](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.15.1) - 2022-12-19
 
 Prior to this release, setTrait(s) calls were not returning a promise, they will now resolve when the API returns a new set of flags.
 
@@ -551,7 +570,7 @@ Prior to this release, setTrait(s) calls were not returning a promise, they will
 
 
 <a id="3.15.0"></a>
-# [3.15.0 - Unify and improve setTrait / setTraits calls](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.15.0) - 2022-12-19
+## [3.15.0 - Unify and improve setTrait / setTraits calls](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.15.0) - 2022-12-19
 
 - Calls to setTrait/setTraits now only hit 1 endpoint, previously they hit 2.
 - The behaviour of setTrait now matches setTraits, prior to this you could not delete a trait via ``flagsmith.setTrait("trait",null)``. Also, this prevents an issue where segment flags were sometimes not returned in response to setting a trait.
@@ -561,7 +580,7 @@ Prior to this release, setTrait(s) calls were not returning a promise, they will
 
 
 <a id="3.14.1"></a>
-# [3.14.1 - React fix: initialise flagsmith with serverState if provided](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.14.1) - 2022-11-14
+## [3.14.1 - React fix: initialise flagsmith with serverState if provided](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.14.1) - 2022-11-14
 
 Prior to this release, there were cases where flags provided by serverState are cleared, potentially effecting the isomorphic client (e.g. Next.js applications). This is because ``<ReactProvider/>`` [initialises Flagsmith](https://github.com/Flagsmith/flagsmith-js-client/blob/main/react.tsx#L41) internally after server state is set.
 
@@ -573,7 +592,7 @@ This change makes sure that Flagsmith is initialises with the server state so th
 
 
 <a id="3.14.0"></a>
-# [3.14.0 - Reduce bundle size](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.14.0) - 2022-11-09
+## [3.14.0 - Reduce bundle size](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.14.0) - 2022-11-09
 
 This release reduces the bundle size (31kb -> 21kb Pre GZIP) of the core SDK, it does so by patching one of our only dependencies (@callstack/async-storage) to export just the functions we need and remove the dependency of lodash.
 
@@ -584,7 +603,7 @@ This release reduces the bundle size (31kb -> 21kb Pre GZIP) of the core SDK, it
 
 
 <a id="3.13.1"></a>
-# [3.13.1 - fix IFlagsmithFeature type](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.13.1) - 2022-11-09
+## [3.13.1 - fix IFlagsmithFeature type](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.13.1) - 2022-11-09
 
 Closes [#153](https://github.com/Flagsmith/flagsmith-js-client/issues/153)
 
@@ -592,7 +611,7 @@ Closes [#153](https://github.com/Flagsmith/flagsmith-js-client/issues/153)
 
 
 <a id="3.13.0"></a>
-# [3.13.0 - Fix race condition with useFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.13.0) - 2022-10-27
+## [3.13.0 - Fix race condition with useFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.13.0) - 2022-10-27
 
 Prior to this release, there were cases where useFlags was not updating flags when the Flagsmith cache was received. This was down to event listeners not being initialised prior to the cache being accessed.
 
@@ -600,7 +619,7 @@ Prior to this release, there were cases where useFlags was not updating flags wh
 
 
 <a id="3.12.0"></a>
-# [3.12.0 - fix fallback usage on null flags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.12.0) - 2022-10-27
+## [3.12.0 - fix fallback usage on null flags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.12.0) - 2022-10-27
 
 A few releases ago we added the ability to automatically parse JSON in flagsmith.getValue. Since null is parseable by JSON.parse, the fallback was not being used in a lot of cases. Now, the client will ignore null flag values and use the fallback.
 
@@ -617,7 +636,7 @@ A few releases ago we added the ability to automatically parse JSON in flagsmith
 
 
 <a id="3.11.0"></a>
-# [3.11.0 - Fix offline cache usage](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.11.0) - 2022-10-20
+## [3.11.0 - Fix offline cache usage](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.11.0) - 2022-10-20
 
 Closes [#148](https://github.com/Flagsmith/flagsmith-js-client/issues/148), prior to this release failed API requests (e.g. offline) would incorrectly update the local storage cache. Failed API calls will correctly trigger ``onError`` with the appropriate information.
 
@@ -629,7 +648,7 @@ Thank you so much to [@gfrancischini](https://github.com/gfrancischini) for spot
 
 
 <a id="3.10.5"></a>
-# [3.10.5 - getValue JSON type support](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.5) - 2022-10-09
+## [3.10.5 - getValue JSON type support](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.5) - 2022-10-09
 
 This release will allow you to specify the return type of getValue as well as allow you to parse the value as JSON.
 
@@ -652,7 +671,7 @@ Thank you very much [@azriel46d](https://github.com/azriel46d) and [@dangrima90]
 
 
 <a id="3.10.2"></a>
-# [3.10.2 - Bundle "flagsmith/react" into react-native-flagsmith](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.2) - 2022-10-03
+## [3.10.2 - Bundle "flagsmith/react" into react-native-flagsmith](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.2) - 2022-10-03
 
 Prior to this release, users on React Native had to install both the react-native SDK and standard flagsmith SDK.
 
@@ -678,7 +697,7 @@ import {FlagsmithProvider} from 'react-native-flagsmith/react';
 
 
 <a id="3.10.1"></a>
-# [3.10.1 - Fix multi project flag analytics](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.1) - 2022-09-22
+## [3.10.1 - Fix multi project flag analytics](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.1) - 2022-09-22
 
 Closes [#145](https://github.com/Flagsmith/flagsmith-js-client/issues/145)
 
@@ -686,7 +705,7 @@ Closes [#145](https://github.com/Flagsmith/flagsmith-js-client/issues/145)
 
 
 <a id="3.10.0"></a>
-# [3.10.0 Realtime flag preparations](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.0) - 2022-09-22
+## [3.10.0 Realtime flag preparations](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.10.0) - 2022-09-22
 
 This release configures serverside event urls to match what we intend to use for production. More updates on realtime flags will follow.
 
@@ -694,7 +713,7 @@ This release configures serverside event urls to match what we intend to use for
 
 
 <a id="3.9.2"></a>
-# [3.9.2 - TypeScript fixes and Fixed React Native Async Storage](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.9.2) - 2022-08-26
+## [3.9.2 - TypeScript fixes and Fixed React Native Async Storage](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.9.2) - 2022-08-26
 
 Closes [#140](https://github.com/Flagsmith/flagsmith-js-client/issues/140), [#139](https://github.com/Flagsmith/flagsmith-js-client/issues/139), [#137](https://github.com/Flagsmith/flagsmith-js-client/issues/137).
 
@@ -702,7 +721,7 @@ Closes [#140](https://github.com/Flagsmith/flagsmith-js-client/issues/140), [#13
 
 
 <a id="3.9.0"></a>
-# [3.9.0 Fixed source maps](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.9.0) - 2022-08-22
+## [3.9.0 Fixed source maps](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.9.0) - 2022-08-22
 
 This release fixes source mapping for all clients, prior to this you could not inspect ts functions such as ``init`` and ``getFlags`` from ``flagsmith-core.ts``.
 
@@ -710,7 +729,7 @@ This release fixes source mapping for all clients, prior to this you could not i
 
 
 <a id="3.8.1"></a>
-# [3.8.1 - Preparations for realtime flags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.8.1) - 2022-08-17
+## [3.8.1 - Preparations for realtime flags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.8.1) - 2022-08-17
 
 This release includes working functionality for Serverside Events in the Flagsmith JavaScript client, React Native and SSR clients. A follow-up release will be published when this is released to production.
 
@@ -718,7 +737,7 @@ This release includes working functionality for Serverside Events in the Flagsmi
 
 
 <a id="3.8.0"></a>
-# [3.8.0 - Fix useFlags for React Native, prepare for realtime flags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.8.0) - 2022-08-16
+## [3.8.0 - Fix useFlags for React Native, prepare for realtime flags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.8.0) - 2022-08-16
 
 Prior to this release, React Native was not receiving flag updates with useFlags(["flag_name"]), this is due to the event emitter not being compatible.
 
@@ -728,7 +747,7 @@ This release also prepares functionality for realtime flags.
 
 
 <a id="3.7.2"></a>
-# [3.7.2 - Inform user of undefined fetch](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.7.2) - 2022-08-10
+## [3.7.2 - Inform user of undefined fetch](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.7.2) - 2022-08-10
 
 Similarly to version 3.7.1, this change caters for SSR technologies not supporting fetch. This version informs the user when fetch is undefined regardless of whether the user is opted into logging.
 
@@ -736,7 +755,7 @@ Similarly to version 3.7.1, this change caters for SSR technologies not supporti
 
 
 <a id="3.7.1"></a>
-# [3.7.1 - Add fetch logging](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.7.1) - 2022-08-10
+## [3.7.1 - Add fetch logging](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.7.1) - 2022-08-10
 
 With SSR clients especially where fetch implementations differ, it's important to be able to debug fetch requests. With this version you will be able to see fetch statuses and exceptions when you pass ``enableLogs:true`` within ``flagsmith.init``
 
@@ -744,7 +763,7 @@ With SSR clients especially where fetch implementations differ, it's important t
 
 
 <a id="3.7.0"></a>
-# [3.7.0 - Typed generics for flagsmith flags and traits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.7.0) - 2022-08-09
+## [3.7.0 - Typed generics for flagsmith flags and traits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.7.0) - 2022-08-09
 
 Given that we type our flags and traits
 
@@ -774,7 +793,7 @@ Thank you very much for this addition [@PrettyWood](https://github.com/PrettyWoo
 
 
 <a id="3.6.0"></a>
-# [3.6.0 - Improve event-trigger code, fix up TypeScript issues](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.6.0) - 2022-08-09
+## [3.6.0 - Improve event-trigger code, fix up TypeScript issues](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.6.0) - 2022-08-09
 
 Closes [#132](https://github.com/Flagsmith/flagsmith-js-client/issues/132) Thank you to [@dgreene1](https://github.com/dgreene1) for the in-depth review 🚀 .
 
@@ -782,7 +801,7 @@ Closes [#132](https://github.com/Flagsmith/flagsmith-js-client/issues/132) Thank
 
 
 <a id="3.5.0"></a>
-# [3.5.0 - allow custom fetch implementations](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.5.0) - 2022-08-05
+## [3.5.0 - allow custom fetch implementations](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.5.0) - 2022-08-05
 
 Some SSR technologies e.g. Nuxt do not provide a fetch polyfill, this means that sometimes we need to tell Flagsmith how to fetch data.
 
@@ -798,7 +817,7 @@ Here's an example of how this can be done with Nuxt https://github.com/Flagsmith
 
 
 <a id="3.4.0"></a>
-# [3.4.0 - Remove deprecated IBulletTrainFeature type](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.4.0) - 2022-07-15
+## [3.4.0 - Remove deprecated IBulletTrainFeature type](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.4.0) - 2022-07-15
 
 IBulletTrainFeature had been deprecated many releases ago, this release removes it entirely. If your application imports it, just import IFlagsmithFeature instead. See https://github.com/Flagsmith/flagsmith-js-client/blob/main/types.d.ts
 
@@ -806,7 +825,7 @@ IBulletTrainFeature had been deprecated many releases ago, this release removes 
 
 
 <a id="3.3.2"></a>
-# [3.3.2 - Added Next.js Middleware Support](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.3.2) - 2022-07-01
+## [3.3.2 - Added Next.js Middleware Support](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.3.2) - 2022-07-01
 
 This release adds a Next.js middleware compatible bundle, a working example of this can be found [here](https://github.com/Flagsmith/flagsmith-js-client/blob/main/examples/nextjs-middleware).
 
@@ -816,7 +835,7 @@ Closes [#112](https://github.com/Flagsmith/flagsmith-js-client/issues/112)
 
 
 <a id="3.3.0"></a>
-# [3.3.0 - Added cacheOptions](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.3.0) - 2022-06-29
+## [3.3.0 - Added cacheOptions](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.3.0) - 2022-06-29
 
 When calling ``flagsmith.init`` you can now pass ``cacheOptions``
 
@@ -837,7 +856,7 @@ Thanks to [@qrush](https://github.com/qrush) for the suggestion 🚀
 
 
 <a id="3.2.0"></a>
-# [3.2.0 fix <FlagsmithProvider /> initialisation](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.2.0) - 2022-06-24
+## [3.2.0 fix <FlagsmithProvider /> initialisation](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.2.0) - 2022-06-24
 
 Prior to this release, flagsmith would initialise inside a useEffect within the FlagsmithProvider component, now it will initialise immediately as can be seen [here](https://github.com/Flagsmith/flagsmith-js-client/blob/main/react/index.tsx#L39). Initialising flagsmith asynchronously meant that the UI could flicker when default values are supplied, as well as being overall slower than it needs to be.
 
@@ -847,7 +866,7 @@ Thanks to [@briangorham](https://github.com/briangorham) for spotting this 🚀 
 
 
 <a id="3.1.2"></a>
-# [3.1.2 - Adjust Dynatrace integration syntax](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.1.2) - 2022-06-13
+## [3.1.2 - Adjust Dynatrace integration syntax](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.1.2) - 2022-06-13
 
 In order to make the Dynatrace integration more simplistic, this replaces the dtrum init property with "enableDynatrace"
 
@@ -855,7 +874,7 @@ In order to make the Dynatrace integration more simplistic, this replaces the dt
 
 
 <a id="3.1.1"></a>
-# [3.1.1 - Dynatrace realtime user monitoring integration](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.1.1) - 2022-06-13
+## [3.1.1 - Dynatrace realtime user monitoring integration](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.1.1) - 2022-06-13
 
 When providing dtrum instance to flagsmith.init, flagsmith will send session properties corresponding to flag enabled state, flag values and user traits. See [here](https://github.com/Flagsmith/flagsmith-js-client/blob/main/examples/dynatrace-realtime-user-monitoring/main.js#L42) for an example.
 
@@ -875,7 +894,7 @@ View the docs [here](https://docs.flagsmith.com/clients/javascript#dynatrace-jav
 
 
 <a id="3.1.0"></a>
-# [3.1.0 - fix setTrait(s) prior to identify](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.1.0) - 2022-06-13
+## [3.1.0 - fix setTrait(s) prior to identify](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.1.0) - 2022-06-13
 
 Prior to this release, there were instances where calling setTrait or setTraits prior to identifying would attempt to hit the API. With this change, setTrait(s) will always build up an object of intended traits that will get sent as soon as the user is identified.
 
@@ -883,7 +902,7 @@ Prior to this release, there were instances where calling setTrait or setTraits 
 
 
 <a id="3.0.6"></a>
-# [3.0.6 - fix flagsmith.setTraits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.6) - 2022-06-11
+## [3.0.6 - fix flagsmith.setTraits](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.6) - 2022-06-11
 
 After migrating to the v2 SDK, the traits/bulk endpoint was deprecated, this release replaces that endpoint.
 
@@ -891,7 +910,7 @@ After migrating to the v2 SDK, the traits/bulk endpoint was deprecated, this rel
 
 
 <a id="3.0.4"></a>
-# [3.0.4: Remove increment / decrement functions](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.4) - 2022-06-08
+## [3.0.4: Remove increment / decrement functions](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.4) - 2022-06-08
 
 Merges:
 [#120](https://github.com/Flagsmith/flagsmith-js-client/pull/120) [@matthewelwell](https://github.com/matthewelwell) 🥳
@@ -903,7 +922,7 @@ The Edge API will no longer allow for ``flagsmith. incrementTrait``, this PR rem
 
 
 <a id="3.0.3"></a>
-# [3.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.3) - 2022-06-08
+## [3.0.3](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.3) - 2022-06-08
 
 Closes:
 [#118](https://github.com/Flagsmith/flagsmith-js-client/issues/118)
@@ -918,7 +937,7 @@ Merges:
 
 
 <a id="3.0.0"></a>
-# [3.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.0) - 2022-06-07
+## [3.0.0](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/3.0.0) - 2022-06-07
 
 Edge API as default!
 
@@ -926,7 +945,7 @@ Edge API as default!
 
 
 <a id="2.0.9"></a>
-# [2.0.9 Fix error with incrementTrait](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.9) - 2022-03-25
+## [2.0.9 Fix error with incrementTrait](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.9) - 2022-03-25
 
 Closes [#109](https://github.com/Flagsmith/flagsmith-js-client/pull/109), thanks [@TD-4242](https://github.com/TD-4242) 🚀
 
@@ -934,7 +953,7 @@ Closes [#109](https://github.com/Flagsmith/flagsmith-js-client/pull/109), thanks
 
 
 <a id="2.0.8"></a>
-# [2.0.8 ESM module support](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.8) - 2022-03-23
+## [2.0.8 ESM module support](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.8) - 2022-03-23
 
 With this release, users are now able to npm install from [flagsmith-es](https://www.npmjs.com/package/flagsmith-es), this is a mirrored npm module except it is bundled as an ES module.
 
@@ -944,7 +963,7 @@ Thanks [@bradberger](https://github.com/bradberger) for the suggestion 🚀
 
 
 <a id="2.0.6"></a>
-# [2.0.6: Closes https://github.com/Flagsmith/flagsmith-js-client/issues/103](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.6) - 2022-03-23
+## [2.0.6: Closes https://github.com/Flagsmith/flagsmith-js-client/issues/103](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.6) - 2022-03-23
 
 Closes [#103](https://github.com/Flagsmith/flagsmith-js-client/issues/103) thanks to [@xrash](https://github.com/xrash) 🥳  [#104](https://github.com/Flagsmith/flagsmith-js-client/pull/104)
 
@@ -952,7 +971,7 @@ Closes [#103](https://github.com/Flagsmith/flagsmith-js-client/issues/103) thank
 
 
 <a id="2.0.5"></a>
-# [2.0.5 - Minor fixes and React Improvements](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.5) - 2022-03-23
+## [2.0.5 - Minor fixes and React Improvements](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.5) - 2022-03-23
 
 This release includes a few underlying type fixes as well as a solution to [#105](https://github.com/Flagsmith/flagsmith-js-client/issues/105)
 
@@ -984,7 +1003,7 @@ flagsmith.init({
 
 
 <a id="2.0.0"></a>
-# [2.0.0 - react hook support for React+React Native](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.0) - 2022-03-22
+## [2.0.0 - react hook support for React+React Native](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.0) - 2022-03-22
 
 React and React Native users will now be able to use a hook based approach to retrieving flags
 
@@ -1020,7 +1039,7 @@ Then in your app
 
 
 <a id="2.0.0-beta.2"></a>
-# [2.0.0-beta.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.0-beta.2) - 2022-03-15
+## [2.0.0-beta.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.0-beta.2) - 2022-03-15
 
 Fixes passing undefined to traits in useFlags, thanks [@NileDaley](https://github.com/NileDaley) 🚀 [#102](https://github.com/Flagsmith/flagsmith-js-client/pull/102)
 
@@ -1028,7 +1047,7 @@ Fixes passing undefined to traits in useFlags, thanks [@NileDaley](https://githu
 
 
 <a id="2.0.0-beta.1"></a>
-# [2.0.0-beta.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.0-beta.1) - 2022-03-07
+## [2.0.0-beta.1](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/2.0.0-beta.1) - 2022-03-07
 
 This release includes a rewrite to the build system of the SDK. It is now typescript-first and generates much better d.ts output.
 
@@ -1061,7 +1080,7 @@ This also includes a new react hooks library with easy to use nextjs support.
 
 
 <a id="1.7.4"></a>
-# [1.7.4](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.4) - 2022-02-20
+## [1.7.4](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.4) - 2022-02-20
 
 Closes [#99](https://github.com/Flagsmith/flagsmith-js-client/pull/99)
 Closes [#98](https://github.com/Flagsmith/flagsmith-js-client/pull/98)
@@ -1072,7 +1091,7 @@ Thank you [@gf3](https://github.com/gf3) and [@xrash](https://github.com/xrash) 
 
 
 <a id="1.7.3"></a>
-# [Release 1.7.3 - Remove Bullet Train instances, small type fixes](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.3) - 2022-01-18
+## [Release 1.7.3 - Remove Bullet Train instances, small type fixes](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.3) - 2022-01-18
 
 This non-breaking change release removes mentions of Bullet Train where possible, the release contains the following PR:
 [#94](https://github.com/Flagsmith/flagsmith-js-client/pull/94)
@@ -1081,7 +1100,7 @@ This non-breaking change release removes mentions of Bullet Train where possible
 
 
 <a id="1.7.2"></a>
-# [1.7.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.2) - 2021-12-16
+## [1.7.2](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.2) - 2021-12-16
 
 Merged:
 [#90](https://github.com/Flagsmith/flagsmith-js-client/pull/90)
@@ -1090,7 +1109,7 @@ Merged:
 
 
 <a id="1.7.1"></a>
-# [1.7.1 - Added Identity type](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.1) - 2021-12-06
+## [1.7.1 - Added Identity type](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.1) - 2021-12-06
 
 This release adds the identity typescript type to flagsmith
 
@@ -1108,7 +1127,7 @@ This release adds the identity typescript type to flagsmith
 
 
 <a id="1.7.0"></a>
-# [1.7.0 - resolve init promise for previously identified users](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.0) - 2021-11-04
+## [1.7.0 - resolve init promise for previously identified users](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.7.0) - 2021-11-04
 
 Prior to this release, if you identify a user before calling init then the promise would not resolve.
 
@@ -1116,7 +1135,7 @@ Prior to this release, if you identify a user before calling init then the promi
 
 
 <a id="1.6.10"></a>
-# [1.6.10 - trigger onChange with defaultFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.10) - 2021-10-11
+## [1.6.10 - trigger onChange with defaultFlags](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.10) - 2021-10-11
 
 Previously, if defaultFlags were set but preventFetch was true, flagsmith would never call onChange. As of this release onChange will callback with the defaultFlags.
 
@@ -1124,7 +1143,7 @@ Previously, if defaultFlags were set but preventFetch was true, flagsmith would 
 
 
 <a id="1.6.7"></a>
-# [1.6.7](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.7) - 2021-09-22
+## [1.6.7](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.7) - 2021-09-22
 
 Fixes [#84](https://github.com/Flagsmith/flagsmith-js-client/issues/84)
 
@@ -1132,7 +1151,7 @@ Fixes [#84](https://github.com/Flagsmith/flagsmith-js-client/issues/84)
 
 
 <a id="1.6.6"></a>
-# [1.6.6](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.6) - 2021-09-15
+## [1.6.6](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.6) - 2021-09-15
 
 This release fixes an issue where flagsmith.init was not resolving if no flags previously existed in cache.
 
@@ -1140,7 +1159,7 @@ This release fixes an issue where flagsmith.init was not resolving if no flags p
 
 
 <a id="1.6.2"></a>
-# [1.6.2 - update types](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.2) - 2021-07-26
+## [1.6.2 - update types](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.2) - 2021-07-26
 
 This release resolves [#81](https://github.com/Flagsmith/flagsmith-js-client/issues/81), previously types indicated that getFlags,identify,setTrait and other calls would resolve with IFlags however this is not the case. These calls should be followed by getValue / hasFeature.
 
@@ -1148,7 +1167,7 @@ This release resolves [#81](https://github.com/Flagsmith/flagsmith-js-client/iss
 
 
 <a id="1.6.1"></a>
-# [1.6.1 - Fix react native types](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.1) - 2021-07-26
+## [1.6.1 - Fix react native types](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.1) - 2021-07-26
 
 This release fixes an issue with react native types [#82](https://github.com/Flagsmith/flagsmith-js-client/issues/82)
 
@@ -1156,7 +1175,7 @@ This release fixes an issue with react native types [#82](https://github.com/Fla
 
 
 <a id="1.6.0"></a>
-# [1.6.0 - Use api.flagsmith.com](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.0) - 2021-07-06
+## [1.6.0 - Use api.flagsmith.com](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.6.0) - 2021-07-06
 
 Prior to this release, API calls from the JS SDK went to https://api.bullet-train.io, now they go to https://api.flagsmith.com
 
@@ -1164,9 +1183,9 @@ Prior to this release, API calls from the JS SDK went to https://api.bullet-trai
 
 
 <a id="1.5.0"></a>
-# [1.5.0 Multiple flagsmith instances](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.5.0) - 2021-06-15
+## [1.5.0 Multiple flagsmith instances](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.5.0) - 2021-06-15
 
-# 1.5.0
+## 1.5.0
 
 This release allows you to create multiple instances of flagsmith, this may be used when you wish to identify multiple users simultaneously within your app and retain access to getValue, hasFeature etc for each user.
 
@@ -1194,7 +1213,7 @@ const flagsmithB = createFlagsmithInstance();
 
 
 <a id="1.4.1"></a>
-# [Added traits parameter to identify (1.4.1)](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.4.1) - 2021-05-20
+## [Added traits parameter to identify (1.4.1)](https://github.com/Flagsmith/flagsmith-js-client/releases/tag/1.4.1) - 2021-05-20
 
 As of this release you can now supply traits with the identify call, this combines setTraits and identify into 1 call.
 
