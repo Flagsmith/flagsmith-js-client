@@ -1,0 +1,94 @@
+{
+    "bootstrap-sha": "644c5c883ecbb3786507b50cea01903dc2e533bf",
+    "packages": {
+        ".": {
+            "release-type": "simple",
+            "changelog-path": "CHANGELOG.md",
+            "bump-minor-pre-major": false,
+            "bump-patch-for-minor-pre-major": false,
+            "draft": false,
+            "prerelease": false,
+            "include-component-in-tag": false,
+            "extra-files": [
+                {
+                    "type": "json",
+                    "path": "lib/flagsmith/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "lib/flagsmith/package-lock.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "lib/flagsmith/package-lock.json",
+                    "jsonpath": "$.packages..version"
+                },
+                {
+                    "type": "json",
+                    "path": "lib/react-native-flagsmith/package.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "lib/react-native-flagsmith/package-lock.json",
+                    "jsonpath": "$.version"
+                },
+                {
+                    "type": "json",
+                    "path": "lib/react-native-flagsmith/package-lock.json",
+                    "jsonpath": "$.packages..version"
+                }
+            ]
+        }
+    },
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "changelog-sections": [
+        {
+            "type": "feat",
+            "hidden": false,
+            "section": "Features"
+        },
+        {
+            "type": "fix",
+            "hidden": false,
+            "section": "Bug Fixes"
+        },
+        {
+            "type": "ci",
+            "hidden": false,
+            "section": "CI"
+        },
+        {
+            "type": "docs",
+            "hidden": false,
+            "section": "Docs"
+        },
+        {
+            "type": "deps",
+            "hidden": false,
+            "section": "Dependency Updates"
+        },
+        {
+            "type": "perf",
+            "hidden": false,
+            "section": "Performance Improvements"
+        },
+        {
+            "type": "refactor",
+            "hidden": false,
+            "section": "Refactoring"
+        },
+        {
+            "type": "test",
+            "hidden": false,
+            "section": "Tests"
+        },
+        {
+            "type": "chore",
+            "hidden": false,
+            "section": "Other"
+        }
+    ]
+}
