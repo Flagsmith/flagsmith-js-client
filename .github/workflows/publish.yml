@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - '*'
-    branches:
-      - ci/use-latest-npm
 
 permissions:
   id-token: write
@@ -23,9 +21,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: 'https://registry.npmjs.org'  # required for trusted publishing
 
-      # Ensure npm 11.5.1 or later for trusted publishing
+      # npm>=11.5.1 required for NPM trusted publishing
       - run: npm install -g npm@latest
       - run: npm i
       - run: npm run deploy
