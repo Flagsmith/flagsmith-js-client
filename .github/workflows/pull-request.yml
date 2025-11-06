@@ -12,11 +12,11 @@ jobs:
 
     steps:
       - name: Cloning repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+       - uses: actions/setup-node@v6
         with:
-          node-version: '18.x'
+          node-version-file: .nvmrc
 
       - run: npm i
       - run: npm run build
