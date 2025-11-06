@@ -7,7 +7,7 @@
     "prebuild": "node scripts/write-version.js",
     "build": "npm run prebuild && npm run bundle && npm run typecheck",
     "bundle": "rollup -c && node ./move-react.js",
-    "deploy": "cd ../../lib/react-native-flagsmith && npm publish",
+    "deploy": "cd lib/react-native-flagsmith && npm publish",
     "deploy:beta": "npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag beta && cd ../../lib/react-native-flagsmith && npm publish --tag beta",
     "dev": "nodemon",
     "generatetypes": "curl https://raw.githubusercontent.com/Flagsmith/flagsmith/refs/heads/main/sdk/evaluation-context.json -o evaluation-context.json && npx quicktype -o evaluation-context.ts --src-lang schema --just-types --no-prefer-types --nice-property-names evaluation-context.json && rm evaluation-context.json",
