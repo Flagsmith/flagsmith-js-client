@@ -2,8 +2,8 @@
   "proseWrap": "always",
   "singleQuote": true,
   "printWidth": 120,
-  "trailingComma": "all",
   "tabWidth": 4,
+  "semi": false,
   "overrides": [
     {
       "files": "*.md",
