@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.3.4](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.3...v9.3.4) (2025-11-11)
+
+
+### Bug Fixes
+
+* catch init error in useFlagsmith ([#351](https://github.com/Flagsmith/flagsmith-js-client/issues/351)) ([5380dc3](https://github.com/Flagsmith/flagsmith-js-client/commit/5380dc390a7f0532bb21f3452a850d9a83dda2f5))
+
+
+### CI
+
+* fix trusted publishing ([#355](https://github.com/Flagsmith/flagsmith-js-client/issues/355)) ([881c648](https://github.com/Flagsmith/flagsmith-js-client/commit/881c64869ac829a79b5c28847ab3377115e50509))
+
 ## [9.3.3](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.2...v9.3.3) (2025-11-05)
 
 
