@@ -6,7 +6,7 @@ export default (angularHttpClient: any) => (url: string, params: {
     const { headers, method, body } = params;
     const options = { headers, observe: 'response', responseType: 'text' };
 
-    const toFetchResponse = (response: any, ok: boolean) => {
+    const buildResponse = (response: any, ok: boolean) => {
         const { status, headers, body, error, message } = response;
         return {
             status: status ?? (ok ? 200 : 500),
@@ -17,8 +17,8 @@ export default (angularHttpClient: any) => (url: string, params: {
     };
 
     return new Promise((resolve) => {
-        const onNext  = (res: any) => resolve(toFetchResponse(res, res.status >= 200 && res.status < 300));
-        const onError = (err: any) => resolve(toFetchResponse(err, false));
+        const onNext  = (res: any) => resolve(buildResponse(res, res.status ? res.status >= 200 && res.status < 300 : true));
+        const onError = (err: any) => resolve(buildResponse(err, false));
         switch (method) {
             case "GET":
                 return angularHttpClient.get(url, options).subscribe(onNext, onError);
