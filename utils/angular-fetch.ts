@@ -12,7 +12,10 @@ export default (angularHttpClient: any) => (url: string, params: {
             status: status ?? (ok ? 200 : 500),
             ok,
             headers: { get: (name: string) => headers?.get?.(name) ?? null },
-            text: () => Promise.resolve(body ?? error ?? message ?? ''),
+            text: () => {
+                const value = body ?? error ?? message ?? '';
+                return Promise.resolve(typeof value !== 'string' ? JSON.stringify(value) : value);
+            },
         };
     };
 

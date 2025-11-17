@@ -326,4 +326,98 @@ describe('Angular HttpClient Fetch Adapter', () => {
         expect(errorText).toContain('Unsupported method');
         expect(errorText).toContain('DELETE');
     });
+
+    it('should stringify JSON objects in text() method', async () => {
+        // Test case 1: body contains a JSON object
+        const mockAngularHttpClient1 = {
+            get: jest.fn().mockReturnValue({
+                subscribe: (onSuccess: any, onError: any) => {
+                    onSuccess({
+                        status: 200,
+                        body: { flags: [], message: 'Success' },
+                        headers: { get: (name: string) => null }
+                    });
+                }
+            })
+        };
+
+        const fetchAdapter1 = angularFetch(mockAngularHttpClient1);
+        const response1: any = await fetchAdapter1('https://api.example.com/test', {
+            headers: {},
+            method: 'GET',
+            body: ''
+        });
+
+        const text1 = await response1.text();
+        expect(text1).toBe(JSON.stringify({ flags: [], message: 'Success' }));
+
+        // Test case 2: error contains a JSON object
+        const mockAngularHttpClient2 = {
+            get: jest.fn().mockReturnValue({
+                subscribe: (onSuccess: any, onError: any) => {
+                    onError({
+                        status: 400,
+                        error: { code: 'INVALID_REQUEST', details: 'Bad data' },
+                        headers: { get: (name: string) => null }
+                    });
+                }
+            })
+        };
+
+        const fetchAdapter2 = angularFetch(mockAngularHttpClient2);
+        const response2: any = await fetchAdapter2('https://api.example.com/test', {
+            headers: {},
+            method: 'GET',
+            body: ''
+        });
+
+        const text2 = await response2.text();
+        expect(text2).toBe(JSON.stringify({ code: 'INVALID_REQUEST', details: 'Bad data' }));
+
+        // Test case 3: body contains a string (should not stringify)
+        const mockAngularHttpClient3 = {
+            get: jest.fn().mockReturnValue({
+                subscribe: (onSuccess: any, onError: any) => {
+                    onSuccess({
+                        status: 200,
+                        body: 'plain text response',
+                        headers: { get: (name: string) => null }
+                    });
+                }
+            })
+        };
+
+        const fetchAdapter3 = angularFetch(mockAngularHttpClient3);
+        const response3: any = await fetchAdapter3('https://api.example.com/test', {
+            headers: {},
+            method: 'GET',
+            body: ''
+        });
+
+        const text3 = await response3.text();
+        expect(text3).toBe('plain text response');
+
+        // Test case 4: message contains a string (should not stringify)
+        const mockAngularHttpClient4 = {
+            get: jest.fn().mockReturnValue({
+                subscribe: (onSuccess: any, onError: any) => {
+                    onError({
+                        status: 500,
+                        message: 'Internal Server Error',
+                        headers: { get: (name: string) => null }
+                    });
+                }
+            })
+        };
+
+        const fetchAdapter4 = angularFetch(mockAngularHttpClient4);
+        const response4: any = await fetchAdapter4('https://api.example.com/test', {
+            headers: {},
+            method: 'GET',
+            body: ''
+        });
+
+        const text4 = await response4.text();
+        expect(text4).toBe('Internal Server Error');
+    });
 });
