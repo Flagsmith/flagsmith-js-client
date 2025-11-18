@@ -1,5 +1,19 @@
 # Changelog
 
+## [9.3.4](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.3...v9.3.4) (2025-11-18)
+
+
+### Bug Fixes
+
+* angularHttpClient fetch error ([#359](https://github.com/Flagsmith/flagsmith-js-client/issues/359)) ([44e4b79](https://github.com/Flagsmith/flagsmith-js-client/commit/44e4b79ee77693e7c228a341c2bd8d83b02fdc3a))
+* catch init error in useFlagsmith ([#351](https://github.com/Flagsmith/flagsmith-js-client/issues/351)) ([5380dc3](https://github.com/Flagsmith/flagsmith-js-client/commit/5380dc390a7f0532bb21f3452a850d9a83dda2f5))
+* **types:** loading state source unresolved any ([#360](https://github.com/Flagsmith/flagsmith-js-client/issues/360)) ([30c35a3](https://github.com/Flagsmith/flagsmith-js-client/commit/30c35a3a5a75a9c2947ff9741e96c44c4b974d6b))
+
+
+### CI
+
+* fix trusted publishing ([#355](https://github.com/Flagsmith/flagsmith-js-client/issues/355)) ([881c648](https://github.com/Flagsmith/flagsmith-js-client/commit/881c64869ac829a79b5c28847ab3377115e50509))
+
 ## [9.3.3](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.2...v9.3.3) (2025-11-05)
 
 
