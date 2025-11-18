@@ -1,37 +1,36 @@
-export default (angularHttpClient:any)=> (url: string, params: { headers: Record<string, string>, method: "GET" | "POST" | "PUT", body: string }) => {
-    const {headers, method, body} = params
+export default (angularHttpClient: any) => (url: string, params: { 
+    headers: Record<string, string>, 
+    method: "GET" | "POST" | "PUT", 
+    body?: string 
+}) => {
+    const { headers, method, body } = params;
+    const options = { headers, observe: 'response', responseType: 'text' };
+
+    const buildResponse = (response: any, ok: boolean) => {
+        const { status, headers, body, error, message } = response;
+        return {
+            status: status ?? (ok ? 200 : 500),
+            ok,
+            headers: { get: (name: string) => headers?.get?.(name) ?? null },
+            text: () => {
+                const value = body ?? error ?? message ?? '';
+                return Promise.resolve(typeof value !== 'string' ? JSON.stringify(value) : value);
+            },
+        };
+    };
+
     return new Promise((resolve) => {
+        const onNext  = (res: any) => resolve(buildResponse(res, res.status ? res.status >= 200 && res.status < 300 : true));
+        const onError = (err: any) => resolve(buildResponse(err, false));
         switch (method) {
-            case "GET": {
-                return angularHttpClient.get(url, {
-                    headers,
-                }).subscribe((v:string) => {
-                    resolve({
-                        ok: true,
-                        text: () => Promise.resolve(v)
-                    })
-                })
-            }
-            case "POST": {
-                return angularHttpClient.post(url, body, {
-                    headers,
-                }).subscribe((v:string) => {
-                    resolve({
-                        ok: true,
-                        text: () => Promise.resolve(v)
-                    })
-                })
-            }
-            case "PUT": {
-                return angularHttpClient.post(url, body, {
-                    headers,
-                }).subscribe((v:string) => {
-                    resolve({
-                        ok: true,
-                        text: () => Promise.resolve(v)
-                    })
-                })
-            }
-        }
-    })
-}
+            case "GET":
+                return angularHttpClient.get(url, options).subscribe(onNext, onError);
+            case "POST":
+                return angularHttpClient.post(url, body ?? '', options).subscribe(onNext, onError);
+            case "PUT":
+                return angularHttpClient.post(url, body ?? '', options).subscribe(onNext, onError);
+            default:
+                return onError({ status: 405, message: `Unsupported method: ${method}` });
+        }   
+    });
+};
