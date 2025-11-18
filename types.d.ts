@@ -1,4 +1,5 @@
 import { EvaluationContext, IdentityEvaluationContext, TraitEvaluationContext } from "./evaluation-context";
+import { FlagSource } from "./flagsmith-core";
 
 type IFlagsmithValue<T = string | number | boolean | null> = T
 
@@ -84,13 +85,13 @@ export type ISentryClient = {
 } | undefined;
 
 
-export { FlagSource } from './flagsmith-core';
+export { FlagSource };
 
 export declare type LoadingState = {
     error: Error | null, // Current error, resets on next attempt to fetch flags
     isFetching: boolean, // Whether there is a current request to fetch server flags
     isLoading: boolean,  // Whether any flag data exists
-    source: FlagSource //Indicates freshness of flags
+    source: FlagSource // Indicates freshness of flags
 }
 
 export type OnChange<F extends string = string> = (previousFlags: IFlags<FKey<F>> | null, params: IRetrieveInfo, loadingState:LoadingState) => void
