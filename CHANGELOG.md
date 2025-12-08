@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.3.5](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.4...v9.3.5) (2025-12-08)
+
+
+### Bug Fixes
+
+* revert User-Agent header again ([#362](https://github.com/Flagsmith/flagsmith-js-client/issues/362)) ([53baaa9](https://github.com/Flagsmith/flagsmith-js-client/commit/53baaa9fc1c240fdef730cab1746dc1a5b47e80f))
+
 ## [9.3.4](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.3...v9.3.4) (2025-11-18)
 
 
