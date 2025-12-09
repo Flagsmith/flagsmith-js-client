@@ -274,6 +274,21 @@ describe('Flagsmith.init', () => {
         });
         expect(onError).toHaveBeenCalledWith(new Error('Mocked fetch error'));
     });
+    test('should call onError when the API cannot be reached with cacheFlags enabled but no cache exists', async () => {
+        const onError = jest.fn();
+        const { flagsmith, initConfig } = getFlagsmith({
+            cacheFlags: true,
+            fetch: async () => {
+                return Promise.resolve({ text: () => Promise.resolve('Mocked fetch error'), ok: false, status: 401 });
+            },
+            onError,
+        });
+        // NOTE: No AsyncStorage.setItem() - cache is empty, and no defaultFlags provided
+
+        await expect(flagsmith.init(initConfig)).rejects.toThrow('Mocked fetch error');
+        expect(onError).toHaveBeenCalledTimes(1);
+        expect(onError).toHaveBeenCalledWith(new Error('Mocked fetch error'));
+    });
     test('should send app name and version headers when provided', async () => {
         const onChange = jest.fn();
         const { flagsmith, initConfig, AsyncStorage, mockFetch } = getFlagsmith({
