@@ -1,5 +1,27 @@
 # Changelog
 
+## [10.0.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.5...v10.0.0) (2025-12-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* re-add sdk version headers ([#344](https://github.com/Flagsmith/flagsmith-js-client/issues/344))
+* onError not called if cacheFlags is true and api is not reachable ([#365](https://github.com/Flagsmith/flagsmith-js-client/issues/365))
+
+### Features
+
+* re-add sdk version headers ([#344](https://github.com/Flagsmith/flagsmith-js-client/issues/344)) ([47b610f](https://github.com/Flagsmith/flagsmith-js-client/commit/47b610f5f5271426f49e2d047e0c1e8ebccff422))
+
+
+### Bug Fixes
+
+* onError not called if cacheFlags is true and api is not reachable ([#365](https://github.com/Flagsmith/flagsmith-js-client/issues/365)) ([1411b85](https://github.com/Flagsmith/flagsmith-js-client/commit/1411b85636d77a3a6c9969a30de2824cc8916f0b))
+
+
+### Other
+
+* **deps:** bump js-yaml from 3.14.1 to 3.14.2 ([#361](https://github.com/Flagsmith/flagsmith-js-client/issues/361)) ([e15a0dc](https://github.com/Flagsmith/flagsmith-js-client/commit/e15a0dc473fe096c703fc32492dd930e1ea29b2b))
+
 ## [9.3.5](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.4...v9.3.5) (2025-12-08)
 
 
