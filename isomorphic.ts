@@ -24,3 +24,4 @@ export const createFlagsmithInstance = (): IFlagsmith => {
         eventSource: typeof window !=='undefined'?eventSource : null
     })
 }
+export { FlagSource } from './flagsmith-core';

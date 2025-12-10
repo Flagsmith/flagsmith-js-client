@@ -27,7 +27,7 @@ import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContext
 import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
 import { SDK_VERSION } from './utils/version';
 
-enum FlagSource {
+export enum FlagSource {
     "NONE" = "NONE",
     "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
     "CACHE" = "CACHE",
@@ -516,6 +516,7 @@ const Flagsmith = class {
                                 }
                             } catch (e) {
                                 this.log("Exception fetching cached logs", e);
+                                throw e;
                             }
                         } else {
                             if (!preventFetch) {
@@ -540,7 +541,15 @@ const Flagsmith = class {
                     try {
                         const res = AsyncStorage.getItemSync? AsyncStorage.getItemSync(this.getStorageKey()) : await AsyncStorage.getItem(this.getStorageKey());
                         await onRetrievedStorage(null, res)
-                    } catch (e) {}
+                    } catch (e) {
+                        // Only re-throw if we don't have fallback flags (defaultFlags or cached flags)
+                        if (!this.flags || Object.keys(this.flags).length === 0) {
+                            throw e;
+                        }
+                        // We have fallback flags, so call onError but don't reject init()
+                        const typedError = e instanceof Error ? e : new Error(`${e}`);
+                        this.onError?.(typedError);
+                    }
                 }
             } else if (!preventFetch) {
                 await this.getFlags();
