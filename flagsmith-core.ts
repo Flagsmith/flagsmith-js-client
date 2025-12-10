@@ -838,6 +838,10 @@ const Flagsmith = class {
             options.headers['Flagsmith-Application-Version'] = this.applicationMetadata.version;
         }
 
+        if (SDK_VERSION) {
+            options.headers['Flagsmith-SDK-User-Agent'] = `flagsmith-js-sdk/${SDK_VERSION}`
+        }
+
         if (headers) {
             Object.assign(options.headers, headers);
         }
