@@ -307,7 +307,7 @@ describe('Flagsmith.init', () => {
                 headers: expect.objectContaining({
                     'Flagsmith-Application-Name': 'Test App',
                     'Flagsmith-Application-Version': '1.2.3',
-                    'Flagsmith-SDK-user-agent': `flagsmith-js-sdk/${SDK_VERSION}`,
+                    'Flagsmith-SDK-User-Agent': `flagsmith-js-sdk/${SDK_VERSION}`,
                 }),
             }),
         );

@@ -839,7 +839,7 @@ const Flagsmith = class {
         }
 
         if (SDK_VERSION) {
-            options.headers['Flagsmith-SDK-user-agent'] = `flagsmith-js-sdk/${SDK_VERSION}`
+            options.headers['Flagsmith-SDK-User-Agent'] = `flagsmith-js-sdk/${SDK_VERSION}`
         }
 
         if (headers) {
