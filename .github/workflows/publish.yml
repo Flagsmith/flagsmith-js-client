@@ -24,4 +24,15 @@ jobs:
           registry-url: 'https://registry.npmjs.org'  # required for trusted publishing
 
       - run: npm i
-      - run: npm run deploy
+
+      - name: Build and publish
+        run: npm run deploy
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Deprecate old packages
+        run: |
+          npm deprecate flagsmith "This package has moved to @flagsmith/flagsmith. Please update your dependencies."
+          npm deprecate react-native-flagsmith "This package has moved to @flagsmith/react-native. Please update your dependencies."
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

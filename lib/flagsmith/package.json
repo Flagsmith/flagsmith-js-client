@@ -1,6 +1,6 @@
 {
-  "name": "flagsmith",
-  "version": "10.0.0",
+  "name": "@flagsmith/flagsmith",
+  "version": "11.0.0",
   "description": "Feature flagging to support continuous development",
   "main": "./index.js",
   "module": "./index.mjs",
@@ -50,5 +50,8 @@
   "bugs": {
     "url": "https://github.com/Flagsmith/flagsmith-js-client/issues"
   },
-  "homepage": "https://flagsmith.com"
+  "homepage": "https://flagsmith.com",
+  "publishConfig": {
+    "access": "public"
+  }
 }
