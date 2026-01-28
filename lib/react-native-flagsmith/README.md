@@ -2,10 +2,18 @@
 
 # Flagsmith React Native Client
 
-[![npm version](https://badge.fury.io/js/flagsmith.svg)](https://badge.fury.io/js/react-native-flagsmith)
-[![](https://data.jsdelivr.com/v1/package/npm/flagsmith/badge)](https://www.jsdelivr.com/package/npm/flagsmith)
+[![npm version](https://badge.fury.io/js/@flagsmith/react-native.svg)](https://badge.fury.io/js/@flagsmith/react-native)
+[![](https://data.jsdelivr.com/v1/package/npm/@flagsmith/react-native/badge)](https://www.jsdelivr.com/package/npm/@flagsmith/react-native)
 
 The React Native SDK client for [https://www.flagsmith.com/](https://www.flagsmith.com/). Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
+
+## Installation
+
+```bash
+npm install @flagsmith/react-native
+# or
+yarn add @flagsmith/react-native
+```
 
 ## Adding to your project
 

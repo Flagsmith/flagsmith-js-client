@@ -2,10 +2,18 @@
 
 # Flagsmith Javascript Client
 
-[![npm version](https://badge.fury.io/js/flagsmith.svg)](https://badge.fury.io/js/flagsmith)
-[![](https://data.jsdelivr.com/v1/package/npm/flagsmith/badge)](https://www.jsdelivr.com/package/npm/flagsmith)
+[![npm version](https://badge.fury.io/js/@flagsmith/flagsmith.svg)](https://badge.fury.io/js/@flagsmith/flagsmith)
+[![](https://data.jsdelivr.com/v1/package/npm/@flagsmith/flagsmith/badge)](https://www.jsdelivr.com/package/npm/@flagsmith/flagsmith)
 
 The web and SSR SDK clients for [https://www.flagsmith.com/](https://www.flagsmith.com/). Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
+
+## Installation
+
+```bash
+npm install @flagsmith/flagsmith
+# or
+yarn add @flagsmith/flagsmith
+```
 
 ## Adding to your project
 
