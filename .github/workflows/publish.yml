@@ -25,8 +25,3 @@ jobs:
 
       - run: npm i
       - run: npm run deploy
-
-      - name: Deprecate old packages
-        run: |
-          npm deprecate flagsmith "This package has moved to @flagsmith/flagsmith. Please update your dependencies."
-          npm deprecate react-native-flagsmith "This package has moved to @flagsmith/react-native. Please update your dependencies."
