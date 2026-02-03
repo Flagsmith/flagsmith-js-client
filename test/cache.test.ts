@@ -1,6 +1,7 @@
 import {
     defaultState,
     defaultStateAlt,
+    environmentID,
     FLAGSMITH_KEY,
     getFlagsmith,
     getStateToCheck,
@@ -8,6 +9,8 @@ import {
     testIdentity,
 } from './test-constants';
 import SyncStorageMock from './mocks/sync-storage-mock';
+import MockAsyncStorage from './mocks/async-storage-mock';
+import { createFlagsmithInstance } from '../lib/flagsmith';
 import { promises as fs } from 'fs'
 
 describe('Cache', () => {
@@ -333,5 +336,48 @@ describe('Cache', () => {
                 'source': 'CACHE',
             },
         );
+    });
+    test('should use cache in SSR when custom AsyncStorage is provided via init (no canUseStorage override)', async () => {
+        // This test simulates SSR: no window, no browserlessStorage, but a custom AsyncStorage passed via init().
+        // We do NOT use getFlagsmith() which forces canUseStorage = true.
+        const originalWindow = globalThis.window;
+        // @ts-ignore - simulate SSR by removing window
+        delete globalThis.window;
+        try {
+            const flagsmith = createFlagsmithInstance();
+            const asyncStorage = new MockAsyncStorage();
+            const onChange = jest.fn();
+            const mockFetch = jest.fn(async () => ({
+                status: 200,
+                text: () => Promise.resolve(JSON.stringify([
+                    { feature: { name: 'hero' }, enabled: true, feature_state_value: 'test', id: 1804 },
+                ])),
+            }));
+
+            // Pre-populate cache
+            await asyncStorage.setItem(FLAGSMITH_KEY, JSON.stringify({
+                ...defaultStateAlt,
+                ts: new Date().valueOf(),
+            }));
+
+            await flagsmith.init({
+                evaluationContext: { environment: { apiKey: environmentID } },
+                cacheFlags: true,
+                AsyncStorage: asyncStorage,
+                onChange,
+                fetch: mockFetch,
+                cacheOptions: { ttl: 60000 },
+            });
+
+            // With the fix: cache should be loaded, onChange called with CACHE source
+            expect(asyncStorage.getItem).toHaveBeenCalled();
+            expect(onChange).toHaveBeenCalledWith(
+                null,
+                expect.objectContaining({ isFromServer: false }),
+                expect.objectContaining({ source: 'CACHE' }),
+            );
+        } finally {
+            globalThis.window = originalWindow;
+        }
     });
 });

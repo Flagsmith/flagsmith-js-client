@@ -371,6 +371,7 @@ const Flagsmith = class {
 
             if (_AsyncStorage) {
                 AsyncStorage = _AsyncStorage;
+                this.canUseStorage = true;
             }
             if (realtime && typeof window !== 'undefined') {
                 this.setupRealtime(eventSourceUrl, evaluationContext.environment.apiKey);
