@@ -11,7 +11,9 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "target": "ES5",
+    "downlevelIteration": true
   },
-  "exclude": ["lib"]
+  "exclude": ["lib", "node_modules/flagsmith-nodejs"]
 }
