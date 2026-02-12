@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
-import { FlagsmithProvider, useFlags, useFlagsmithLoading } from '../lib/flagsmith/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { FlagsmithProvider, useFlags, useFlagsmithLoading, useExperiment } from '../lib/flagsmith/react'
 import {
     defaultState,
     delay,
@@ -314,4 +314,144 @@ it('should not throw unhandled promise rejection when server returns 500 error',
     // onError callback should have been called
     expect(onError).toHaveBeenCalledTimes(1)
     window.removeEventListener('unhandledrejection', unhandledRejectionHandler)
+})
+
+describe('useExperiment', () => {
+    const ExperimentPage: FC<{ flagKey: string }> = ({ flagKey }) => {
+        const { enabled, value, success, failure } = useExperiment(flagKey)
+        return (
+            <>
+                <div data-testid="enabled">{String(enabled)}</div>
+                <div data-testid="value">{String(value)}</div>
+                <button data-testid="success" onClick={() => success()} />
+                <button data-testid="failure" onClick={() => failure()} />
+            </>
+        )
+    }
+
+    it('reflects flag enabled and value', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({})
+        jest.spyOn(flagsmith, 'setTrait').mockResolvedValue()
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <ExperimentPage flagKey="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByTestId('enabled').textContent).toBe('true')
+            expect(screen.getByTestId('value').textContent).toBe('16')
+        })
+    })
+
+    it('returns enabled=false and value=null for unknown flag', () => {
+        const { flagsmith, initConfig } = getFlagsmith({ preventFetch: true })
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <ExperimentPage flagKey="nonexistent" />
+            </FlagsmithProvider>
+        )
+
+        expect(screen.getByTestId('enabled').textContent).toBe('false')
+        expect(screen.getByTestId('value').textContent).toBe('null')
+    })
+
+    it('auto-enrolls by setting variant trait on render when enabled', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({})
+        const setTraitSpy = jest.spyOn(flagsmith, 'setTrait').mockResolvedValue()
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <ExperimentPage flagKey="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByTestId('enabled').textContent).toBe('true')
+        })
+
+        await waitFor(() => {
+            expect(setTraitSpy).toHaveBeenCalledWith('exp_font_size_variant', '16')
+        })
+    })
+
+    it('does not auto-enroll when flag is disabled', () => {
+        const { flagsmith, initConfig } = getFlagsmith({ preventFetch: true })
+        const setTraitSpy = jest.spyOn(flagsmith, 'setTrait').mockResolvedValue()
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <ExperimentPage flagKey="nonexistent" />
+            </FlagsmithProvider>
+        )
+
+        expect(setTraitSpy).not.toHaveBeenCalled()
+    })
+
+    it('success() calls setTrait with converted=true', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({})
+        const setTraitSpy = jest.spyOn(flagsmith, 'setTrait').mockResolvedValue()
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <ExperimentPage flagKey="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByTestId('enabled').textContent).toBe('true')
+        })
+
+        fireEvent.click(screen.getByTestId('success'))
+
+        await waitFor(() => {
+            expect(setTraitSpy).toHaveBeenCalledWith('exp_font_size_converted', true)
+        })
+    })
+
+    it('failure() calls setTrait with converted=false', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({})
+        const setTraitSpy = jest.spyOn(flagsmith, 'setTrait').mockResolvedValue()
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <ExperimentPage flagKey="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByTestId('enabled').textContent).toBe('true')
+        })
+
+        fireEvent.click(screen.getByTestId('failure'))
+
+        await waitFor(() => {
+            expect(setTraitSpy).toHaveBeenCalledWith('exp_font_size_converted', false)
+        })
+    })
+
+    it('does not report outcome twice on repeated calls', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({})
+        const setTraitSpy = jest.spyOn(flagsmith, 'setTrait').mockResolvedValue()
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <ExperimentPage flagKey="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByTestId('enabled').textContent).toBe('true')
+        })
+
+        // Wait for auto-enrollment to complete
+        await waitFor(() => {
+            expect(setTraitSpy).toHaveBeenCalledWith('exp_font_size_variant', '16')
+        })
+        setTraitSpy.mockClear()
+
+        fireEvent.click(screen.getByTestId('success'))
+        fireEvent.click(screen.getByTestId('success'))
+        fireEvent.click(screen.getByTestId('failure'))
+
+        await waitFor(() => {
+            expect(setTraitSpy).toHaveBeenCalledTimes(1)
+            expect(setTraitSpy).toHaveBeenCalledWith('exp_font_size_converted', true)
+        })
+    })
 })

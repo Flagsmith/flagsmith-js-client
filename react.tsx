@@ -198,3 +198,40 @@ export function useFlagsmith<F extends string | Record<string, any>, T extends s
 
     return context as unknown as IFlagsmith<F, T>
 }
+
+export function useExperiment(flagKey: string) {
+    const flagsmith = useFlagsmith()
+    const flags = useFlags([flagKey])
+    const enrolledRef = useRef(false)
+    const reportedRef = useRef(false)
+
+    // Auto-enroll: set variant trait when user first sees the experiment
+    useEffect(() => {
+        if (!enrolledRef.current && flags[flagKey]?.enabled) {
+            enrolledRef.current = true
+            const variant = flagsmith.getValue(flagKey)
+            flagsmith.setTrait(`exp_${flagKey}_variant`, String(variant))
+        }
+    }, [flagsmith, flagKey, flags])
+
+    const reportOutcome = useCallback(
+        (result: boolean) => {
+            if (reportedRef.current) {
+                return Promise.resolve()
+            }
+            reportedRef.current = true
+            return flagsmith.setTrait(`exp_${flagKey}_converted`, result)
+        },
+        [flagsmith, flagKey],
+    )
+
+    const success = useCallback(() => reportOutcome(true), [reportOutcome])
+    const failure = useCallback(() => reportOutcome(false), [reportOutcome])
+
+    return {
+        enabled: flags[flagKey]?.enabled ?? false,
+        value: flags[flagKey]?.value ?? null,
+        success,
+        failure,
+    }
+}
