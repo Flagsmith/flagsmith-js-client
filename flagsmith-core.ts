@@ -9,6 +9,8 @@ import {
     IFlagsmithResponse,
     IFlagsmithTrait,
     IInitConfig,
+    IPipelineEvent,
+    IPipelineEventBatch,
     ISentryClient,
     IState,
     ITraits,
@@ -265,6 +267,35 @@ const Flagsmith = class {
         }
     };
 
+    flushPipelineAnalytics = async () => {
+        if (!this.evaluationAnalyticsUrl || this.pipelineEvents.length === 0 || !this.evaluationContext.environment) {
+            return;
+        }
+
+        const eventsToSend = this.pipelineEvents;
+        this.pipelineEvents = [];
+
+        const batch: IPipelineEventBatch = {
+            events: eventsToSend,
+            sdk_version: SDK_VERSION,
+            environment_key: this.evaluationContext.environment.apiKey,
+        };
+
+        try {
+            await this.getJSON(this.evaluationAnalyticsUrl + 'v1/analytics/batch', 'POST', JSON.stringify(batch));
+            this.log('Pipeline analytics: flush successful');
+        } catch (err) {
+            // Re-queue failed events (prepend so they're sent first on next flush)
+            this.pipelineEvents = eventsToSend.concat(this.pipelineEvents);
+            const isExceedingBuffer = this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer;
+            if (isExceedingBuffer) {
+                const excessCount = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
+                this.pipelineEvents = this.pipelineEvents.slice(excessCount);
+            }
+            this.log('Pipeline analytics: flush failed, events re-queued', err);
+        }
+    };
+
     datadogRum: IDatadogRum | null = null;
     loadingState: LoadingState = {isLoading: true, isFetching: true, error: null, source: FlagSource.NONE}
     canUseStorage = false
@@ -290,6 +321,10 @@ const Flagsmith = class {
     sentryClient: ISentryClient | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
+    evaluationAnalyticsUrl: string | null = null
+    evaluationAnalyticsMaxBuffer: number = 1000
+    pipelineEvents: IPipelineEvent[] = []
+    pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -308,6 +343,7 @@ const Flagsmith = class {
                 enableDynatrace,
                 enableLogs,
                 environmentID,
+                evaluationAnalyticsConfig,
                 eventSourceUrl= "https://realtime.flagsmith.com/",
                 fetch: fetchImplementation,
                 headers,
@@ -439,6 +475,10 @@ const Flagsmith = class {
                         }
                     });
                 }
+            }
+
+            if (evaluationAnalyticsConfig) {
+                this.initPipelineAnalytics(evaluationAnalyticsConfig);
             }
 
             //If the user specified default flags emit a changed event immediately
@@ -916,8 +956,47 @@ const Flagsmith = class {
             }
             this.evaluationEvent[this.evaluationContext.environment.apiKey][key] += 1;
         }
+
+        if (this.evaluationAnalyticsUrl) {
+            this.recordPipelineEvent(key, method);
+        }
+
         this.updateEventStorage();
     };
+
+    private initPipelineAnalytics(config: NonNullable<IInitConfig['evaluationAnalyticsConfig']>) {
+        if (this.pipelineAnalyticsInterval) {
+            clearInterval(this.pipelineAnalyticsInterval);
+        }
+        this.evaluationAnalyticsUrl = ensureTrailingSlash(config.analyticsServerUrl);
+        this.evaluationAnalyticsMaxBuffer = config.maxBuffer ?? 1000;
+        this.pipelineEvents = [];
+        this.pipelineAnalyticsInterval = setInterval(
+            this.flushPipelineAnalytics,
+            config.flushInterval ?? this.ticks!,
+        );
+    }
+
+    private recordPipelineEvent(key: string, method: 'VALUE' | 'ENABLED') {
+        const flagKey = key.toLowerCase().replace(/ /g, '_');
+        const flag = this.flags && this.flags[flagKey];
+        const event: IPipelineEvent = {
+            type: method,
+            flag_key: flagKey,
+            value: flag ? (method === 'ENABLED' ? flag.enabled : flag.value) : null,
+            identity_id: this.evaluationContext.identity?.identifier ?? null,
+            timestamp: Math.floor(Date.now() / 1000),
+            traits: this.evaluationContext.identity?.traits ?? null,
+            custom: flag ? { id: flag.id, enabled: flag.enabled, value: flag.value } : null,
+        };
+        this.pipelineEvents.push(event);
+
+        const isExceedingBuffer = this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer;
+        if (isExceedingBuffer) {
+            const excessCount = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
+            this.pipelineEvents = this.pipelineEvents.slice(excessCount);
+        }
+    }
 
     private setLoadingState(loadingState: LoadingState) {
         if (!deepEqual(loadingState, this.loadingState)) {

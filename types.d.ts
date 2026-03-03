@@ -131,6 +131,34 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
      * Customer application metadata
      */
     applicationMetadata?: ApplicationMetadata;
+    /**
+     * Configuration for the evaluation analytics pipeline. When provided,
+     * individual flag evaluation events are buffered and sent to the pipeline endpoint.
+     */
+    evaluationAnalyticsConfig?: {
+        /** URL of the pipeline server (e.g. 'https://analytics.flagsmith.com/'). */
+        analyticsServerUrl: string;
+        /** Maximum events to buffer in memory before dropping oldest. Default 1000. */
+        maxBuffer?: number;
+        /** Flush interval in milliseconds. Default 10000 (10s). */
+        flushInterval?: number;
+    };
+}
+
+export interface IPipelineEvent {
+    type: string;
+    flag_key: string;
+    value: any;
+    identity_id?: string | null;
+    timestamp: number;
+    traits?: { [key: string]: null | TraitEvaluationContext } | null;
+    custom?: Record<string, any> | null;
+}
+
+export interface IPipelineEventBatch {
+    events: IPipelineEvent[];
+    sdk_version: string;
+    environment_key: string;
 }
 
 export interface IFlagsmithResponse {
