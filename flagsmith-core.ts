@@ -66,6 +66,7 @@ type Config = {
 const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
 const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
 const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
+const DEFAULT_PIPELINE_FLUSH_INTERVAL = 10000;
 
 const Flagsmith = class {
     _trigger?:(()=>void)|null= null
@@ -268,10 +269,11 @@ const Flagsmith = class {
     };
 
     flushPipelineAnalytics = async () => {
-        if (!this.evaluationAnalyticsUrl || this.pipelineEvents.length === 0 || !this.evaluationContext.environment) {
+        if (this.isPipelineFlushing || !this.evaluationAnalyticsUrl || this.pipelineEvents.length === 0 || !this.evaluationContext.environment) {
             return;
         }
 
+        this.isPipelineFlushing = true;
         const eventsToSend = this.pipelineEvents;
         this.pipelineEvents = [];
 
@@ -282,10 +284,20 @@ const Flagsmith = class {
         };
 
         try {
-            await this.getJSON(this.evaluationAnalyticsUrl + 'v1/analytics/batch', 'POST', JSON.stringify(batch));
+            const res = await _fetch(this.evaluationAnalyticsUrl + 'v1/analytics/batch', {
+                method: 'POST',
+                body: JSON.stringify(batch),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'X-Environment-Key': this.evaluationContext.environment.apiKey,
+                    ...(SDK_VERSION ? { 'Flagsmith-SDK-User-Agent': `flagsmith-js-sdk/${SDK_VERSION}` } : {}),
+                },
+            });
+            if (!res.status || res.status < 200 || res.status >= 300) {
+                throw new Error(`Pipeline analytics: unexpected status ${res.status}`);
+            }
             this.log('Pipeline analytics: flush successful');
         } catch (err) {
-            // Re-queue failed events (prepend so they're sent first on next flush)
             this.pipelineEvents = eventsToSend.concat(this.pipelineEvents);
             const isExceedingBuffer = this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer;
             if (isExceedingBuffer) {
@@ -293,6 +305,8 @@ const Flagsmith = class {
                 this.pipelineEvents = this.pipelineEvents.slice(excessCount);
             }
             this.log('Pipeline analytics: flush failed, events re-queued', err);
+        } finally {
+            this.isPipelineFlushing = false;
         }
     };
 
@@ -325,6 +339,7 @@ const Flagsmith = class {
     evaluationAnalyticsMaxBuffer: number = 1000
     pipelineEvents: IPipelineEvent[] = []
     pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
+    isPipelineFlushing = false
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -479,6 +494,8 @@ const Flagsmith = class {
 
             if (evaluationAnalyticsConfig) {
                 this.initPipelineAnalytics(evaluationAnalyticsConfig);
+            } else {
+                this.stopPipelineAnalytics();
             }
 
             //If the user specified default flags emit a changed event immediately
@@ -965,16 +982,23 @@ const Flagsmith = class {
     };
 
     private initPipelineAnalytics(config: NonNullable<IInitConfig['evaluationAnalyticsConfig']>) {
-        if (this.pipelineAnalyticsInterval) {
-            clearInterval(this.pipelineAnalyticsInterval);
-        }
+        this.stopPipelineAnalytics();
         this.evaluationAnalyticsUrl = ensureTrailingSlash(config.analyticsServerUrl);
         this.evaluationAnalyticsMaxBuffer = config.maxBuffer ?? 1000;
         this.pipelineEvents = [];
         this.pipelineAnalyticsInterval = setInterval(
             this.flushPipelineAnalytics,
-            config.flushInterval ?? this.ticks!,
+            config.flushInterval ?? DEFAULT_PIPELINE_FLUSH_INTERVAL,
         );
+    }
+
+    private stopPipelineAnalytics() {
+        if (this.pipelineAnalyticsInterval) {
+            clearInterval(this.pipelineAnalyticsInterval);
+            this.pipelineAnalyticsInterval = null;
+        }
+        this.evaluationAnalyticsUrl = null;
+        this.pipelineEvents = [];
     }
 
     private recordPipelineEvent(key: string, method: 'VALUE' | 'ENABLED') {
@@ -986,7 +1010,9 @@ const Flagsmith = class {
             value: flag ? (method === 'ENABLED' ? flag.enabled : flag.value) : null,
             identity_id: this.evaluationContext.identity?.identifier ?? null,
             timestamp: Math.floor(Date.now() / 1000),
-            traits: this.evaluationContext.identity?.traits ?? null,
+            traits: this.evaluationContext.identity?.traits
+                ? JSON.parse(JSON.stringify(this.evaluationContext.identity.traits))
+                : null,
             custom: flag ? { id: flag.id, enabled: flag.enabled, value: flag.value } : null,
         };
         this.pipelineEvents.push(event);
