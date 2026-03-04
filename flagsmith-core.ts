@@ -1028,7 +1028,10 @@ const Flagsmith = class {
             traits: this.evaluationContext.identity?.traits
                 ? { ...this.evaluationContext.identity.traits }
                 : null,
-            metadata: flag ? { id: flag.id } : null,
+            metadata: {
+                ...(flag ? { id: flag.id } : {}),
+                ...(typeof window !== 'undefined' && window.location ? { page_url: window.location.href } : {}),
+            },
         };
         this.pipelineEvents.push(event);
         this.trimPipelineBuffer();
