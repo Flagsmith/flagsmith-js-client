@@ -22,4 +22,19 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - run: npm i
-      - run: npm run build && npm test && cd ./lib/flagsmith/ && npm publish --tag internal --access public && cd ../../lib/react-native-flagsmith && npm publish --tag internal --access public
+
+      - name: Set internal version
+        run: |
+          VERSION=$(node -p "require('./lib/flagsmith/package.json').version")
+          INTERNAL="${VERSION}-internal.${{ github.run_number }}"
+          echo "Publishing version: $INTERNAL"
+          cd lib/flagsmith && npm version $INTERNAL --no-git-tag-version
+          cd ../../lib/react-native-flagsmith && npm version $INTERNAL --no-git-tag-version
+
+      - name: Build and test
+        run: npm run build && npm test
+
+      - name: Publish
+        run: |
+          cd lib/flagsmith && npm publish --tag internal --access public
+          cd ../../lib/react-native-flagsmith && npm publish --tag internal --access public
