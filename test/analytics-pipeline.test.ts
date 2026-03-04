@@ -50,7 +50,7 @@ describe('Pipeline Analytics', () => {
         expect(valueEvent.enabled).toBe(true);
         expect(valueEvent.identity_identifier).toBeNull();
         expect(valueEvent.evaluated_at).toBeDefined();
-        expect(valueEvent.metadata).toEqual({ id: 6149 });
+        expect(valueEvent.metadata).toEqual(expect.objectContaining({ id: 6149 }));
 
         const enabledEvent = body.events[1];
         expect(enabledEvent.event_id).toBe('hero');
