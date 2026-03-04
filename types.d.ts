@@ -148,7 +148,7 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
 export interface IPipelineEvent {
     event_id: string; // flag_name or event_name
     event_type: 'flag_evaluation' | 'custom_event';
-    evaluated_at: number;
+    evaluated_at: string;
     identity_identifier: string | null;
     enabled?: boolean | null;
     value: IFlagsmithValue;

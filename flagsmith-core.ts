@@ -269,10 +269,13 @@ const Flagsmith = class {
     };
 
     flushPipelineAnalytics = async () => {
-        if (this.isPipelineFlushing || !this.evaluationAnalyticsUrl || this.pipelineEvents.length === 0 || !this.evaluationContext.environment) {
+        const isEvaluationEnabled = this.evaluationAnalyticsUrl && this.evaluationContext.environment;
+        const isReadyToFlush = this.pipelineEvents.length > 0 && (!this.isPipelineFlushing || this.pipelineFlushInterval === 0);
+        if (!isEvaluationEnabled || !isReadyToFlush) {
             return;
         }
 
+        const environmentKey = this.evaluationContext.environment!.apiKey;
         this.isPipelineFlushing = true;
         const eventsToSend = this.pipelineEvents;
         this.pipelineEvents = [];
@@ -280,7 +283,7 @@ const Flagsmith = class {
         const batch: IPipelineEventBatch = {
             events: eventsToSend,
             sdk_version: SDK_VERSION,
-            environment_key: this.evaluationContext.environment.apiKey,
+            environment_key: environmentKey,
         };
 
         try {
@@ -289,7 +292,7 @@ const Flagsmith = class {
                 body: JSON.stringify(batch),
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8',
-                    'X-Environment-Key': this.evaluationContext.environment.apiKey,
+                    'X-Environment-Key': environmentKey,
                     ...(SDK_VERSION ? { 'Flagsmith-SDK-User-Agent': `flagsmith-js-sdk/${SDK_VERSION}` } : {}),
                 },
             });
@@ -299,11 +302,7 @@ const Flagsmith = class {
             this.log('Pipeline analytics: flush successful');
         } catch (err) {
             this.pipelineEvents = eventsToSend.concat(this.pipelineEvents);
-            const isExceedingBuffer = this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer;
-            if (isExceedingBuffer) {
-                const excessCount = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
-                this.pipelineEvents = this.pipelineEvents.slice(excessCount);
-            }
+            this.trimPipelineBuffer();
             this.log('Pipeline analytics: flush failed, events re-queued', err);
         } finally {
             this.isPipelineFlushing = false;
@@ -975,7 +974,7 @@ const Flagsmith = class {
         }
 
         if (this.evaluationAnalyticsUrl) {
-            this.recordPipelineEvent(key, method);
+            this.recordPipelineEvent(key);
         }
 
         this.updateEventStorage();
@@ -994,6 +993,7 @@ const Flagsmith = class {
                 this.flushPipelineAnalytics,
                 this.pipelineFlushInterval,
             );
+            this.pipelineAnalyticsInterval?.unref?.();
         }
     }
 
@@ -1006,28 +1006,32 @@ const Flagsmith = class {
         this.pipelineEvents = [];
     }
 
-    private recordPipelineEvent(key: string, method: 'VALUE' | 'ENABLED') {
+    private trimPipelineBuffer() {
+        if (this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer) {
+            const excess = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
+            this.pipelineEvents = this.pipelineEvents.slice(excess);
+        }
+    }
+
+    // Pipeline event schema — must match the pipeline server's Event struct.
+    // To update: 1) IPipelineEvent in types.d.ts  2) event object below  3) tests in test/analytics-pipeline.test.ts
+    private recordPipelineEvent(key: string) {
         const flagKey = key.toLowerCase().replace(/ /g, '_');
         const flag = this.flags && this.flags[flagKey];
         const event: IPipelineEvent = {
             event_id: flagKey,
             event_type: 'flag_evaluation',
-            evaluated_at: Math.floor(Date.now() / 1000),
+            evaluated_at: new Date().toISOString(),
             identity_identifier: this.evaluationContext.identity?.identifier ?? null,
             enabled: flag ? flag.enabled : null,
             value: flag ? flag.value : null,
             traits: this.evaluationContext.identity?.traits
-                ? JSON.parse(JSON.stringify(this.evaluationContext.identity.traits))
+                ? { ...this.evaluationContext.identity.traits }
                 : null,
             metadata: flag ? { id: flag.id } : null,
         };
         this.pipelineEvents.push(event);
-
-        const isExceedingBuffer = this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer;
-        if (isExceedingBuffer) {
-            const excessCount = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
-            this.pipelineEvents = this.pipelineEvents.slice(excessCount);
-        }
+        this.trimPipelineBuffer();
 
         if (this.pipelineFlushInterval === 0) {
             this.flushPipelineAnalytics();
