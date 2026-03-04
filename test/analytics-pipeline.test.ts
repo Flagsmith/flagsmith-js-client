@@ -1,4 +1,4 @@
-import { getFlagsmith, delay, environmentID, testIdentity } from './test-constants';
+import { getFlagsmith, environmentID, testIdentity } from './test-constants';
 import { promises as fs } from 'fs';
 
 const pipelineUrl = 'http://localhost:8080/';
@@ -45,7 +45,7 @@ describe('Pipeline Analytics', () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith({
             evaluationAnalyticsConfig: {
                 analyticsServerUrl: pipelineUrl,
-                flushInterval: 100,
+                flushInterval: 60000,
             },
         });
         mockFetchWithPipeline(mockFetch);
@@ -54,7 +54,8 @@ describe('Pipeline Analytics', () => {
         flagsmith.getValue('font_size');
         flagsmith.hasFeature('hero');
 
-        await delay(150);
+        // @ts-ignore
+        await flagsmith.flushPipelineAnalytics();
 
         const calls = getPipelineCalls(mockFetch);
         expect(calls).toHaveLength(1);
@@ -65,17 +66,19 @@ describe('Pipeline Analytics', () => {
         expect(body.events).toHaveLength(2);
 
         const valueEvent = body.events[0];
-        expect(valueEvent.type).toBe('VALUE');
-        expect(valueEvent.flag_key).toBe('font_size');
+        expect(valueEvent.event_id).toBe('font_size');
+        expect(valueEvent.event_type).toBe('flag_evaluation');
         expect(valueEvent.value).toBe(16);
-        expect(valueEvent.identity_id).toBeNull();
-        expect(valueEvent.timestamp).toBeGreaterThan(0);
-        expect(valueEvent.custom).toEqual({ id: 6149, enabled: true, value: 16 });
+        expect(valueEvent.enabled).toBe(true);
+        expect(valueEvent.identity_identifier).toBeNull();
+        expect(valueEvent.evaluated_at).toBeGreaterThan(0);
+        expect(valueEvent.metadata).toEqual({ id: 6149 });
 
         const enabledEvent = body.events[1];
-        expect(enabledEvent.type).toBe('ENABLED');
-        expect(enabledEvent.flag_key).toBe('hero');
-        expect(enabledEvent.value).toBe(true);
+        expect(enabledEvent.event_id).toBe('hero');
+        expect(enabledEvent.event_type).toBe('flag_evaluation');
+        expect(enabledEvent.enabled).toBe(true);
+        expect(enabledEvent.value).toBe(flagsmith.getValue('hero'));
 
         const headers = calls[0][1].headers;
         expect(headers['X-Environment-Key']).toBe(environmentID);
@@ -87,7 +90,7 @@ describe('Pipeline Analytics', () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith({
             evaluationAnalyticsConfig: {
                 analyticsServerUrl: pipelineUrl,
-                flushInterval: 100,
+                flushInterval: 60000,
             },
             identity: testIdentity,
         });
@@ -96,12 +99,13 @@ describe('Pipeline Analytics', () => {
 
         flagsmith.getValue('hero');
 
-        await delay(150);
+        // @ts-ignore
+        await flagsmith.flushPipelineAnalytics();
 
         const calls = getPipelineCalls(mockFetch);
         const event = JSON.parse(calls[0][1].body).events[0];
 
-        expect(event.identity_id).toBe(testIdentity);
+        expect(event.identity_identifier).toBe(testIdentity);
         expect(event.traits).toEqual({
             number_trait: { value: 1 },
             string_trait: { value: 'Example' },
@@ -133,9 +137,9 @@ describe('Pipeline Analytics', () => {
         // @ts-ignore
         expect(flagsmith.pipelineEvents).toHaveLength(3);
         // @ts-ignore
-        expect(flagsmith.pipelineEvents[0].flag_key).toBe('json_value');
+        expect(flagsmith.pipelineEvents[0].event_id).toBe('json_value');
         // @ts-ignore
-        expect(flagsmith.pipelineEvents[2].flag_key).toBe('off_value');
+        expect(flagsmith.pipelineEvents[2].event_id).toBe('off_value');
     });
 
     test('should re-queue on failure and coexist with standard analytics', async () => {
@@ -178,6 +182,6 @@ describe('Pipeline Analytics', () => {
         // @ts-ignore
         expect(flagsmith.pipelineEvents).toHaveLength(2);
         // @ts-ignore
-        expect(flagsmith.pipelineEvents[0].flag_key).toBe('hero');
+        expect(flagsmith.pipelineEvents[0].event_id).toBe('hero');
     });
 });

@@ -981,15 +981,20 @@ const Flagsmith = class {
         this.updateEventStorage();
     };
 
+    private pipelineFlushInterval: number = DEFAULT_PIPELINE_FLUSH_INTERVAL;
+
     private initPipelineAnalytics(config: NonNullable<IInitConfig['evaluationAnalyticsConfig']>) {
         this.stopPipelineAnalytics();
         this.evaluationAnalyticsUrl = ensureTrailingSlash(config.analyticsServerUrl);
         this.evaluationAnalyticsMaxBuffer = config.maxBuffer ?? 1000;
+        this.pipelineFlushInterval = config.flushInterval ?? DEFAULT_PIPELINE_FLUSH_INTERVAL;
         this.pipelineEvents = [];
-        this.pipelineAnalyticsInterval = setInterval(
-            this.flushPipelineAnalytics,
-            config.flushInterval ?? DEFAULT_PIPELINE_FLUSH_INTERVAL,
-        );
+        if (this.pipelineFlushInterval > 0) {
+            this.pipelineAnalyticsInterval = setInterval(
+                this.flushPipelineAnalytics,
+                this.pipelineFlushInterval,
+            );
+        }
     }
 
     private stopPipelineAnalytics() {
@@ -1005,15 +1010,16 @@ const Flagsmith = class {
         const flagKey = key.toLowerCase().replace(/ /g, '_');
         const flag = this.flags && this.flags[flagKey];
         const event: IPipelineEvent = {
-            type: method,
-            flag_key: flagKey,
-            value: flag ? (method === 'ENABLED' ? flag.enabled : flag.value) : null,
-            identity_id: this.evaluationContext.identity?.identifier ?? null,
-            timestamp: Math.floor(Date.now() / 1000),
+            event_id: flagKey,
+            event_type: 'flag_evaluation',
+            evaluated_at: Math.floor(Date.now() / 1000),
+            identity_identifier: this.evaluationContext.identity?.identifier ?? null,
+            enabled: flag ? flag.enabled : null,
+            value: flag ? flag.value : null,
             traits: this.evaluationContext.identity?.traits
                 ? JSON.parse(JSON.stringify(this.evaluationContext.identity.traits))
                 : null,
-            custom: flag ? { id: flag.id, enabled: flag.enabled, value: flag.value } : null,
+            metadata: flag ? { id: flag.id } : null,
         };
         this.pipelineEvents.push(event);
 
@@ -1021,6 +1027,10 @@ const Flagsmith = class {
         if (isExceedingBuffer) {
             const excessCount = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
             this.pipelineEvents = this.pipelineEvents.slice(excessCount);
+        }
+
+        if (this.pipelineFlushInterval === 0) {
+            this.flushPipelineAnalytics();
         }
     }
 

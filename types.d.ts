@@ -140,19 +140,20 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
         analyticsServerUrl: string;
         /** Maximum events to buffer in memory before dropping oldest. Default 1000. */
         maxBuffer?: number;
-        /** Flush interval in milliseconds. Default 10000 (10s). */
+        /** Flush interval in milliseconds. Set to 0 to flush immediately after each evaluation. Default 10000 (10s). */
         flushInterval?: number;
     };
 }
 
 export interface IPipelineEvent {
-    type: string;
-    flag_key: string;
-    value: any;
-    identity_id?: string | null;
-    timestamp: number;
+    event_id: string; // flag_name or event_name
+    event_type: 'flag_evaluation' | 'custom_event';
+    evaluated_at: number;
+    identity_identifier: string | null;
+    enabled?: boolean | null;
+    value: IFlagsmithValue;
     traits?: { [key: string]: null | TraitEvaluationContext } | null;
-    custom?: Record<string, any> | null;
+    metadata?: Record<string, any> | null;
 }
 
 export interface IPipelineEventBatch {
