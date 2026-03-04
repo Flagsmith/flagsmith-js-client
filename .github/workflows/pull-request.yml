@@ -1,23 +1,40 @@
-name: Pull Requests
+name: Publish Internal NPM Package
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   package:
     runs-on: ubuntu-latest
-    name: Test
+    name: Publish Internal NPM Package
 
     steps:
       - name: Cloning repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          registry-url: 'https://registry.npmjs.org'
 
       - run: npm i
-      - run: npm run build
-      - run: npm test
+
+      - name: Set internal version
+        run: |
+          VERSION=$(node -p "require('./lib/flagsmith/package.json').version")
+          INTERNAL="${VERSION}-internal.${{ github.run_number }}"
+          echo "Publishing version: $INTERNAL"
+          cd lib/flagsmith && npm version $INTERNAL --no-git-tag-version
+          cd ../../lib/react-native-flagsmith && npm version $INTERNAL --no-git-tag-version
+
+      - name: Build and test
+        run: npm run build && npm test
+
+      - name: Publish
+        run: |
+          cd lib/flagsmith && npm publish --tag internal --access public
+          cd ../../lib/react-native-flagsmith && npm publish --tag internal --access public
