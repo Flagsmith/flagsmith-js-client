@@ -148,7 +148,7 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
 export interface IPipelineEvent {
     event_id: string; // flag_name or event_name
     event_type: 'flag_evaluation' | 'custom_event';
-    evaluated_at: string;
+    evaluated_at: number;
     identity_identifier: string | null;
     enabled?: boolean | null;
     value: IFlagsmithValue;
@@ -158,7 +158,6 @@ export interface IPipelineEvent {
 
 export interface IPipelineEventBatch {
     events: IPipelineEvent[];
-    sdk_version: string;
     environment_key: string;
 }
 

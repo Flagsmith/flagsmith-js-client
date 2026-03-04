@@ -40,7 +40,6 @@ describe('Pipeline Analytics', () => {
         expect(calls).toHaveLength(1);
 
         const body = JSON.parse(calls[0][1].body);
-        expect(body.sdk_version).toBe('11.0.0');
         expect(body.environment_key).toBe(environmentID);
         expect(body.events).toHaveLength(2);
 

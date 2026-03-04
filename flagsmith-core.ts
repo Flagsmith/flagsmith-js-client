@@ -282,7 +282,6 @@ const Flagsmith = class {
 
         const batch: IPipelineEventBatch = {
             events: eventsToSend,
-            sdk_version: SDK_VERSION,
             environment_key: environmentKey,
         };
 
@@ -1021,7 +1020,7 @@ const Flagsmith = class {
         const event: IPipelineEvent = {
             event_id: flagKey,
             event_type: 'flag_evaluation',
-            evaluated_at: new Date().toISOString(),
+            evaluated_at: Date.now(),
             identity_identifier: this.evaluationContext.identity?.identifier ?? null,
             enabled: flag ? flag.enabled : null,
             value: flag ? flag.value : null,
@@ -1031,6 +1030,7 @@ const Flagsmith = class {
             metadata: {
                 ...(flag ? { id: flag.id } : {}),
                 ...(typeof window !== 'undefined' && window.location ? { page_url: window.location.href } : {}),
+                ...(SDK_VERSION ? { sdk_version: SDK_VERSION } : {}),
             },
         };
         this.pipelineEvents.push(event);
