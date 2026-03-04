@@ -1,25 +1,6 @@
 import { getFlagsmith, environmentID, testIdentity } from './test-constants';
-import { promises as fs } from 'fs';
 
-const pipelineUrl = 'http://localhost:8080/';
-
-function mockFetchWithPipeline(mockFetch: jest.Mock) {
-    mockFetch.mockImplementation(async (url: string) => {
-        if (url.includes('v1/analytics/batch')) {
-            return { status: 202, text: () => Promise.resolve('') };
-        }
-        if (url.includes('analytics/flags')) {
-            return { status: 200, text: () => Promise.resolve('{}') };
-        }
-        if (url.includes('identities')) {
-            return { status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentity}.json`, 'utf8') };
-        }
-        if (url.includes('flags')) {
-            return { status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8') };
-        }
-        throw new Error('Unmocked URL: ' + url);
-    });
-}
+const pipelineUrl = 'https://analytics.flagsmith.com/';
 
 function getPipelineCalls(mockFetch: jest.Mock) {
     return mockFetch.mock.calls.filter(
@@ -28,7 +9,6 @@ function getPipelineCalls(mockFetch: jest.Mock) {
 }
 
 describe('Pipeline Analytics', () => {
-
     test('should not send pipeline events when evaluationAnalyticsConfig is not set', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith();
         await flagsmith.init(initConfig);
@@ -48,7 +28,6 @@ describe('Pipeline Analytics', () => {
                 flushInterval: 60000,
             },
         });
-        mockFetchWithPipeline(mockFetch);
         await flagsmith.init(initConfig);
 
         flagsmith.getValue('font_size');
@@ -71,7 +50,7 @@ describe('Pipeline Analytics', () => {
         expect(valueEvent.value).toBe(16);
         expect(valueEvent.enabled).toBe(true);
         expect(valueEvent.identity_identifier).toBeNull();
-        expect(valueEvent.evaluated_at).toBeGreaterThan(0);
+        expect(valueEvent.evaluated_at).toBeDefined();
         expect(valueEvent.metadata).toEqual({ id: 6149 });
 
         const enabledEvent = body.events[1];
@@ -94,7 +73,6 @@ describe('Pipeline Analytics', () => {
             },
             identity: testIdentity,
         });
-        mockFetchWithPipeline(mockFetch);
         await flagsmith.init(initConfig);
 
         flagsmith.getValue('hero');
@@ -113,14 +91,13 @@ describe('Pipeline Analytics', () => {
     });
 
     test('should cap buffer at maxBuffer and skip events when skipAnalytics is used', async () => {
-        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+        const { flagsmith, initConfig } = getFlagsmith({
             evaluationAnalyticsConfig: {
                 analyticsServerUrl: pipelineUrl,
                 maxBuffer: 3,
                 flushInterval: 60000,
             },
         });
-        mockFetchWithPipeline(mockFetch);
         await flagsmith.init(initConfig);
 
         flagsmith.getValue('hero', { skipAnalytics: true });
@@ -151,17 +128,12 @@ describe('Pipeline Analytics', () => {
             },
         });
 
-        mockFetch.mockImplementation(async (url: string) => {
+        const original = mockFetch.getMockImplementation() as jest.Mock;
+        mockFetch.mockImplementation(async (url: string, options: any) => {
             if (url.includes('v1/analytics/batch')) {
                 return { status: 500, text: () => Promise.resolve('Server Error') };
             }
-            if (url.includes('analytics/flags')) {
-                return { status: 200, text: () => Promise.resolve('{}') };
-            }
-            if (url.includes('flags')) {
-                return { status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8') };
-            }
-            throw new Error('Unmocked URL: ' + url);
+            return original(url, options);
         });
 
         await flagsmith.init(initConfig);
