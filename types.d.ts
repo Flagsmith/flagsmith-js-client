@@ -131,6 +131,18 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
      * Customer application metadata
      */
     applicationMetadata?: ApplicationMetadata;
+    /**
+     * Server-side API key for local evaluation (requires "ser." prefix)
+     */
+    serverAPIKey?: string;
+    /**
+     * Enable local evaluation mode (requires serverAPIKey or environmentDocument)
+     */
+    enableLocalEvaluation?: boolean;
+    /**
+     * Preloaded environment document for local evaluation (optional, for SSR optimization)
+     */
+    environmentDocument?: any;
 }
 
 export interface IFlagsmithResponse {
@@ -176,6 +188,18 @@ T extends string = string
      * Initialise the sdk against a particular environment
      */
     init: (config: IInitConfig<FKey<F>, T>) => Promise<void>;
+    /**
+     * Internal: Whether local evaluation is enabled
+     */
+    useLocalEvaluation?: boolean;
+    /**
+     * Internal: The environment document for local evaluation
+     */
+    environmentDocument?: any;
+    /**
+     * Internal: The current flags
+     */
+    flags?: IFlags<FKey<F>>;
     /**
      * Set evaluation context. Refresh the flags.
      */

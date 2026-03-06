@@ -1,0 +1,4 @@
+export const CONSTANTS = {
+    STANDARD: 'STANDARD',
+    MULTIVARIATE: 'MULTIVARIATE'
+};

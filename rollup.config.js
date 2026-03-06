@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
+import json from '@rollup/plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import path from 'path';
@@ -9,6 +10,7 @@ const externalDependencies = ["react", "react-dom", "react-native"];
 
 const createPlugins = (exclude) => [
     peerDepsExternal(),
+    json(),
     resolve(),
     commonjs(),
     typescript({ tsconfig: "./tsconfig.json", exclude }),
@@ -28,11 +30,12 @@ const sourcemapPathTransform = (relativeSourcePath) => {
 const generateConfig = (input, outputDir, name, exclude = []) => ({
     input,
     output: [
-        { file: path.join(outputDir, `${name}.js`), format: "umd", name, sourcemap: true,sourcemapPathTransform },
+        { file: path.join(outputDir, `${name}.js`), format: "umd", name, sourcemap: true, sourcemapPathTransform },
         { file: path.join(outputDir, `${name}.mjs`), format: "es", sourcemap: true, sourcemapPathTransform },
     ],
     plugins: createPlugins(exclude),
     external: externalDependencies,
+    inlineDynamicImports: true,
 });
 
 export default [

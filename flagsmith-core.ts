@@ -27,6 +27,21 @@ import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContext
 import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
 import { SDK_VERSION } from './utils/version';
 
+// Local evaluation engine - lazy loaded to avoid cold start penalty
+// Modules imported dynamically when enableLocalEvaluation is true
+let engineModule: any = null;
+let mapperModule: any = null;
+
+async function loadEngineModules() {
+    if (!engineModule) {
+        [engineModule, mapperModule] = await Promise.all([
+            import('./flagsmith-engine'),
+            import('./utils/environment-mapper')
+        ]);
+    }
+    return { engineModule, mapperModule };
+}
+
 export enum FlagSource {
     "NONE" = "NONE",
     "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
@@ -92,6 +107,11 @@ const Flagsmith = class {
     }
 
     getFlags = () => {
+        // Use local evaluation if enabled
+        if (this.useLocalEvaluation) {
+            return this.getLocalFlags();
+        }
+
         const { api, evaluationContext } = this;
         this.log("Get Flags")
         this.isLoading = true;
@@ -290,6 +310,12 @@ const Flagsmith = class {
     sentryClient: ISentryClient | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
+
+    // Local evaluation properties
+    useLocalEvaluation = false
+    environmentDocument: any = null
+    serverAPIKey: string | null = null
+
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -307,6 +333,8 @@ const Flagsmith = class {
                 enableAnalytics,
                 enableDynatrace,
                 enableLogs,
+                enableLocalEvaluation,
+                environmentDocument,
                 environmentID,
                 eventSourceUrl= "https://realtime.flagsmith.com/",
                 fetch: fetchImplementation,
@@ -317,6 +345,7 @@ const Flagsmith = class {
                 preventFetch,
                 realtime,
                 sentryClient,
+                serverAPIKey,
                 state,
                 traits,
             } = config;
@@ -405,6 +434,24 @@ const Flagsmith = class {
             if (angularHttpClient) {
                 // @ts-expect-error
                 _fetch = angularFetch(angularHttpClient);
+            }
+
+            // Set up local evaluation if enabled
+            if (serverAPIKey || enableLocalEvaluation || environmentDocument) {
+                this.useLocalEvaluation = true;
+                this.serverAPIKey = serverAPIKey || null;
+
+                // Lazy load engine modules to avoid cold start penalty
+                await loadEngineModules();
+
+                if (environmentDocument) {
+                    // Use preloaded environment document (SSR optimization)
+                    this.environmentDocument = environmentDocument;
+                    this.log('Using preloaded environment document for local evaluation');
+                } else if (serverAPIKey) {
+                    // Fetch environment document from API
+                    await this.updateEnvironmentDocument();
+                }
             }
 
             if (AsyncStorage && this.canUseStorage) {
@@ -575,6 +622,126 @@ const Flagsmith = class {
         }
     }
 
+    /**
+     * Fetches the environment document from the Flagsmith API for local evaluation.
+     * This document contains all flags, segments, and rules needed to evaluate flags locally.
+     */
+    private async updateEnvironmentDocument() {
+        if (!this.serverAPIKey && !this.evaluationContext.environment?.apiKey) {
+            throw new Error('serverAPIKey or environmentID required for local evaluation');
+        }
+
+        const apiKey = this.serverAPIKey || this.evaluationContext.environment?.apiKey;
+        const url = `${this.api}environment-document/`;
+
+        this.log('Fetching environment document for local evaluation');
+
+        try {
+            // Build headers similar to existing fetch logic
+            const requestHeaders: Record<string, string> = {
+                'X-Environment-Key': apiKey || '',
+            };
+
+            if (this.applicationMetadata?.name) {
+                requestHeaders['Flagsmith-Application-Name'] = this.applicationMetadata.name;
+            }
+
+            if (this.applicationMetadata?.version) {
+                requestHeaders['Flagsmith-Application-Version'] = this.applicationMetadata.version;
+            }
+
+            if (SDK_VERSION) {
+                requestHeaders['Flagsmith-SDK-User-Agent'] = `flagsmith-js-sdk/${SDK_VERSION}`;
+            }
+
+            if (this.headers) {
+                Object.assign(requestHeaders, this.headers);
+            }
+
+            const response = await _fetch(url, {
+                method: 'GET',
+                headers: requestHeaders,
+            });
+
+            if (response.status === 200) {
+                const text = await response.text!();
+                this.environmentDocument = JSON.parse(text || '{}');
+                this.log('Environment document fetched successfully');
+            } else {
+                throw new Error(`Failed to fetch environment document: ${response.status}`);
+            }
+        } catch (error) {
+            this.log('Error fetching environment document', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Evaluates flags locally using the evaluation engine.
+     * This method is called when local evaluation mode is enabled.
+     */
+    private getLocalFlags(): Promise<IFlags> {
+        this.log('Evaluating flags locally');
+
+        if (!this.environmentDocument) {
+            const error = new Error('Environment document not loaded for local evaluation');
+            this.onError?.(error);
+            return Promise.reject(error);
+        }
+
+        if (!engineModule || !mapperModule) {
+            const error = new Error('Engine modules not loaded - this should not happen');
+            this.onError?.(error);
+            return Promise.reject(error);
+        }
+
+        try {
+            // Use the engine's getEvaluationResult function
+            const evaluationContext = this.buildEvaluationContext();
+            const result = engineModule.getEvaluationResult(evaluationContext);
+
+            // Convert engine result to SDK flags format
+            const flags = mapperModule.mapEngineResultToSDKFlags(result.flags);
+
+            // Update internal state
+            this.oldFlags = { ...this.flags };
+            const flagsChanged = getChanges(this.oldFlags, flags);
+            this.flags = flags;
+            this.isLoading = false;
+
+            // Update storage
+            this.updateStorage();
+
+            // Notify listeners
+            this._onChange(this.oldFlags, {
+                isFromServer: false,
+                flagsChanged,
+                traitsChanged: null
+            }, this._loadedState(null, FlagSource.SERVER));
+
+            return Promise.resolve(flags);
+        } catch (error) {
+            this.log('Error during local evaluation', error);
+            const typedError = error instanceof Error ? error : new Error(`${error}`);
+            this.onError?.(typedError);
+            return Promise.reject(typedError);
+        }
+    }
+
+    /**
+     * Builds the evaluation context from the current SDK state and environment document.
+     * Uses the engine's mappers to properly convert the API format.
+     */
+    private buildEvaluationContext(): any {
+        if (!mapperModule) {
+            throw new Error('Engine modules not loaded - call init() with enableLocalEvaluation first');
+        }
+        return mapperModule.buildEvaluationContextFromDocument(
+            this.environmentDocument,
+            this.evaluationContext
+        );
+    }
+
     getAllFlags() {
         return this.flags;
     }
@@ -675,7 +842,6 @@ const Flagsmith = class {
                 return options.fallback;
             }
         }
-        //todo record check for value
         return res;
     }
 
