@@ -1029,7 +1029,7 @@ const Flagsmith = class {
             event_id: flagKey,
             event_type: 'flag_evaluation',
             evaluated_at: Date.now(),
-            identity_identifier: this.evaluationContext.identity?.identifier ?? null,
+            identity_identifier: this.evaluationContext.identity?.identifier ?? '',
             enabled: flag ? flag.enabled : null,
             value: flag ? flag.value : null,
             traits: this.evaluationContext.identity?.traits
