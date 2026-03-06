@@ -29,7 +29,6 @@ jobs:
           INTERNAL="${VERSION}-internal.${{ github.run_number }}"
           echo "Publishing version: $INTERNAL"
           cd lib/flagsmith && npm version $INTERNAL --no-git-tag-version
-          cd ../../lib/react-native-flagsmith && npm version $INTERNAL --no-git-tag-version
 
       - name: Build and test
         run: npm run build && npm test
@@ -37,4 +36,3 @@ jobs:
       - name: Publish
         run: |
           cd lib/flagsmith && npm publish --tag internal --access public
-          cd ../../lib/react-native-flagsmith && npm publish --tag internal --access public
