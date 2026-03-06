@@ -279,6 +279,7 @@ const Flagsmith = class {
         this.isPipelineFlushing = true;
         const eventsToSend = this.pipelineEvents;
         this.pipelineEvents = [];
+        this.pipelineRecordedKeys.clear();
 
         const batch: IPipelineEventBatch = {
             events: eventsToSend,
@@ -338,6 +339,7 @@ const Flagsmith = class {
     pipelineEvents: IPipelineEvent[] = []
     pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
     isPipelineFlushing = false
+    pipelineRecordedKeys: Map<string, string> = new Map()
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -1003,6 +1005,7 @@ const Flagsmith = class {
         }
         this.evaluationAnalyticsUrl = null;
         this.pipelineEvents = [];
+        this.pipelineRecordedKeys.clear();
     }
 
     private trimPipelineBuffer() {
@@ -1017,6 +1020,11 @@ const Flagsmith = class {
     private recordPipelineEvent(key: string) {
         const flagKey = key.toLowerCase().replace(/ /g, '_');
         const flag = this.flags && this.flags[flagKey];
+        const fingerprint = `${this.evaluationContext.identity?.identifier ?? 'none'}|${flag?.enabled ?? false}|${flag?.value ?? 'null'}`;
+        if (this.pipelineRecordedKeys.get(flagKey) === fingerprint) {
+            return;
+        }
+        this.pipelineRecordedKeys.set(flagKey, fingerprint);
         const event: IPipelineEvent = {
             event_id: flagKey,
             event_type: 'flag_evaluation',

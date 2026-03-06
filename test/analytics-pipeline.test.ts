@@ -118,6 +118,63 @@ describe('Pipeline Analytics', () => {
         expect(flagsmith.pipelineEvents[2].event_id).toBe('off_value');
     });
 
+    test('should deduplicate repeated evaluations with same result per flush window', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                flushInterval: 60000,
+            },
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.getValue('font_size');
+        flagsmith.getValue('font_size');
+        flagsmith.getValue('font_size');
+        flagsmith.hasFeature('font_size');
+        flagsmith.hasFeature('font_size');
+
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(1);
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents[0].event_id).toBe('font_size');
+
+        // @ts-ignore
+        await flagsmith.flushPipelineAnalytics();
+        flagsmith.getValue('font_size');
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(1);
+
+        flagsmith.getValue('hero');
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(2);
+    });
+
+    test('should record new event when evaluation result changes for same key', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                flushInterval: 60000,
+            },
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.getValue('font_size');
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(1);
+
+        flagsmith.getValue('font_size');
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(1);
+
+        await flagsmith.identify(testIdentity);
+        flagsmith.getValue('font_size');
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(2);
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents[1].identity_identifier).toBe(testIdentity);
+    });
+
     test('should re-queue on failure and coexist with standard analytics', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith({
             enableAnalytics: true,
