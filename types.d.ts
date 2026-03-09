@@ -131,6 +131,34 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
      * Customer application metadata
      */
     applicationMetadata?: ApplicationMetadata;
+    /**
+     * @experimental Internal use only — API may change without notice.
+     * Configuration for the evaluation analytics pipeline. When provided,
+     * individual flag evaluation events are buffered and sent to the pipeline endpoint.
+     * @hidden
+     */
+    /** @internal */
+    evaluationAnalyticsConfig?: {
+        analyticsServerUrl: string;
+        maxBuffer?: number;
+        flushInterval?: number;
+    };
+}
+
+export interface IPipelineEvent {
+    event_id: string; // flag_name or event_name
+    event_type: 'flag_evaluation' | 'custom_event';
+    evaluated_at: number;
+    identity_identifier: string | null;
+    enabled?: boolean | null;
+    value: IFlagsmithValue;
+    traits?: { [key: string]: null | TraitEvaluationContext } | null;
+    metadata?: Record<string, any> | null;
+}
+
+export interface IPipelineEventBatch {
+    events: IPipelineEvent[];
+    environment_key: string;
 }
 
 export interface IFlagsmithResponse {
