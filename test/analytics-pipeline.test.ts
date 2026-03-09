@@ -48,7 +48,7 @@ describe('Pipeline Analytics', () => {
         expect(valueEvent.event_type).toBe('flag_evaluation');
         expect(valueEvent.value).toBe(16);
         expect(valueEvent.enabled).toBe(true);
-        expect(valueEvent.identity_identifier).toBe('');
+        expect(valueEvent.identity_identifier).toBeNull();
         expect(valueEvent.evaluated_at).toBeDefined();
         expect(valueEvent.metadata).toEqual(expect.objectContaining({ id: 6149 }));
 
