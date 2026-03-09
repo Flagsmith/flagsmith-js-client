@@ -89,8 +89,8 @@ describe('Pipeline Analytics', () => {
         });
     });
 
-    test('should cap buffer at maxBuffer and skip events when skipAnalytics is used', async () => {
-        const { flagsmith, initConfig } = getFlagsmith({
+    test('should flush excess events when buffer exceeds maxBuffer and skip events when skipAnalytics is used', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
             evaluationAnalyticsConfig: {
                 analyticsServerUrl: pipelineUrl,
                 maxBuffer: 3,
@@ -110,12 +110,17 @@ describe('Pipeline Analytics', () => {
         flagsmith.getValue('number_value');
         flagsmith.getValue('off_value');
 
+        const calls = mockFetch.mock.calls.filter(([url]: [string, any]) => url.includes('v1/analytics/batch'));
+        expect(calls).toHaveLength(1);
+        const flushedBatch = JSON.parse(calls[0][1].body).events;
+        expect(flushedBatch).toHaveLength(3);
+        expect(flushedBatch[0].event_id).toBe('hero');
+        expect(flushedBatch[2].event_id).toBe('json_value');
+
+        // @ts-ignore — remaining events kept for next flush
+        expect(flagsmith.pipelineEvents).toHaveLength(2);
         // @ts-ignore
-        expect(flagsmith.pipelineEvents).toHaveLength(3);
-        // @ts-ignore
-        expect(flagsmith.pipelineEvents[0].event_id).toBe('json_value');
-        // @ts-ignore
-        expect(flagsmith.pipelineEvents[2].event_id).toBe('off_value');
+        expect(flagsmith.pipelineEvents[0].event_id).toBe('number_value');
     });
 
     test('should deduplicate repeated evaluations with same result per flush window', async () => {

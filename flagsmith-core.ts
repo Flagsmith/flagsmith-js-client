@@ -277,8 +277,8 @@ const Flagsmith = class {
 
         const environmentKey = this.evaluationContext.environment!.apiKey;
         this.isPipelineFlushing = true;
-        const eventsToSend = this.pipelineEvents;
-        this.pipelineEvents = [];
+        const eventsToSend = this.pipelineEvents.slice(0, this.evaluationAnalyticsMaxBuffer);
+        this.pipelineEvents = this.pipelineEvents.slice(this.evaluationAnalyticsMaxBuffer);
         this.pipelineRecordedKeys.clear();
 
         const batch: IPipelineEventBatch = {
@@ -302,7 +302,6 @@ const Flagsmith = class {
             this.log('Pipeline analytics: flush successful');
         } catch (err) {
             this.pipelineEvents = eventsToSend.concat(this.pipelineEvents);
-            this.trimPipelineBuffer();
             this.log('Pipeline analytics: flush failed, events re-queued', err);
         } finally {
             this.isPipelineFlushing = false;
@@ -1008,13 +1007,6 @@ const Flagsmith = class {
         this.pipelineRecordedKeys.clear();
     }
 
-    private trimPipelineBuffer() {
-        if (this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer) {
-            const excess = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
-            this.pipelineEvents = this.pipelineEvents.slice(excess);
-        }
-    }
-
     // Pipeline event schema — must match the pipeline server's Event struct.
     // To update: 1) IPipelineEvent in types.d.ts  2) event object below  3) tests in test/analytics-pipeline.test.ts
     private recordPipelineEvent(key: string) {
@@ -1042,9 +1034,8 @@ const Flagsmith = class {
             },
         };
         this.pipelineEvents.push(event);
-        this.trimPipelineBuffer();
 
-        if (this.pipelineFlushInterval === 0) {
+        if (this.pipelineFlushInterval === 0 || this.pipelineEvents.length >= this.evaluationAnalyticsMaxBuffer) {
             this.flushPipelineAnalytics();
         }
     }
