@@ -132,15 +132,15 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
      */
     applicationMetadata?: ApplicationMetadata;
     /**
+     * @experimental Internal use only — API may change without notice.
      * Configuration for the evaluation analytics pipeline. When provided,
      * individual flag evaluation events are buffered and sent to the pipeline endpoint.
+     * @hidden
      */
+    /** @internal */
     evaluationAnalyticsConfig?: {
-        /** URL of the pipeline server (e.g. 'https://analytics.flagsmith.com/'). */
         analyticsServerUrl: string;
-        /** Maximum events to buffer in memory before dropping oldest. Default 1000. */
         maxBuffer?: number;
-        /** Flush interval in milliseconds. Set to 0 to flush immediately after each evaluation. Default 10000 (10s). */
         flushInterval?: number;
     };
 }
