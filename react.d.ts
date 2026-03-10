@@ -30,3 +30,9 @@ export declare function useFlags<
 export declare const useFlagsmith: <F extends string | Record<string, any>,
     T extends string = string>() => IFlagsmith<F, T>;
 export declare const useFlagsmithLoading: () => LoadingState | undefined;
+export declare function useExperiment(flagKey: string): {
+    enabled: boolean;
+    value: IFlagsmithValue;
+    success: () => Promise<void>;
+    failure: () => Promise<void>;
+};
