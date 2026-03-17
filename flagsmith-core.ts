@@ -36,6 +36,11 @@ export enum FlagSource {
     "SERVER" = "SERVER",
 }
 
+export enum PipelineEventType {
+    FLAG_EVALUATION = 'flag_evaluation',
+    CUSTOM_EVENT = 'custom_event',
+}
+
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
 let _fetch: LikeFetch;
 
@@ -1060,7 +1065,7 @@ const Flagsmith = class {
         this.pipelineRecordedKeys.set(flagKey, fingerprint);
         const event: IPipelineEvent = {
             event_id: flagKey,
-            event_type: 'flag_evaluation',
+            event_type: PipelineEventType.FLAG_EVALUATION,
             evaluated_at: Date.now(),
             identity_identifier: this.evaluationContext.identity?.identifier ?? null,
             enabled: flag ? flag.enabled : null,
@@ -1084,7 +1089,7 @@ const Flagsmith = class {
     private buildCustomEvent(eventName: string, identityIdentifier: string | null, metadata?: Record<string, unknown>, timestamp?: number): IPipelineEvent {
         return {
             event_id: eventName,
-            event_type: 'custom_event',
+            event_type: PipelineEventType.CUSTOM_EVENT,
             evaluated_at: timestamp ?? Date.now(),
             identity_identifier: identityIdentifier,
             enabled: null,

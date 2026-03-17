@@ -1,5 +1,5 @@
 import { EvaluationContext, IdentityEvaluationContext, TraitEvaluationContext } from "./evaluation-context";
-import { FlagSource } from "./flagsmith-core";
+import { FlagSource, PipelineEventType } from "./flagsmith-core";
 
 type IFlagsmithValue<T = string | number | boolean | null> = T
 
@@ -85,7 +85,7 @@ export type ISentryClient = {
 } | undefined;
 
 
-export { FlagSource };
+export { FlagSource, PipelineEventType };
 
 export declare type LoadingState = {
     error: Error | null, // Current error, resets on next attempt to fetch flags
@@ -147,7 +147,7 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
 
 export interface IPipelineEvent {
     event_id: string; // flag_name or event_name
-    event_type: 'flag_evaluation' | 'custom_event';
+    event_type: PipelineEventType;
     evaluated_at: number;
     identity_identifier: string | null;
     enabled?: boolean | null;
