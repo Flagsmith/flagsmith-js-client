@@ -300,6 +300,14 @@ T extends string = string
      */
     setTraits: (traits: ITraits) => Promise<void>;
     /**
+     * Track a custom event through the evaluation analytics pipeline.
+     * Requires `evaluationAnalyticsConfig` to be set; no-op otherwise.
+     * Events tracked before `identify()` are buffered and sent once identity is set.
+     * @experimental Internal use only — API may change without notice.
+     * @hidden
+     */
+    trackEvent: (eventName: string, metadata?: Record<string, any>) => void;
+    /**
      * The stored identity of the user
     */
     identity?: IIdentity;
