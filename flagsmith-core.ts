@@ -339,6 +339,7 @@ const Flagsmith = class {
     pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
     isPipelineFlushing = false
     pipelineRecordedKeys: Map<string, string> = new Map()
+    pendingCustomEvents: Array<{ eventName: string; metadata?: Record<string, any>; timestamp: number }> = []
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -653,6 +654,18 @@ const Flagsmith = class {
                 )
             );
         }
+        // Drain pending custom events now that identity is set
+        if (this.pendingCustomEvents.length > 0 && this.evaluationAnalyticsUrl) {
+            for (const pending of this.pendingCustomEvents) {
+                const event = this.buildCustomEvent(pending.eventName, userId ?? null, pending.metadata, pending.timestamp);
+                this.pipelineEvents.push(event);
+            }
+            this.pendingCustomEvents = [];
+            this.trimPipelineBuffer();
+            if (this.pipelineFlushInterval === 0) {
+                this.flushPipelineAnalytics();
+            }
+        }
         if (this.initialised) {
             return this.getFlags();
         }
@@ -685,6 +698,7 @@ const Flagsmith = class {
     logout() {
         this.identity = null
         this.evaluationContext.identity = null;
+        this.pendingCustomEvents = [];
         if (this.initialised) {
             return this.getFlags();
         }
@@ -1004,7 +1018,34 @@ const Flagsmith = class {
         }
         this.evaluationAnalyticsUrl = null;
         this.pipelineEvents = [];
+        this.pendingCustomEvents = [];
         this.pipelineRecordedKeys.clear();
+    }
+
+    private trimPipelineBuffer() {
+        if (this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer) {
+            const excess = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
+            this.pipelineEvents = this.pipelineEvents.slice(excess);
+        }
+    }
+
+    private currentTraitsSnapshot() {
+        return this.evaluationContext.identity?.traits
+            ? { ...this.evaluationContext.identity.traits }
+            : null;
+    }
+
+    private getPageUrl(): string | null {
+        return typeof window !== 'undefined' && window.location ? window.location.href : null;
+    }
+
+    private sdkMetadata(extra?: Record<string, any>): Record<string, any> {
+        const pageUrl = this.getPageUrl();
+        return {
+            ...(extra || {}),
+            ...(pageUrl ? { page_url: pageUrl } : {}),
+            ...(SDK_VERSION ? { sdk_version: SDK_VERSION } : {}),
+        };
     }
 
     // Pipeline event schema — must match the pipeline server's Event struct.
@@ -1036,6 +1077,38 @@ const Flagsmith = class {
         this.pipelineEvents.push(event);
 
         if (this.pipelineFlushInterval === 0 || this.pipelineEvents.length >= this.evaluationAnalyticsMaxBuffer) {
+            this.flushPipelineAnalytics();
+        }
+    }
+
+    private buildCustomEvent(eventName: string, identityIdentifier: string | null, metadata?: Record<string, any>, timestamp?: number): IPipelineEvent {
+        return {
+            event_id: eventName,
+            event_type: 'custom_event',
+            evaluated_at: timestamp ?? Date.now(),
+            identity_identifier: identityIdentifier,
+            enabled: null,
+            value: null,
+            traits: this.currentTraitsSnapshot(),
+            metadata: this.sdkMetadata(metadata),
+        };
+    }
+
+    trackEvent = (eventName: string, metadata?: Record<string, any>) => {
+        if (!this.evaluationAnalyticsUrl || !eventName) {
+            return;
+        }
+        if (!this.evaluationContext.identity?.identifier) {
+            if (this.pendingCustomEvents.length < this.evaluationAnalyticsMaxBuffer) {
+                this.pendingCustomEvents.push({ eventName, metadata, timestamp: Date.now() });
+            }
+            return;
+        }
+        const event = this.buildCustomEvent(eventName, this.evaluationContext.identity.identifier, metadata);
+        this.pipelineEvents.push(event);
+        this.trimPipelineBuffer();
+
+        if (this.pipelineFlushInterval === 0) {
             this.flushPipelineAnalytics();
         }
     }
