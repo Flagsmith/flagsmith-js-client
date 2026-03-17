@@ -306,7 +306,7 @@ T extends string = string
      * @experimental Internal use only — API may change without notice.
      * @hidden
      */
-    trackEvent: (eventName: string, metadata?: Record<string, any>) => void;
+    trackEvent: (eventName: string, metadata?: Record<string, unknown>) => void;
     /**
      * The stored identity of the user
     */

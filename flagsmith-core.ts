@@ -339,7 +339,7 @@ const Flagsmith = class {
     pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
     isPipelineFlushing = false
     pipelineRecordedKeys: Map<string, string> = new Map()
-    pendingCustomEvents: Array<{ eventName: string; metadata?: Record<string, any>; timestamp: number }> = []
+    pendingCustomEvents: Array<{ eventName: string; metadata?: Record<string, unknown>; timestamp: number }> = []
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -1039,7 +1039,7 @@ const Flagsmith = class {
         return typeof window !== 'undefined' && window.location ? window.location.href : null;
     }
 
-    private sdkMetadata(extra?: Record<string, any>): Record<string, any> {
+    private sdkMetadata(extra?: Record<string, unknown>): Record<string, unknown> {
         const pageUrl = this.getPageUrl();
         return {
             ...(extra || {}),
@@ -1081,7 +1081,7 @@ const Flagsmith = class {
         }
     }
 
-    private buildCustomEvent(eventName: string, identityIdentifier: string | null, metadata?: Record<string, any>, timestamp?: number): IPipelineEvent {
+    private buildCustomEvent(eventName: string, identityIdentifier: string | null, metadata?: Record<string, unknown>, timestamp?: number): IPipelineEvent {
         return {
             event_id: eventName,
             event_type: 'custom_event',
@@ -1094,7 +1094,7 @@ const Flagsmith = class {
         };
     }
 
-    trackEvent = (eventName: string, metadata?: Record<string, any>) => {
+    trackEvent = (eventName: string, metadata?: Record<string, unknown>) => {
         if (!this.evaluationAnalyticsUrl || !eventName) {
             return;
         }
