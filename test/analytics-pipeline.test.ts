@@ -1,4 +1,5 @@
 import { getFlagsmith, environmentID, testIdentity } from './test-constants';
+import { PipelineEventType } from '../lib/flagsmith';
 
 const pipelineUrl = 'https://analytics.flagsmith.com/';
 
@@ -227,7 +228,7 @@ const defaultPipelineConfig = {
 };
 
 function getCustomEvents(flagsmith: any) {
-    return flagsmith.pipelineEvents.filter((e: any) => e.event_type === 'custom_event');
+    return flagsmith.pipelineEvents.filter((e: any) => e.event_type === PipelineEventType.CUSTOM_EVENT);
 }
 
 describe('trackEvent (custom events)', () => {
@@ -248,7 +249,7 @@ describe('trackEvent (custom events)', () => {
         const event = JSON.parse(calls[0][1].body).events[0];
         expect(event).toEqual(expect.objectContaining({
             event_id: 'checkout',
-            event_type: 'custom_event',
+            event_type: PipelineEventType.CUSTOM_EVENT,
             enabled: null,
             value: null,
             identity_identifier: testIdentity,
@@ -328,7 +329,7 @@ describe('trackEvent (custom events)', () => {
         const allEvents = calls.flatMap(
             ([, opts]: [string, any]) => JSON.parse(opts.body).events
         );
-        const custom = allEvents.filter((e: any) => e.event_type === 'custom_event');
+        const custom = allEvents.filter((e: any) => e.event_type === PipelineEventType.CUSTOM_EVENT);
         expect(custom).toHaveLength(1);
         expect(custom[0].event_id).toBe('pre_identify_action');
         expect(custom[0].identity_identifier).toBe(testIdentity);
@@ -402,5 +403,27 @@ describe('trackEvent (custom events)', () => {
         expect(flagsmith.pendingCustomEvents[0].eventName).toBe('event_1');
         // @ts-ignore
         expect(flagsmith.pendingCustomEvents[1].eventName).toBe('event_2');
+    });
+
+    test('buffers again after identify then logout', async () => {
+        const { flagsmith, initConfig } = getFlagsmith(defaultPipelineConfig);
+        await flagsmith.init(initConfig);
+
+        // Identify → track goes direct to pipeline
+        await flagsmith.identify(testIdentity);
+        flagsmith.trackEvent('while_identified');
+        expect(getCustomEvents(flagsmith)).toHaveLength(1);
+
+        // Logout → clears pending, identity gone
+        await flagsmith.logout();
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(0);
+
+        // Track after logout → should buffer again (no identity)
+        flagsmith.trackEvent('after_logout');
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(1);
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents[0].eventName).toBe('after_logout');
     });
 });
