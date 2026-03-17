@@ -218,3 +218,189 @@ describe('Pipeline Analytics', () => {
         expect(flagsmith.pipelineEvents[0].event_id).toBe('hero');
     });
 });
+
+const defaultPipelineConfig = {
+    evaluationAnalyticsConfig: {
+        analyticsServerUrl: pipelineUrl,
+        flushInterval: 60000,
+    },
+};
+
+function getCustomEvents(flagsmith: any) {
+    return flagsmith.pipelineEvents.filter((e: any) => e.event_type === 'custom_event');
+}
+
+describe('trackEvent (custom events)', () => {
+    test('sends custom_event with correct shape', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+            ...defaultPipelineConfig,
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('checkout', { item: 'shoes', price: 99 });
+        // @ts-ignore
+        await flagsmith.flushPipelineAnalytics();
+
+        const calls = getPipelineCalls(mockFetch);
+        expect(calls).toHaveLength(1);
+
+        const event = JSON.parse(calls[0][1].body).events[0];
+        expect(event).toEqual(expect.objectContaining({
+            event_id: 'checkout',
+            event_type: 'custom_event',
+            enabled: null,
+            value: null,
+            identity_identifier: testIdentity,
+        }));
+        expect(event.evaluated_at).toEqual(expect.any(Number));
+        expect(event.metadata).toEqual(expect.objectContaining({ item: 'shoes', price: 99 }));
+        expect(event.metadata.sdk_version).toBeDefined();
+    });
+
+    test('no-ops when evaluationAnalyticsConfig is not set', async () => {
+        const { flagsmith, initConfig } = getFlagsmith();
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('checkout');
+
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(0);
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(0);
+    });
+
+    test('no-ops when eventName is empty', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            ...defaultPipelineConfig,
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('');
+
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(0);
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(0);
+    });
+
+    test('queues events before identify and drains on identify', async () => {
+        const { flagsmith, initConfig } = getFlagsmith(defaultPipelineConfig);
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('page_view', { page: '/home' });
+        flagsmith.trackEvent('signup');
+
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(2);
+        expect(getCustomEvents(flagsmith)).toHaveLength(0);
+
+        await flagsmith.identify(testIdentity);
+
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(0);
+        const custom = getCustomEvents(flagsmith);
+        expect(custom).toHaveLength(2);
+        expect(custom[0].event_id).toBe('page_view');
+        expect(custom[0].identity_identifier).toBe(testIdentity);
+        expect(custom[1].event_id).toBe('signup');
+        expect(custom[1].identity_identifier).toBe(testIdentity);
+    });
+
+    test('flushes immediately on identify when flushInterval is 0', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                flushInterval: 0,
+            },
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('pre_identify_action');
+        expect(getPipelineCalls(mockFetch)).toHaveLength(0);
+
+        await flagsmith.identify(testIdentity);
+
+        const calls = getPipelineCalls(mockFetch);
+        expect(calls.length).toBeGreaterThanOrEqual(1);
+
+        const allEvents = calls.flatMap(
+            ([, opts]: [string, any]) => JSON.parse(opts.body).events
+        );
+        const custom = allEvents.filter((e: any) => e.event_type === 'custom_event');
+        expect(custom).toHaveLength(1);
+        expect(custom[0].event_id).toBe('pre_identify_action');
+        expect(custom[0].identity_identifier).toBe(testIdentity);
+    });
+
+    test('does not deduplicate - each call produces a distinct event', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            ...defaultPipelineConfig,
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('click');
+        flagsmith.trackEvent('click');
+        flagsmith.trackEvent('click');
+
+        expect(getCustomEvents(flagsmith)).toHaveLength(3);
+    });
+
+    test('preserves original timestamps for queued events', async () => {
+        const { flagsmith, initConfig } = getFlagsmith(defaultPipelineConfig);
+        await flagsmith.init(initConfig);
+
+        const trackTime = 1700000000000;
+        const identifyTime = 1700000005000;
+        const dateSpy = jest.spyOn(Date, 'now');
+
+        dateSpy.mockReturnValue(trackTime);
+        flagsmith.trackEvent('early_event');
+
+        dateSpy.mockReturnValue(identifyTime);
+        await flagsmith.identify(testIdentity);
+        dateSpy.mockRestore();
+
+        const custom = getCustomEvents(flagsmith);
+        expect(custom).toHaveLength(1);
+        expect(custom[0].evaluated_at).toBe(trackTime);
+    });
+
+    test('clears pending events on logout', async () => {
+        const { flagsmith, initConfig } = getFlagsmith(defaultPipelineConfig);
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('pre_login_action');
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(1);
+
+        await flagsmith.logout();
+
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(0);
+    });
+
+    test('respects maxBuffer for pending events', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                maxBuffer: 2,
+                flushInterval: 60000,
+            },
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('event_1');
+        flagsmith.trackEvent('event_2');
+        flagsmith.trackEvent('event_3');
+
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents).toHaveLength(2);
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents[0].eventName).toBe('event_1');
+        // @ts-ignore
+        expect(flagsmith.pendingCustomEvents[1].eventName).toBe('event_2');
+    });
+});
