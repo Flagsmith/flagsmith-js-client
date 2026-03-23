@@ -302,7 +302,7 @@ T extends string = string
     /**
      * Track a custom event through the evaluation analytics pipeline.
      * Requires `evaluationAnalyticsConfig` to be set; no-op otherwise.
-     * Events tracked before `identify()` are buffered and sent once identity is set.
+     * Events are sent with the current identity (or null if anonymous).
      * @experimental Internal use only — API may change without notice.
      * @hidden
      */

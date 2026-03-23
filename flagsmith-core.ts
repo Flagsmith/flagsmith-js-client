@@ -344,7 +344,6 @@ const Flagsmith = class {
     private pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
     private isPipelineFlushing = false
     private pipelineRecordedKeys: Map<string, string> = new Map()
-    private pendingCustomEvents: Array<{ eventName: string; metadata?: Record<string, unknown>; timestamp: number }> = []
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -659,18 +658,6 @@ const Flagsmith = class {
                 )
             );
         }
-        // Drain pending custom events now that identity is set
-        if (this.pendingCustomEvents.length > 0 && this.evaluationAnalyticsUrl) {
-            for (const pending of this.pendingCustomEvents) {
-                const event = this.buildCustomEvent(pending.eventName, userId ?? null, pending.metadata, pending.timestamp);
-                this.pipelineEvents.push(event);
-            }
-            this.pendingCustomEvents = [];
-            this.trimPipelineBuffer();
-            if (this.pipelineFlushInterval === 0) {
-                this.flushPipelineAnalytics();
-            }
-        }
         if (this.initialised) {
             return this.getFlags();
         }
@@ -703,7 +690,6 @@ const Flagsmith = class {
     logout() {
         this.identity = null
         this.evaluationContext.identity = null;
-        this.pendingCustomEvents = [];
         if (this.initialised) {
             return this.getFlags();
         }
@@ -1023,7 +1009,6 @@ const Flagsmith = class {
         }
         this.evaluationAnalyticsUrl = null;
         this.pipelineEvents = [];
-        this.pendingCustomEvents = [];
         this.pipelineRecordedKeys.clear();
     }
 
@@ -1103,13 +1088,7 @@ const Flagsmith = class {
         if (!this.evaluationAnalyticsUrl || !eventName) {
             return;
         }
-        if (!this.evaluationContext.identity?.identifier) {
-            if (this.pendingCustomEvents.length < this.evaluationAnalyticsMaxBuffer) {
-                this.pendingCustomEvents.push({ eventName, metadata, timestamp: Date.now() });
-            }
-            return;
-        }
-        const event = this.buildCustomEvent(eventName, this.evaluationContext.identity.identifier, metadata);
+        const event = this.buildCustomEvent(eventName, this.evaluationContext.identity?.identifier ?? null, metadata);
         this.pipelineEvents.push(event);
         this.trimPipelineBuffer();
 
