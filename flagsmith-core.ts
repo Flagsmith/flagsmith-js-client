@@ -338,13 +338,13 @@ const Flagsmith = class {
     sentryClient: ISentryClient | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
-    evaluationAnalyticsUrl: string | null = null
-    evaluationAnalyticsMaxBuffer: number = 1000
-    pipelineEvents: IPipelineEvent[] = []
-    pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
-    isPipelineFlushing = false
-    pipelineRecordedKeys: Map<string, string> = new Map()
-    pendingCustomEvents: Array<{ eventName: string; metadata?: Record<string, unknown>; timestamp: number }> = []
+    private evaluationAnalyticsUrl: string | null = null
+    private evaluationAnalyticsMaxBuffer: number = 1000
+    private pipelineEvents: IPipelineEvent[] = []
+    private pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
+    private isPipelineFlushing = false
+    private pipelineRecordedKeys: Map<string, string> = new Map()
+    private pendingCustomEvents: Array<{ eventName: string; metadata?: Record<string, unknown>; timestamp: number }> = []
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
