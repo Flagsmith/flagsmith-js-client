@@ -304,6 +304,7 @@ T extends string = string
      * Requires `evaluationAnalyticsConfig` to be set; no-op otherwise.
      * Events are sent with the current identity (or null if anonymous).
      * @experimental Internal use only — API may change without notice.
+     * @internal
      * @hidden
      */
     trackEvent: (eventName: string, metadata?: Record<string, unknown>) => void;
