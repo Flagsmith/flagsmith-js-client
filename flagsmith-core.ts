@@ -1012,13 +1012,6 @@ const Flagsmith = class {
         this.pipelineRecordedKeys.clear();
     }
 
-    private trimPipelineBuffer() {
-        if (this.pipelineEvents.length > this.evaluationAnalyticsMaxBuffer) {
-            const excess = this.pipelineEvents.length - this.evaluationAnalyticsMaxBuffer;
-            this.pipelineEvents = this.pipelineEvents.slice(excess);
-        }
-    }
-
     private currentTraitsSnapshot() {
         return this.evaluationContext.identity?.traits
             ? { ...this.evaluationContext.identity.traits }
@@ -1090,9 +1083,8 @@ const Flagsmith = class {
             extraMetadata: metadata,
         });
         this.pipelineEvents.push(event);
-        this.trimPipelineBuffer();
 
-        if (this.pipelineFlushInterval === 0) {
+        if (this.pipelineFlushInterval === 0 || this.pipelineEvents.length >= this.evaluationAnalyticsMaxBuffer) {
             this.flushPipelineAnalytics();
         }
     }
