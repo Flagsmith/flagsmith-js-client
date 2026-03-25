@@ -1,4 +1,5 @@
 import { getFlagsmith, environmentID, testIdentity } from './test-constants';
+import { PipelineEventType } from '../lib/flagsmith';
 
 const pipelineUrl = 'https://analytics.flagsmith.com/';
 
@@ -216,5 +217,155 @@ describe('Pipeline Analytics', () => {
         expect(flagsmith.pipelineEvents).toHaveLength(2);
         // @ts-ignore
         expect(flagsmith.pipelineEvents[0].event_id).toBe('hero');
+    });
+});
+
+const defaultPipelineConfig = {
+    evaluationAnalyticsConfig: {
+        analyticsServerUrl: pipelineUrl,
+        flushInterval: 60000,
+    },
+};
+
+function getCustomEvents(flagsmith: any) {
+    return flagsmith.pipelineEvents.filter((e: any) => e.event_type === PipelineEventType.CUSTOM_EVENT);
+}
+
+describe('trackEvent (custom events)', () => {
+    test('sends custom_event with correct shape', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+            ...defaultPipelineConfig,
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('checkout', { item: 'shoes', price: 99 });
+        // @ts-ignore
+        await flagsmith.flushPipelineAnalytics();
+
+        const calls = getPipelineCalls(mockFetch);
+        expect(calls).toHaveLength(1);
+
+        const event = JSON.parse(calls[0][1].body).events[0];
+        expect(event).toEqual(expect.objectContaining({
+            event_id: 'checkout',
+            event_type: PipelineEventType.CUSTOM_EVENT,
+            enabled: null,
+            value: null,
+            identity_identifier: testIdentity,
+        }));
+        expect(event.evaluated_at).toEqual(expect.any(Number));
+        expect(event.metadata).toEqual(expect.objectContaining({ item: 'shoes', price: 99 }));
+        expect(event.metadata.sdk_version).toBeDefined();
+    });
+
+    test('no-ops when evaluationAnalyticsConfig is not set', async () => {
+        const { flagsmith, initConfig } = getFlagsmith();
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('checkout');
+
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(0);
+    });
+
+    test('no-ops when eventName is empty', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            ...defaultPipelineConfig,
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('');
+
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(0);
+    });
+
+    test('tracks events with null identity when not identified', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(defaultPipelineConfig);
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('page_view', { page: '/home' });
+        flagsmith.trackEvent('signup');
+
+        const custom = getCustomEvents(flagsmith);
+        expect(custom).toHaveLength(2);
+        expect(custom[0].event_id).toBe('page_view');
+        expect(custom[0].identity_identifier).toBeNull();
+        expect(custom[0].metadata).toEqual(expect.objectContaining({ page: '/home' }));
+        expect(custom[1].event_id).toBe('signup');
+        expect(custom[1].identity_identifier).toBeNull();
+
+        // @ts-ignore
+        await flagsmith.flushPipelineAnalytics();
+        const calls = getPipelineCalls(mockFetch);
+        expect(calls).toHaveLength(1);
+    });
+
+    test('tracks events with identity after identify', async () => {
+        const { flagsmith, initConfig } = getFlagsmith(defaultPipelineConfig);
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('anonymous_action');
+        await flagsmith.identify(testIdentity);
+        flagsmith.trackEvent('identified_action');
+
+        const custom = getCustomEvents(flagsmith);
+        expect(custom).toHaveLength(2);
+        expect(custom[0].identity_identifier).toBeNull();
+        expect(custom[1].identity_identifier).toBe(testIdentity);
+    });
+
+    test('flushes immediately when flushInterval is 0', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                flushInterval: 0,
+            },
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('instant_event');
+
+        const calls = getPipelineCalls(mockFetch);
+        expect(calls.length).toBeGreaterThanOrEqual(1);
+
+        const allEvents = calls.flatMap(
+            ([, opts]: [string, any]) => JSON.parse(opts.body).events
+        );
+        const custom = allEvents.filter((e: any) => e.event_type === PipelineEventType.CUSTOM_EVENT);
+        expect(custom).toHaveLength(1);
+        expect(custom[0].event_id).toBe('instant_event');
+    });
+
+    test('does not deduplicate - each call produces a distinct event', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            ...defaultPipelineConfig,
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.trackEvent('click');
+        flagsmith.trackEvent('click');
+        flagsmith.trackEvent('click');
+
+        expect(getCustomEvents(flagsmith)).toHaveLength(3);
+    });
+
+    test('tracks with null identity after logout', async () => {
+        const { flagsmith, initConfig } = getFlagsmith(defaultPipelineConfig);
+        await flagsmith.init(initConfig);
+
+        await flagsmith.identify(testIdentity);
+        flagsmith.trackEvent('while_identified');
+        expect(getCustomEvents(flagsmith)[0].identity_identifier).toBe(testIdentity);
+
+        await flagsmith.logout();
+
+        flagsmith.trackEvent('after_logout');
+        const custom = getCustomEvents(flagsmith);
+        expect(custom[custom.length - 1].identity_identifier).toBeNull();
     });
 });
