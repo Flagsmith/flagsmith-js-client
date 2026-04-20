@@ -623,6 +623,13 @@ const Flagsmith = class {
             this.evaluationEvent = state.evaluationEvent || this.evaluationEvent;
             this.identity = this.getContext()?.identity?.identifier
             this.log("setState called", this)
+            // Hydration from server state (e.g. <FlagsmithProvider serverState={...}>
+            // without an options prop) must flip loadingState to loaded. Guarded on
+            // source===NONE so we never clobber a loaded state already set by
+            // init()/getFlags()/cache paths that also call setState internally.
+            if (this.loadingState.source === FlagSource.NONE && this.flags && Object.keys(this.flags).length > 0) {
+                this.setLoadingState(this._loadedState(null, FlagSource.SERVER));
+            }
         }
     }
 
