@@ -187,11 +187,6 @@ describe('FlagsmithProvider', () => {
         })
     })
     it('reports a loaded state when hydrated from serverState with no options', async () => {
-        // Reproduces the Next.js/SSR pattern from the docs:
-        //   <FlagsmithProvider flagsmith={...} serverState={flagsmithState}>
-        // No options prop, so flagsmith.init() is not called on the client.
-        // useFlagsmithLoading() must still reflect that flags are loaded,
-        // because the server has already provided them.
         const { flagsmith } = getFlagsmith({})
         render(
             <FlagsmithProvider flagsmith={flagsmith} serverState={defaultState}>
