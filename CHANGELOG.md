@@ -1,5 +1,56 @@
 # Changelog
 
+## [12.0.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v11.0.0...v12.0.0) (2026-04-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate npm packages to @flagsmith organization scope ([#367](https://github.com/Flagsmith/flagsmith-js-client/issues/367))
+* re-add sdk version headers ([#344](https://github.com/Flagsmith/flagsmith-js-client/issues/344))
+* onError not called if cacheFlags is true and api is not reachable ([#365](https://github.com/Flagsmith/flagsmith-js-client/issues/365))
+
+### Features
+
+* migrate npm packages to [@flagsmith](https://github.com/flagsmith) organization scope ([#367](https://github.com/Flagsmith/flagsmith-js-client/issues/367)) ([d0ecefb](https://github.com/Flagsmith/flagsmith-js-client/commit/d0ecefb33e81c23b5f0c750cab7ba44834bd7ebe))
+* re-add sdk version headers ([#344](https://github.com/Flagsmith/flagsmith-js-client/issues/344)) ([47b610f](https://github.com/Flagsmith/flagsmith-js-client/commit/47b610f5f5271426f49e2d047e0c1e8ebccff422))
+
+
+### Bug Fixes
+
+* angularHttpClient fetch error ([#359](https://github.com/Flagsmith/flagsmith-js-client/issues/359)) ([44e4b79](https://github.com/Flagsmith/flagsmith-js-client/commit/44e4b79ee77693e7c228a341c2bd8d83b02fdc3a))
+* catch init error in useFlagsmith ([#351](https://github.com/Flagsmith/flagsmith-js-client/issues/351)) ([5380dc3](https://github.com/Flagsmith/flagsmith-js-client/commit/5380dc390a7f0532bb21f3452a850d9a83dda2f5))
+* cleanup event-emitter subscriptions in provider hooks ([#392](https://github.com/Flagsmith/flagsmith-js-client/issues/392)) ([9b962c7](https://github.com/Flagsmith/flagsmith-js-client/commit/9b962c7c5b092299efb6a258e38c4b910f769cd9))
+* export FlagSource enum as runtime value ([#349](https://github.com/Flagsmith/flagsmith-js-client/issues/349)) ([d480bb9](https://github.com/Flagsmith/flagsmith-js-client/commit/d480bb96cf893c2cea532e44b1053cb019213fdd))
+* onError not called if cacheFlags is true and api is not reachable ([#365](https://github.com/Flagsmith/flagsmith-js-client/issues/365)) ([1411b85](https://github.com/Flagsmith/flagsmith-js-client/commit/1411b85636d77a3a6c9969a30de2824cc8916f0b))
+* removed-react-native-publishing ([#381](https://github.com/Flagsmith/flagsmith-js-client/issues/381)) ([a0894b9](https://github.com/Flagsmith/flagsmith-js-client/commit/a0894b903c36f1df5bd83987af7ee5e3743ce28d))
+* revert User-Agent header again ([#362](https://github.com/Flagsmith/flagsmith-js-client/issues/362)) ([53baaa9](https://github.com/Flagsmith/flagsmith-js-client/commit/53baaa9fc1c240fdef730cab1746dc1a5b47e80f))
+* **types:** loading state source unresolved any ([#360](https://github.com/Flagsmith/flagsmith-js-client/issues/360)) ([30c35a3](https://github.com/Flagsmith/flagsmith-js-client/commit/30c35a3a5a75a9c2947ff9741e96c44c4b974d6b))
+* update loadingState when hydrating via serverState ([#393](https://github.com/Flagsmith/flagsmith-js-client/issues/393)) ([d543564](https://github.com/Flagsmith/flagsmith-js-client/commit/d5435648c6049ca5456512c10e2abd41212f7cb5))
+
+
+### CI
+
+* add release please ([#353](https://github.com/Flagsmith/flagsmith-js-client/issues/353)) ([353dbf7](https://github.com/Flagsmith/flagsmith-js-client/commit/353dbf7a8421a83840e869c2a64d39dcc1019fcf))
+* fix trusted publishing ([#355](https://github.com/Flagsmith/flagsmith-js-client/issues/355)) ([881c648](https://github.com/Flagsmith/flagsmith-js-client/commit/881c64869ac829a79b5c28847ab3377115e50509))
+* publish-internal-version-action-workflow ([#378](https://github.com/Flagsmith/flagsmith-js-client/issues/378)) ([02b1892](https://github.com/Flagsmith/flagsmith-js-client/commit/02b1892ec1f6838db82907a1fc670a3f24b6f5a9))
+
+
+### Other
+
+* **deps-dev:** bump form-data from 4.0.0 to 4.0.4 ([#331](https://github.com/Flagsmith/flagsmith-js-client/issues/331)) ([187feda](https://github.com/Flagsmith/flagsmith-js-client/commit/187feda63c94bfa20956e1ae473a53a5df8b62a1))
+* **deps-dev:** bump lodash from 4.17.21 to 4.18.1 ([#388](https://github.com/Flagsmith/flagsmith-js-client/issues/388)) ([eddbb97](https://github.com/Flagsmith/flagsmith-js-client/commit/eddbb97f771f25ffbf2be1373560dd807f1cb036))
+* **deps:** bump @tootallnate/once and jest-environment-jsdom ([#380](https://github.com/Flagsmith/flagsmith-js-client/issues/380)) ([0f8edc4](https://github.com/Flagsmith/flagsmith-js-client/commit/0f8edc4af715e02c411fad3b36449c387c7652cd))
+* **deps:** bump flatted from 3.2.7 to 3.4.2 ([#385](https://github.com/Flagsmith/flagsmith-js-client/issues/385)) ([189160e](https://github.com/Flagsmith/flagsmith-js-client/commit/189160e72554e7f7d197c91f8707fa19502074e7))
+* **deps:** bump js-yaml from 3.14.1 to 3.14.2 ([#361](https://github.com/Flagsmith/flagsmith-js-client/issues/361)) ([e15a0dc](https://github.com/Flagsmith/flagsmith-js-client/commit/e15a0dc473fe096c703fc32492dd930e1ea29b2b))
+* **deps:** bump minimatch from 3.1.2 to 3.1.5 ([#376](https://github.com/Flagsmith/flagsmith-js-client/issues/376)) ([39fa238](https://github.com/Flagsmith/flagsmith-js-client/commit/39fa2382d53841a7d55f4695c6819cc0d8f089ee))
+* **deps:** bump minimatch from 3.1.2 to 3.1.5 in /lib/react-native-flagsmith ([#375](https://github.com/Flagsmith/flagsmith-js-client/issues/375)) ([2b2caaf](https://github.com/Flagsmith/flagsmith-js-client/commit/2b2caafe4059ac03af5e6fd4c8f3061df61a2b02))
+* **deps:** bump picomatch from 2.3.1 to 2.3.2 in /lib/react-native-flagsmith ([#386](https://github.com/Flagsmith/flagsmith-js-client/issues/386)) ([fb18502](https://github.com/Flagsmith/flagsmith-js-client/commit/fb1850240fe7c6fde64c6e54e299e565822b7e4b))
+* **deps:** bump yaml from 2.8.2 to 2.8.3 in /lib/react-native-flagsmith ([#395](https://github.com/Flagsmith/flagsmith-js-client/issues/395)) ([4d94b9c](https://github.com/Flagsmith/flagsmith-js-client/commit/4d94b9c526d2f07e62a5a67622eb74ab46bfd996))
+* **main:** release 10.0.0 ([#364](https://github.com/Flagsmith/flagsmith-js-client/issues/364)) ([9187900](https://github.com/Flagsmith/flagsmith-js-client/commit/91879001815da0e5b35c4dcd359652707ce5eeb8))
+* **main:** release 9.3.3 ([#354](https://github.com/Flagsmith/flagsmith-js-client/issues/354)) ([2832793](https://github.com/Flagsmith/flagsmith-js-client/commit/283279305a988012cd03e2df47ff8c9c832afc46))
+* **main:** release 9.3.4 ([#356](https://github.com/Flagsmith/flagsmith-js-client/issues/356)) ([9ef8c37](https://github.com/Flagsmith/flagsmith-js-client/commit/9ef8c374e8c0bfed6ee237775404dabb3370261f))
+* **main:** release 9.3.5 ([#363](https://github.com/Flagsmith/flagsmith-js-client/issues/363)) ([563e590](https://github.com/Flagsmith/flagsmith-js-client/commit/563e590547cdb57a0c6e9f5332555afb86bb4ded))
+
 ## [10.0.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v9.3.5...v10.0.0) (2025-12-10)
 
 
