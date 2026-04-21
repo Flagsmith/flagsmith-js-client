@@ -186,6 +186,25 @@ describe('FlagsmithProvider', () => {
             expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(defaultState.flags))
         })
     })
+    it('reports a loaded state when hydrated from serverState with no options', async () => {
+        const { flagsmith } = getFlagsmith({})
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} serverState={defaultState}>
+                <FlagsmithPage />
+            </FlagsmithProvider>,
+        )
+
+        // Flags are available from serverState immediately.
+        expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(defaultState.flags))
+
+        // Loading state must not be stuck on isLoading/isFetching=true.
+        await waitFor(() => {
+            const loadingState = JSON.parse(screen.getByTestId('loading-state').innerHTML)
+            expect(loadingState.isLoading).toBe(false)
+            expect(loadingState.isFetching).toBe(false)
+            expect(loadingState.error).toBeNull()
+        })
+    })
     it('ignores init response if identify gets called and resolves first', async () => {
         const onChange = jest.fn()
         const { flagsmith, initConfig, mockFetch } = getFlagsmith({ onChange })
