@@ -1,4 +1,4 @@
-import React, { createContext, FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { createContext, FC, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Emitter from './utils/emitter'
 const events = new Emitter()
 
@@ -87,28 +87,17 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
 export function useFlagsmithLoading() {
     const flagsmith = useContext(FlagsmithContext)
     const [loadingState, setLoadingState] = useState(flagsmith?.loadingState)
-    const [subscribed, setSubscribed] = useState(false)
-    const refSubscribed = useRef(subscribed)
-
-    const eventListener = useCallback(() => {
-        setLoadingState(flagsmith?.loadingState)
-    }, [flagsmith])
-    if (!refSubscribed.current) {
-        events.on('loading_event', eventListener)
-        refSubscribed.current = true
-    }
 
     useEffect(() => {
-        if (!subscribed && flagsmith?.initialised) {
-            events.on('loading_event', eventListener)
-            setSubscribed(true)
-        }
+        if (!flagsmith) return
+        setLoadingState(flagsmith.loadingState)
+        const unsubscribe = events.on('loading_event', () => {
+            setLoadingState(flagsmith.loadingState)
+        })
         return () => {
-            if (subscribed) {
-                events.off('loading_event', eventListener)
-            }
+            unsubscribe()
         }
-    }, [flagsmith, subscribed, eventListener])
+    }, [flagsmith])
 
     return loadingState
 }
@@ -142,32 +131,27 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
     _flags: readonly (F | keyof F)[],
     _traits: readonly T[] = []
 ) {
-    const firstRender = useRef(true)
     const flags = useConstant<string[]>(flagsAsArray(_flags))
     const traits = useConstant<string[]>(flagsAsArray(_traits))
     const flagsmith = useContext(FlagsmithContext)
     const [renderRef, setRenderRef] = useState(getRenderKey(flagsmith as IFlagsmith, flags, traits))
-    const eventListener = useCallback(() => {
-        const newRenderKey = getRenderKey(flagsmith as IFlagsmith, flags, traits)
-        if (newRenderKey !== renderRef) {
-            // @ts-expect-error using internal function, consumers would never call this
-            flagsmith?.log('React - useFlags flags and traits have changed')
-            setRenderRef(newRenderKey)
-        }
-    }, [renderRef])
-    const emitterRef = useRef(events.once('event', eventListener))
-
-    if (firstRender.current) {
-        firstRender.current = false
-        // @ts-expect-error using internal function, consumers would never call this
-        flagsmith?.log('React - Initialising event listeners')
-    }
 
     useEffect(() => {
+        if (!flagsmith) return
+        setRenderRef(getRenderKey(flagsmith, flags, traits))
+        const unsubscribe = events.on('event', () => {
+            setRenderRef((prev) => {
+                const next = getRenderKey(flagsmith, flags, traits)
+                if (prev === next) return prev
+                // @ts-expect-error using internal function, consumers would never call this
+                flagsmith?.log('React - useFlags flags and traits have changed')
+                return next
+            })
+        })
         return () => {
-            emitterRef.current?.()
+            unsubscribe()
         }
-    }, [])
+    }, [flagsmith, flags, traits])
 
     const res = useMemo(() => {
         const res: any = {}
