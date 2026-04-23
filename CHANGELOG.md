@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.0.1](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.0.0...v12.0.1) (2026-04-23)
+
+
+### Other
+
+* **deps:** bump brace-expansion from 1.1.12 to 1.1.14 in /lib/react-native-flagsmith ([#394](https://github.com/Flagsmith/flagsmith-js-client/issues/394)) ([59ec950](https://github.com/Flagsmith/flagsmith-js-client/commit/59ec950e1717566245338ce1d8020feca628ea95))
+
 ## [12.0.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v11.0.0...v12.0.0) (2026-04-21)
 
 
