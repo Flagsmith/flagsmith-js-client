@@ -1,5 +1,5 @@
 import { EvaluationContext, IdentityEvaluationContext, TraitEvaluationContext } from "./evaluation-context";
-import { FlagSource } from "./flagsmith-core";
+import { FlagSource, PipelineEventType } from "./flagsmith-core";
 
 type IFlagsmithValue<T = string | number | boolean | null> = T
 
@@ -85,7 +85,7 @@ export type ISentryClient = {
 } | undefined;
 
 
-export { FlagSource };
+export { FlagSource, PipelineEventType };
 
 export declare type LoadingState = {
     error: Error | null, // Current error, resets on next attempt to fetch flags
@@ -131,6 +131,34 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
      * Customer application metadata
      */
     applicationMetadata?: ApplicationMetadata;
+    /**
+     * @experimental Internal use only — API may change without notice.
+     * Configuration for the evaluation analytics pipeline. When provided,
+     * individual flag evaluation events are buffered and sent to the pipeline endpoint.
+     * @hidden
+     */
+    /** @internal */
+    evaluationAnalyticsConfig?: {
+        analyticsServerUrl: string;
+        maxBuffer?: number;
+        flushInterval?: number;
+    };
+}
+
+export interface IPipelineEvent {
+    event_id: string; // flag_name or event_name
+    event_type: PipelineEventType;
+    evaluated_at: number;
+    identity_identifier: string | null;
+    enabled?: boolean | null;
+    value: IFlagsmithValue;
+    traits?: { [key: string]: null | TraitEvaluationContext } | null;
+    metadata?: Record<string, any> | null;
+}
+
+export interface IPipelineEventBatch {
+    events: IPipelineEvent[];
+    environment_key: string;
 }
 
 export interface IFlagsmithResponse {
@@ -271,6 +299,15 @@ T extends string = string
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
     setTraits: (traits: ITraits) => Promise<void>;
+    /**
+     * Track a custom event through the evaluation analytics pipeline.
+     * Requires `evaluationAnalyticsConfig` to be set; no-op otherwise.
+     * Events are sent with the current identity (or null if anonymous).
+     * @experimental Internal use only — API may change without notice.
+     * @internal
+     * @hidden
+     */
+    trackEvent: (eventName: string, metadata?: Record<string, unknown>) => void;
     /**
      * The stored identity of the user
     */

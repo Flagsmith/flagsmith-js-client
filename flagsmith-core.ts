@@ -9,6 +9,8 @@ import {
     IFlagsmithResponse,
     IFlagsmithTrait,
     IInitConfig,
+    IPipelineEvent,
+    IPipelineEventBatch,
     ISentryClient,
     IState,
     ITraits,
@@ -32,6 +34,11 @@ export enum FlagSource {
     "DEFAULT_FLAGS" = "DEFAULT_FLAGS",
     "CACHE" = "CACHE",
     "SERVER" = "SERVER",
+}
+
+export enum PipelineEventType {
+    FLAG_EVALUATION = 'flag_evaluation',
+    CUSTOM_EVENT = 'custom_event',
 }
 
 export type LikeFetch = (input: Partial<RequestInfo>, init?: Partial<RequestInit>) => Promise<Partial<Response>>
@@ -64,6 +71,7 @@ type Config = {
 const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
 const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
 const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
+const DEFAULT_PIPELINE_FLUSH_INTERVAL = 10000;
 
 const Flagsmith = class {
     _trigger?:(()=>void)|null= null
@@ -265,6 +273,46 @@ const Flagsmith = class {
         }
     };
 
+    flushPipelineAnalytics = async () => {
+        const isEvaluationEnabled = this.evaluationAnalyticsUrl && this.evaluationContext.environment;
+        const isReadyToFlush = this.pipelineEvents.length > 0 && (!this.isPipelineFlushing || this.pipelineFlushInterval === 0);
+        if (!isEvaluationEnabled || !isReadyToFlush) {
+            return;
+        }
+
+        const environmentKey = this.evaluationContext.environment!.apiKey;
+        this.isPipelineFlushing = true;
+        const eventsToSend = this.pipelineEvents.slice(0, this.evaluationAnalyticsMaxBuffer);
+        this.pipelineEvents = this.pipelineEvents.slice(this.evaluationAnalyticsMaxBuffer);
+        this.pipelineRecordedKeys.clear();
+
+        const batch: IPipelineEventBatch = {
+            events: eventsToSend,
+            environment_key: environmentKey,
+        };
+
+        try {
+            const res = await _fetch(this.evaluationAnalyticsUrl + 'v1/analytics/batch', {
+                method: 'POST',
+                body: JSON.stringify(batch),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'X-Environment-Key': environmentKey,
+                    ...(SDK_VERSION ? { 'Flagsmith-SDK-User-Agent': `flagsmith-js-sdk/${SDK_VERSION}` } : {}),
+                },
+            });
+            if (!res.status || res.status < 200 || res.status >= 300) {
+                throw new Error(`Pipeline analytics: unexpected status ${res.status}`);
+            }
+            this.log('Pipeline analytics: flush successful');
+        } catch (err) {
+            this.pipelineEvents = eventsToSend.concat(this.pipelineEvents);
+            this.log('Pipeline analytics: flush failed, events re-queued', err);
+        } finally {
+            this.isPipelineFlushing = false;
+        }
+    };
+
     datadogRum: IDatadogRum | null = null;
     loadingState: LoadingState = {isLoading: true, isFetching: true, error: null, source: FlagSource.NONE}
     canUseStorage = false
@@ -290,6 +338,12 @@ const Flagsmith = class {
     sentryClient: ISentryClient | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
+    private evaluationAnalyticsUrl: string | null = null
+    private evaluationAnalyticsMaxBuffer: number = 1000
+    private pipelineEvents: IPipelineEvent[] = []
+    private pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
+    private isPipelineFlushing = false
+    private pipelineRecordedKeys: Map<string, string> = new Map()
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
@@ -308,6 +362,7 @@ const Flagsmith = class {
                 enableDynatrace,
                 enableLogs,
                 environmentID,
+                evaluationAnalyticsConfig,
                 eventSourceUrl= "https://realtime.flagsmith.com/",
                 fetch: fetchImplementation,
                 headers,
@@ -439,6 +494,12 @@ const Flagsmith = class {
                         }
                     });
                 }
+            }
+
+            if (evaluationAnalyticsConfig) {
+                this.initPipelineAnalytics(evaluationAnalyticsConfig);
+            } else {
+                this.stopPipelineAnalytics();
             }
 
             //If the user specified default flags emit a changed event immediately
@@ -923,8 +984,117 @@ const Flagsmith = class {
             }
             this.evaluationEvent[this.evaluationContext.environment.apiKey][key] += 1;
         }
+
+        if (this.evaluationAnalyticsUrl) {
+            this.recordPipelineEvent(key);
+        }
+
         this.updateEventStorage();
     };
+
+    private pipelineFlushInterval: number = DEFAULT_PIPELINE_FLUSH_INTERVAL;
+
+    private initPipelineAnalytics(config: NonNullable<IInitConfig['evaluationAnalyticsConfig']>) {
+        this.stopPipelineAnalytics();
+        this.evaluationAnalyticsUrl = ensureTrailingSlash(config.analyticsServerUrl);
+        this.evaluationAnalyticsMaxBuffer = config.maxBuffer ?? 1000;
+        this.pipelineFlushInterval = config.flushInterval ?? DEFAULT_PIPELINE_FLUSH_INTERVAL;
+        this.pipelineEvents = [];
+        if (this.pipelineFlushInterval > 0) {
+            this.pipelineAnalyticsInterval = setInterval(
+                this.flushPipelineAnalytics,
+                this.pipelineFlushInterval,
+            );
+            this.pipelineAnalyticsInterval?.unref?.();
+        }
+    }
+
+    private stopPipelineAnalytics() {
+        if (this.pipelineAnalyticsInterval) {
+            clearInterval(this.pipelineAnalyticsInterval);
+            this.pipelineAnalyticsInterval = null;
+        }
+        this.evaluationAnalyticsUrl = null;
+        this.pipelineEvents = [];
+        this.pipelineRecordedKeys.clear();
+    }
+
+    private currentTraitsSnapshot() {
+        return this.evaluationContext.identity?.traits
+            ? { ...this.evaluationContext.identity.traits }
+            : null;
+    }
+
+    private getPageUrl(): string | null {
+        return typeof window !== 'undefined' && window.location ? window.location.href : null;
+    }
+
+    private getEventMetadata(extra?: Record<string, unknown>): Record<string, unknown> {
+        const pageUrl = this.getPageUrl();
+        return {
+            ...(extra || {}),
+            ...(pageUrl ? { page_url: pageUrl } : {}),
+            ...(SDK_VERSION ? { sdk_version: SDK_VERSION } : {}),
+        };
+    }
+
+    // Pipeline event schema — must match the pipeline server's Event struct.
+    // To update: 1) IPipelineEvent in types.d.ts  2) event object below  3) tests in test/analytics-pipeline.test.ts
+    private buildAnalyticEvent(
+        eventType: PipelineEventType,
+        eventId: string,
+        options?: {
+            enabled?: boolean | null;
+            value?: any;
+            extraMetadata?: Record<string, unknown>;
+            timestamp?: number;
+        },
+    ): IPipelineEvent {
+        return {
+            event_id: eventId,
+            event_type: eventType,
+            evaluated_at: options?.timestamp ?? Date.now(),
+            identity_identifier: this.evaluationContext.identity?.identifier ?? null,
+            enabled: options?.enabled ?? null,
+            value: options?.value ?? null,
+            traits: this.currentTraitsSnapshot(),
+            metadata: this.getEventMetadata(options?.extraMetadata),
+        };
+    }
+
+    private recordPipelineEvent(key: string) {
+        const flagKey = key.toLowerCase().replace(/ /g, '_');
+        const flag = this.flags && this.flags[flagKey];
+        const fingerprint = `${this.evaluationContext.identity?.identifier ?? 'none'}|${flag?.enabled ?? false}|${flag?.value ?? 'null'}`;
+        if (this.pipelineRecordedKeys.get(flagKey) === fingerprint) {
+            return;
+        }
+        this.pipelineRecordedKeys.set(flagKey, fingerprint);
+        const event = this.buildAnalyticEvent(PipelineEventType.FLAG_EVALUATION, flagKey, {
+            enabled: flag ? flag.enabled : null,
+            value: flag ? flag.value : null,
+            extraMetadata: flag ? { id: flag.id } : undefined,
+        });
+        this.pipelineEvents.push(event);
+
+        if (this.pipelineFlushInterval === 0 || this.pipelineEvents.length >= this.evaluationAnalyticsMaxBuffer) {
+            this.flushPipelineAnalytics();
+        }
+    }
+
+    trackEvent = (eventName: string, metadata?: Record<string, unknown>) => {
+        if (!this.evaluationAnalyticsUrl || !eventName) {
+            return;
+        }
+        const event = this.buildAnalyticEvent(PipelineEventType.CUSTOM_EVENT, eventName, {
+            extraMetadata: metadata,
+        });
+        this.pipelineEvents.push(event);
+
+        if (this.pipelineFlushInterval === 0 || this.pipelineEvents.length >= this.evaluationAnalyticsMaxBuffer) {
+            this.flushPipelineAnalytics();
+        }
+    }
 
     private setLoadingState(loadingState: LoadingState) {
         if (!deepEqual(loadingState, this.loadingState)) {
