@@ -1077,11 +1077,12 @@ const Flagsmith = class {
         }
     }
 
-    trackEvent = (eventName: string, metadata?: Record<string, unknown>) => {
+    trackEvent = (eventName: string, value?: any, metadata?: Record<string, unknown>) => {
         if (!this.evaluationAnalyticsUrl || !eventName) {
             return;
         }
         const event = this.buildAnalyticEvent(PipelineEventType.CUSTOM_EVENT, eventName, {
+            value,
             extraMetadata: metadata,
         });
         this.pipelineEvents.push(event);

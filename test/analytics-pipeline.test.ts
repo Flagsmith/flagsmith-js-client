@@ -239,7 +239,7 @@ describe('trackEvent (custom events)', () => {
         });
         await flagsmith.init(initConfig);
 
-        flagsmith.trackEvent('checkout', { item: 'shoes', price: 99 });
+        flagsmith.trackEvent('checkout', null, { item: 'shoes', price: 99 });
         // @ts-ignore
         await flagsmith.flushPipelineAnalytics();
 
@@ -286,7 +286,7 @@ describe('trackEvent (custom events)', () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith(defaultPipelineConfig);
         await flagsmith.init(initConfig);
 
-        flagsmith.trackEvent('page_view', { page: '/home' });
+        flagsmith.trackEvent('page_view', null, { page: '/home' });
         flagsmith.trackEvent('signup');
 
         const custom = getCustomEvents(flagsmith);
@@ -400,7 +400,7 @@ describe('autoTrackEvaluations', () => {
         await flagsmith.init(initConfig);
 
         flagsmith.getValue('font_size');
-        flagsmith.trackEvent('checkout', { item: 'shoes' });
+        flagsmith.trackEvent('checkout', null, { item: 'shoes' });
 
         const custom = getCustomEvents(flagsmith);
         expect(custom).toHaveLength(1);

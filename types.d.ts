@@ -308,7 +308,7 @@ T extends string = string
      * @internal
      * @hidden
      */
-    trackEvent: (eventName: string, metadata?: Record<string, unknown>) => void;
+    trackEvent: (eventName: string, value?: any, metadata?: Record<string, unknown>) => void;
     /**
      * The stored identity of the user
     */
