@@ -343,6 +343,7 @@ const Flagsmith = class {
     private pipelineEvents: IPipelineEvent[] = []
     private pipelineAnalyticsInterval: ReturnType<typeof setInterval> | null = null
     private isPipelineFlushing = false
+    private autoTrackEvaluations: boolean = true
     private pipelineRecordedKeys: Map<string, string> = new Map()
     async init(config: IInitConfig) {
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
@@ -978,7 +979,7 @@ const Flagsmith = class {
             this.evaluationEvent[this.evaluationContext.environment.apiKey][key] += 1;
         }
 
-        if (this.evaluationAnalyticsUrl) {
+        if (this.evaluationAnalyticsUrl && this.autoTrackEvaluations) {
             this.recordPipelineEvent(key);
         }
 
@@ -990,6 +991,7 @@ const Flagsmith = class {
     private initPipelineAnalytics(config: NonNullable<IInitConfig['evaluationAnalyticsConfig']>) {
         this.stopPipelineAnalytics();
         this.evaluationAnalyticsUrl = ensureTrailingSlash(config.analyticsServerUrl);
+        this.autoTrackEvaluations = config.autoTrackEvaluations ?? true;
         this.evaluationAnalyticsMaxBuffer = config.maxBuffer ?? 1000;
         this.pipelineFlushInterval = config.flushInterval ?? DEFAULT_PIPELINE_FLUSH_INTERVAL;
         this.pipelineEvents = [];

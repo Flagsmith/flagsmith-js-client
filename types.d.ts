@@ -140,6 +140,7 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
     /** @internal */
     evaluationAnalyticsConfig?: {
         analyticsServerUrl: string;
+        autoTrackEvaluations?: boolean;
         maxBuffer?: number;
         flushInterval?: number;
     };

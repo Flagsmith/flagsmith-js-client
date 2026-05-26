@@ -369,3 +369,69 @@ describe('trackEvent (custom events)', () => {
         expect(custom[custom.length - 1].identity_identifier).toBeNull();
     });
 });
+
+describe('autoTrackEvaluations', () => {
+    test('suppresses flag evaluation events when set to false', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                autoTrackEvaluations: false,
+                flushInterval: 60000,
+            },
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.getValue('font_size');
+        flagsmith.hasFeature('hero');
+
+        // @ts-ignore
+        expect(flagsmith.pipelineEvents).toHaveLength(0);
+    });
+
+    test('still allows trackEvent when autoTrackEvaluations is false', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                autoTrackEvaluations: false,
+                flushInterval: 60000,
+            },
+            identity: testIdentity,
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.getValue('font_size');
+        flagsmith.trackEvent('checkout', { item: 'shoes' });
+
+        const custom = getCustomEvents(flagsmith);
+        expect(custom).toHaveLength(1);
+        expect(custom[0].event_id).toBe('checkout');
+
+        // @ts-ignore
+        await flagsmith.flushPipelineAnalytics();
+        const calls = getPipelineCalls(mockFetch);
+        expect(calls).toHaveLength(1);
+
+        const body = JSON.parse(calls[0][1].body);
+        expect(body.events).toHaveLength(1);
+        expect(body.events[0].event_type).toBe(PipelineEventType.CUSTOM_EVENT);
+    });
+
+    test('records flag evaluations by default (autoTrackEvaluations omitted)', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({
+            evaluationAnalyticsConfig: {
+                analyticsServerUrl: pipelineUrl,
+                flushInterval: 60000,
+            },
+        });
+        await flagsmith.init(initConfig);
+
+        flagsmith.getValue('font_size');
+
+        // @ts-ignore
+        const evalEvents = flagsmith.pipelineEvents.filter(
+            (e: any) => e.event_type === PipelineEventType.FLAG_EVALUATION
+        );
+        expect(evalEvents).toHaveLength(1);
+        expect(evalEvents[0].event_id).toBe('font_size');
+    });
+});
