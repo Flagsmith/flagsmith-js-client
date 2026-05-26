@@ -292,7 +292,7 @@ const Flagsmith = class {
         };
 
         try {
-            const res = await _fetch(this.evaluationAnalyticsUrl + 'v1/analytics/batch', {
+            const res = await _fetch(this.evaluationAnalyticsUrl!, {
                 method: 'POST',
                 body: JSON.stringify(batch),
                 headers: {
@@ -990,7 +990,7 @@ const Flagsmith = class {
 
     private initPipelineAnalytics(config: NonNullable<IInitConfig['evaluationAnalyticsConfig']>) {
         this.stopPipelineAnalytics();
-        this.evaluationAnalyticsUrl = ensureTrailingSlash(config.analyticsServerUrl);
+        this.evaluationAnalyticsUrl = config.analyticsServerUrl;
         this.autoTrackEvaluations = config.autoTrackEvaluations ?? true;
         this.evaluationAnalyticsMaxBuffer = config.maxBuffer ?? 1000;
         this.pipelineFlushInterval = config.flushInterval ?? DEFAULT_PIPELINE_FLUSH_INTERVAL;

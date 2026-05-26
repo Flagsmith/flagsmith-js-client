@@ -76,7 +76,7 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
     const mockFetch = jest.fn(async (url, options) => {
-        if (url.includes('v1/analytics/batch')) {
+        if (url.includes('analytics.flagsmith.com')) {
             return {status: 202, text: () => Promise.resolve('')}
         }
         if (url.includes('analytics/flags')) {

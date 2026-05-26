@@ -5,7 +5,7 @@ const pipelineUrl = 'https://analytics.flagsmith.com/';
 
 function getPipelineCalls(mockFetch: jest.Mock) {
     return mockFetch.mock.calls.filter(
-        ([url]: [string]) => url.includes('v1/analytics/batch')
+        ([url]: [string]) => url.includes(pipelineUrl)
     );
 }
 
@@ -111,7 +111,7 @@ describe('Pipeline Analytics', () => {
         flagsmith.getValue('number_value');
         flagsmith.getValue('off_value');
 
-        const calls = mockFetch.mock.calls.filter(([url]: [string, any]) => url.includes('v1/analytics/batch'));
+        const calls = mockFetch.mock.calls.filter(([url]: [string, any]) => url.includes(pipelineUrl));
         expect(calls).toHaveLength(1);
         const flushedBatch = JSON.parse(calls[0][1].body).events;
         expect(flushedBatch).toHaveLength(3);
@@ -192,7 +192,7 @@ describe('Pipeline Analytics', () => {
 
         const original = mockFetch.getMockImplementation() as jest.Mock;
         mockFetch.mockImplementation(async (url: string, options: any) => {
-            if (url.includes('v1/analytics/batch')) {
+            if (url.includes(pipelineUrl)) {
                 return { status: 500, text: () => Promise.resolve('Server Error') };
             }
             return original(url, options);
