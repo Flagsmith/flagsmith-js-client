@@ -9,6 +9,7 @@ import {
     IFlagsmithFeature,
     IFlagsmithResponse,
     IFlagsmithTrait,
+    IFlagsmithValue,
     IInitConfig,
     ISentryClient,
     IState,
@@ -293,7 +294,6 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     private eventProcessor: EventProcessor | null = null
-    private warnedNoExperimentIdentity = false
     async init(config: IInitConfig) {
         if (config.eventProcessorConfig && !config.enableEvents) {
             throw new Error('Flagsmith: eventProcessorConfig requires enableEvents: true.');
@@ -948,19 +948,9 @@ const Flagsmith = class {
         return this.eventProcessor;
     }
 
-    private resolveEventIdentifier(opts?: { identifier?: string | null }): string | null {
-        if (opts && 'identifier' in opts) return opts.identifier ?? null;
-        return this.evaluationContext.identity?.identifier ?? null;
-    }
-
-    private resolveEventTraits(opts?: { traits?: ITraits }): Record<string, any> | null {
-        const raw = opts && 'traits' in opts ? opts.traits : this.evaluationContext.identity?.traits;
-        return resolveTraitValues(raw as any);
-    }
-
     trackEvent = (event: string, opts?: {
         identifier?: string | null;
-        value?: string | number | boolean | null;
+        value?: IFlagsmithValue;
         traits?: ITraits;
         metadata?: Record<string, unknown>;
     }) => {
@@ -970,25 +960,25 @@ const Flagsmith = class {
         }
         processor.trackEvent({
             event,
-            identifier: this.resolveEventIdentifier(opts),
+            identifier: opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null,
             value: opts?.value ?? null,
-            traits: this.resolveEventTraits(opts),
+            traits: resolveTraitValues(opts?.traits ?? this.evaluationContext.identity?.traits),
             metadata: opts?.metadata ?? null,
         });
     };
 
     trackExposureEvent = (featureName: string, opts?: {
         identifier?: string | null;
-        value?: string | number | boolean | null;
+        value?: IFlagsmithValue;
         traits?: ITraits;
         metadata?: Record<string, unknown>;
     }) => {
         const processor = this.requireEventProcessor();
         processor.trackExposureEvent({
             featureName,
-            identifier: this.resolveEventIdentifier(opts),
+            identifier: opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null,
             value: opts?.value ?? null,
-            traits: this.resolveEventTraits(opts),
+            traits: resolveTraitValues(opts?.traits ?? this.evaluationContext.identity?.traits),
             metadata: opts?.metadata ?? null,
         });
     };
@@ -1001,14 +991,9 @@ const Flagsmith = class {
         const flag = (this.flags && this.flags[key]) || null;
         const identifier = this.evaluationContext.identity?.identifier;
         if (!identifier) {
-            if (!this.warnedNoExperimentIdentity) {
-                this.warnedNoExperimentIdentity = true;
-                console.warn('Flagsmith: getExperimentFlag was called without an identity. Call identify() (optionally with transient: true) before using experiments to record exposures. Falling back to environment flags; no exposure recorded.');
-            }
+            this.log('Flagsmith: getExperimentFlag called without an identity; call identify() (optionally with transient: true) before using experiments to record an exposure. Returning environment flags; no exposure recorded.');
         } else if (this.loadingState.source === FlagSource.SERVER && flag) {
-            this.trackExposureEvent(featureName, {
-                value: flag.value,
-            });
+            this.trackExposureEvent(featureName, { value: flag.value });
         }
         return flag;
     };

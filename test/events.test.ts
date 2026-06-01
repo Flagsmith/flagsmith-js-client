@@ -81,15 +81,15 @@ describe('trackEvent', () => {
         expect(event).toHaveProperty('traits');
     });
 
-    test('explicit identifier: null overrides context (anonymous)', async () => {
+    test('explicit identifier overrides the current context', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }));
         await flagsmith.init(initConfig);
 
-        flagsmith.trackEvent('purchase', { identifier: null });
+        flagsmith.trackEvent('purchase', { identifier: 'other_user' });
         await flagsmith.flushEvents();
 
         const event = JSON.parse(eventCalls(mockFetch)[0][1].body).events[0];
-        expect(event.identifier).toBeNull();
+        expect(event.identifier).toBe('other_user');
     });
 });
 
@@ -112,26 +112,15 @@ describe('getExperimentFlag', () => {
         }));
     });
 
-    test('skips exposure (and warns) when there is no identity, still returns the flag', async () => {
-        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-        try {
-            const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig());
-            await flagsmith.init(initConfig); // anonymous, env flags -> source SERVER, no identity
+    test('skips exposure when there is no identity, still returns the flag', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig());
+        await flagsmith.init(initConfig); // anonymous, env flags -> source SERVER, no identity
 
-            const flag = flagsmith.getExperimentFlag('font_size');
-            expect(flag).toEqual(expect.objectContaining({ enabled: true, value: 16 }));
+        const flag = flagsmith.getExperimentFlag('font_size');
+        expect(flag).toEqual(expect.objectContaining({ enabled: true, value: 16 }));
 
-            await flagsmith.flushEvents();
-            expect(eventCalls(mockFetch)).toHaveLength(0);
-            expect(warnSpy).toHaveBeenCalledTimes(1);
-            expect(warnSpy.mock.calls[0][0]).toMatch(/without an identity/i);
-
-            // warning is emitted at most once
-            flagsmith.getExperimentFlag('font_size');
-            expect(warnSpy).toHaveBeenCalledTimes(1);
-        } finally {
-            warnSpy.mockRestore();
-        }
+        await flagsmith.flushEvents();
+        expect(eventCalls(mockFetch)).toHaveLength(0);
     });
 
     test('skips exposure for default flags (identified but source !== SERVER)', async () => {

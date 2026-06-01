@@ -1,6 +1,7 @@
 import { SDK_VERSION } from './utils/version';
 import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
 import { LikeFetch } from './flagsmith-core';
+import { IFlagsmithValue } from './types';
 
 export const FLAG_EXPOSURE_EVENT = '$flag_exposure';
 export const DEFAULT_EVENTS_API_URL = 'https://events.api.flagsmith.com/';
@@ -12,39 +13,35 @@ export interface IEvent {
     event: string;
     feature_name: string | null;
     identifier: string | null;
-    value: any;
-    traits: Record<string, any> | null;
-    metadata: Record<string, any> | null;
+    value: string | null;
+    traits: Record<string, IFlagsmithValue> | null;
+    metadata: Record<string, unknown> | null;
     timestamp: number;
 }
 
-export interface IEventProcessorConfig {
+export interface EventProcessorOptions {
+    environmentKey: string;
+    fetch: LikeFetch;
     eventsApiUrl?: string;
     maxBuffer?: number;
     flushInterval?: number;
-}
-
-export interface IEventProcessorDeps {
-    environmentKey: string;
-    fetch: LikeFetch;
     log?: (...args: any[]) => void;
     retryBackoffMs?: number;
 }
 
-interface TrackEventArgs {
-    event: string;
+interface EventArgs {
     identifier: string | null;
-    value: string | number | boolean | null;
-    traits: Record<string, any> | null;
+    value: IFlagsmithValue;
+    traits: Record<string, IFlagsmithValue> | null;
     metadata: Record<string, unknown> | null;
 }
 
-interface TrackExposureArgs {
+interface TrackEventArgs extends EventArgs {
+    event: string;
+}
+
+interface TrackExposureArgs extends EventArgs {
     featureName: string;
-    identifier: string | null;
-    value: string | number | boolean | null;
-    traits: Record<string, any> | null;
-    metadata: Record<string, unknown> | null;
 }
 
 export class EventProcessor {
@@ -60,7 +57,7 @@ export class EventProcessor {
     private timer: ReturnType<typeof setInterval> | null = null;
     private retryTimers: Set<ReturnType<typeof setTimeout>> = new Set();
 
-    constructor(opts: IEventProcessorConfig & IEventProcessorDeps) {
+    constructor(opts: EventProcessorOptions) {
         const url = ensureTrailingSlash(opts.eventsApiUrl || DEFAULT_EVENTS_API_URL);
         this.endpoint = `${url}v1/events`;
         this.environmentKey = opts.environmentKey;
@@ -83,8 +80,8 @@ export class EventProcessor {
         event: string,
         feature_name: string | null,
         identifier: string | null,
-        value: string | number | boolean | null,
-        traits: Record<string, any> | null,
+        value: IFlagsmithValue,
+        traits: Record<string, IFlagsmithValue> | null,
         metadata: Record<string, unknown> | null,
         dedupe: boolean,
     ) {
@@ -113,7 +110,7 @@ export class EventProcessor {
         const events = this.buffer;
         this.buffer = [];
         this.dedupeKeys.clear();
-        await this.sendBatch(events, 0);
+        await this.postBatch(events, 0);
     };
 
     start() {
@@ -134,7 +131,19 @@ export class EventProcessor {
         this.retryTimers.clear();
     }
 
-    private sendBatch = async (events: IEvent[], attempt: number): Promise<void> => {
+    // Resolves after `ms`, tracking the timer so stop() can cancel a pending retry.
+    private delay(ms: number): Promise<void> {
+        return new Promise((resolve) => {
+            const timer = setTimeout(() => {
+                this.retryTimers.delete(timer);
+                resolve();
+            }, ms);
+            this.retryTimers.add(timer);
+            (timer as any)?.unref?.();
+        });
+    }
+
+    private postBatch = async (events: IEvent[], attempt: number): Promise<void> => {
         try {
             const res = await this.fetch(this.endpoint, {
                 method: 'POST',
@@ -152,15 +161,8 @@ export class EventProcessor {
         } catch (err) {
             if (attempt < 1) {
                 this.log('Events: flush failed, retrying', err);
-                await new Promise<void>((resolve) => {
-                    const t = setTimeout(() => {
-                        this.retryTimers.delete(t);
-                        resolve();
-                    }, this.retryBackoffMs);
-                    this.retryTimers.add(t);
-                    (t as any)?.unref?.();
-                });
-                return this.sendBatch(events, attempt + 1);
+                await this.delay(this.retryBackoffMs);
+                return this.postBatch(events, attempt + 1);
             }
             this.log('Events: flush failed, dropping batch', err);
         }

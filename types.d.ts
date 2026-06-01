@@ -1,7 +1,7 @@
 import { EvaluationContext, IdentityEvaluationContext, TraitEvaluationContext } from "./evaluation-context";
 import { FlagSource } from "./flagsmith-core";
 
-type IFlagsmithValue<T = string | number | boolean | null> = T
+export type IFlagsmithValue<T = string | number | boolean | null> = T
 
 export type DynatraceObject = {
     "javaLongOrObject": Record<string, number>,
@@ -298,7 +298,7 @@ T extends string = string
      */
     trackEvent: (event: string, opts?: {
         identifier?: string | null;
-        value?: string | number | boolean | null;
+        value?: IFlagsmithValue;
         traits?: ITraits;
         metadata?: Record<string, unknown>;
     }) => void;
@@ -309,7 +309,7 @@ T extends string = string
      */
     trackExposureEvent: (featureName: string, opts?: {
         identifier?: string | null;
-        value?: string | number | boolean | null;
+        value?: IFlagsmithValue;
         traits?: ITraits;
         metadata?: Record<string, unknown>;
     }) => void;
