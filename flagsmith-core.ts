@@ -961,8 +961,8 @@ const Flagsmith = class {
         metadata?: Record<string, unknown>;
     }) => {
         const processor = this.requireEventProcessor();
-        if (event.startsWith('$') && event !== FLAG_EXPOSURE_EVENT) {
-            throw new Error(`Flagsmith: event name "${event}" uses the reserved "$" prefix but is not a known system event.`);
+        if (event.startsWith('$')) {
+            throw new Error(`Flagsmith: event names starting with "$" are reserved; use trackExposureEvent to record "${FLAG_EXPOSURE_EVENT}".`);
         }
         processor.trackEvent({
             event,

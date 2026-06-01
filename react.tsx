@@ -86,7 +86,10 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
 
 const getExperimentRenderKey = (flagsmith: IFlagsmith | null, key: string): string => {
     const flag = flagsmith?.getAllFlags()?.[key]
-    return `${flag?.value}${flag?.enabled}`
+    const identifier = flagsmith?.getContext().identity?.identifier ?? null
+    // Identity is part of the key so that switching identity re-renders (and
+    // re-fires the exposure) even when the resolved value is unchanged.
+    return `${identifier}|${flag?.value}|${flag?.enabled}`
 }
 
 export function useFlagsmithLoading() {
@@ -227,12 +230,12 @@ export function useExperiment(featureName: string): IFlagsmithFeature | null {
     }, [flagsmith, key])
 
     const flag = (flagsmith?.getAllFlags()?.[key] as IFlagsmithFeature | undefined) ?? null
+    const identifier = flagsmith?.getContext().identity?.identifier ?? null
 
     useEffect(() => {
         if (!flagsmith?.eventsEnabled || !flag) {
             return
         }
-        const identifier = flagsmith.getContext().identity?.identifier ?? null
         const exposureKey = `${key}:${identifier}:${flag.value}`
         if (lastExposureKey.current === exposureKey) {
             return
@@ -240,7 +243,7 @@ export function useExperiment(featureName: string): IFlagsmithFeature | null {
         lastExposureKey.current = exposureKey
         flagsmith.getExperimentFlag(featureName)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [flagsmith, featureName, key, flag?.value, flag?.enabled])
+    }, [flagsmith, featureName, key, identifier, flag?.value, flag?.enabled])
 
     return flag
 }

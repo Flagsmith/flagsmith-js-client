@@ -113,6 +113,8 @@ export class EventProcessor {
     };
 
     start() {
+        // stop() clears any existing timer and flushes; the flush is a no-op
+        // when the buffer is empty, which is the usual case on (re)start.
         this.stop();
         if (this.flushInterval > 0) {
             this.timer = setInterval(this.flush, this.flushInterval);
@@ -125,6 +127,9 @@ export class EventProcessor {
             clearInterval(this.timer);
             this.timer = null;
         }
+        // Best-effort, fire-and-forget: this flush is not awaited, so on rapid
+        // re-init buffered events may be lost. Callers needing a guarantee
+        // (SSR/teardown) should await flushEvents() instead.
         this.flush();
     }
 

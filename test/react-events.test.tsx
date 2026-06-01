@@ -116,6 +116,34 @@ describe('useExperiment', () => {
         expect(values).toEqual(['16', '20'])
     })
 
+    test('fires a fresh exposure when identity changes even if the value is unchanged', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }))
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <Probe feature="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.value).toBe(16)
+        })
+
+        // A different identity that resolves the SAME font_size value (16).
+        getMockFetchWithValue(mockFetch, {
+            flags: [
+                { enabled: true, feature_state_value: 16, feature: { id: 6149, name: 'font_size' } },
+            ],
+            traits: [],
+        })
+        await flagsmith.identify('other_identity')
+
+        await waitFor(async () => {
+            await flagsmith.flushEvents()
+            expect(exposures(mockFetch)).toHaveLength(2)
+        })
+        expect(exposures(mockFetch).map((e: any) => e.identifier)).toEqual([testIdentity, 'other_identity'])
+    })
+
     test('renders the flag but fires no exposure when events are disabled', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith({ identity: testIdentity })
         render(

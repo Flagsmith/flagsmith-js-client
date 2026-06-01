@@ -43,6 +43,7 @@ describe('events gate', () => {
         });
         await flagsmith.init(initConfig);
         expect(() => flagsmith.trackEvent('$custom')).toThrow(/reserved/i);
+        expect(() => flagsmith.trackEvent('$flag_exposure')).toThrow(/reserved/i);
     });
 });
 
