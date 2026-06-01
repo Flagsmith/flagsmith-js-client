@@ -327,6 +327,13 @@ T extends string = string
      */
     flushEvents: () => Promise<void>;
     /**
+     * Whether the events pipeline is enabled (enableEvents: true was passed
+     * to init). Used by the React useExperiment hook to skip exposure
+     * recording when events are off.
+     * @experimental @internal
+     */
+    readonly eventsEnabled: boolean;
+    /**
      * The stored identity of the user
     */
     identity?: IIdentity;

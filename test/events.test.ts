@@ -160,3 +160,17 @@ describe('getExperimentFlag', () => {
         expect(events.filter((e: any) => e.event === FLAG_EXPOSURE_EVENT)).toHaveLength(1);
     });
 });
+
+describe('eventsEnabled', () => {
+    test('is false when events are not enabled', async () => {
+        const { flagsmith, initConfig } = getFlagsmith();
+        await flagsmith.init(initConfig);
+        expect(flagsmith.eventsEnabled).toBe(false);
+    });
+
+    test('is true when enableEvents is set', async () => {
+        const { flagsmith, initConfig } = getFlagsmith(eventsConfig());
+        await flagsmith.init(initConfig);
+        expect(flagsmith.eventsEnabled).toBe(true);
+    });
+});

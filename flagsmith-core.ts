@@ -294,6 +294,11 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     private eventProcessor: EventProcessor | null = null
+    /**
+     * @experimental @internal Whether the events pipeline is enabled
+     * (enableEvents: true was passed to init).
+     */
+    eventsEnabled = false
     async init(config: IInitConfig) {
         if (config.eventProcessorConfig && !config.enableEvents) {
             throw new Error('Flagsmith: eventProcessorConfig requires enableEvents: true.');
@@ -461,6 +466,7 @@ const Flagsmith = class {
                 });
                 this.eventProcessor.start();
             }
+            this.eventsEnabled = !!enableEvents;
 
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
