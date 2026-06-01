@@ -291,8 +291,8 @@ T extends string = string
      */
     setTraits: (traits: ITraits) => Promise<void>;
     /**
-     * Record an arbitrary product event (e.g. "purchase"). Requires
-     * enableEvents: true (throws otherwise). identifier/traits default to the
+     * Record an arbitrary product event (e.g. "purchase"). No-op when events
+     * are disabled (enableEvents is not set). identifier/traits default to the
      * current identified context when omitted.
      * @experimental @internal
      */
@@ -304,7 +304,8 @@ T extends string = string
     }) => void;
     /**
      * Record that an identity was exposed to a flag/variant (emits the reserved
-     * "$flag_exposure" event). Requires enableEvents: true (throws otherwise).
+     * "$flag_exposure" event). No-op when events are disabled (enableEvents is
+     * not set).
      * @experimental @internal
      */
     trackExposureEvent: (featureName: string, opts?: {
@@ -316,7 +317,8 @@ T extends string = string
     /**
      * Resolve a flag for the currently identified user and fire one
      * "$flag_exposure" event (skipped unless flags were loaded from the server
-     * and the feature exists). Requires enableEvents: true (throws otherwise).
+     * and the feature exists). When events are disabled (enableEvents is not
+     * set) this degrades to a plain flag read.
      * @experimental @internal
      */
     getExperimentFlag: (featureName: string) => IFlagsmithFeature | null;

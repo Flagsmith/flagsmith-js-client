@@ -947,24 +947,18 @@ const Flagsmith = class {
         this.updateEventStorage();
     };
 
-    private requireEventProcessor(): EventProcessor {
-        if (!this.eventProcessor) {
-            throw new Error('Flagsmith: events must be enabled (enableEvents: true) to use this method.');
-        }
-        return this.eventProcessor;
-    }
-
     trackEvent = (event: string, opts?: {
         identifier?: string | null;
         value?: IFlagsmithValue;
         traits?: ITraits;
         metadata?: Record<string, unknown>;
     }) => {
-        const processor = this.requireEventProcessor();
+        // No-op when events are disabled, mirroring enableAnalytics: false.
+        if (!this.eventProcessor) return;
         if (event.startsWith('$')) {
             throw new Error(`Flagsmith: event names starting with "$" are reserved; use trackExposureEvent to record "${FLAG_EXPOSURE_EVENT}".`);
         }
-        processor.trackEvent({
+        this.eventProcessor.trackEvent({
             event,
             identifier: opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null,
             value: opts?.value ?? null,
@@ -979,8 +973,9 @@ const Flagsmith = class {
         traits?: ITraits;
         metadata?: Record<string, unknown>;
     }) => {
-        const processor = this.requireEventProcessor();
-        processor.trackExposureEvent({
+        // No-op when events are disabled, mirroring enableAnalytics: false.
+        if (!this.eventProcessor) return;
+        this.eventProcessor.trackExposureEvent({
             featureName,
             identifier: opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null,
             value: opts?.value ?? null,
@@ -992,9 +987,10 @@ const Flagsmith = class {
     flushEvents = (): Promise<void> => this.eventProcessor ? this.eventProcessor.flush() : Promise.resolve();
 
     getExperimentFlag = (featureName: string): IFlagsmithFeature | null => {
-        this.requireEventProcessor();
         const key = featureName.toLowerCase().replace(/ /g, '_');
         const flag = (this.flags && this.flags[key]) || null;
+        // When events are disabled this degrades to a plain flag read.
+        if (!this.eventProcessor) return flag;
         const identifier = this.evaluationContext.identity?.identifier;
         if (!identifier) {
             this.log('Flagsmith: getExperimentFlag called without an identity; call identify() (optionally with transient: true) before using experiments to record an exposure. Returning environment flags; no exposure recorded.');

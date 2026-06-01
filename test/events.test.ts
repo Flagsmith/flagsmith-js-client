@@ -16,17 +16,22 @@ function eventCalls(mockFetch: jest.Mock) {
 }
 
 describe('events gate', () => {
-    test('trackEvent throws when events are not enabled', async () => {
-        const { flagsmith, initConfig } = getFlagsmith();
+    test('trackEvent is a no-op when events are not enabled', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith();
         await flagsmith.init(initConfig);
-        expect(() => flagsmith.trackEvent('purchase')).toThrow(/events must be enabled/i);
+        expect(() => flagsmith.trackEvent('purchase')).not.toThrow();
+        await flagsmith.flushEvents();
+        expect(eventCalls(mockFetch)).toHaveLength(0);
     });
 
-    test('trackExposureEvent and getExperimentFlag throw when not enabled', async () => {
-        const { flagsmith, initConfig } = getFlagsmith();
+    test('trackExposureEvent and getExperimentFlag are no-ops when not enabled', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith({ identity: testIdentity });
         await flagsmith.init(initConfig);
-        expect(() => flagsmith.trackExposureEvent('f')).toThrow(/events must be enabled/i);
-        expect(() => flagsmith.getExperimentFlag('f')).toThrow(/events must be enabled/i);
+        expect(() => flagsmith.trackExposureEvent('font_size')).not.toThrow();
+        // getExperimentFlag still returns the flag, just records no exposure.
+        expect(flagsmith.getExperimentFlag('font_size')).toEqual(expect.objectContaining({ value: 16 }));
+        await flagsmith.flushEvents();
+        expect(eventCalls(mockFetch)).toHaveLength(0);
     });
 
     test('eventProcessorConfig without enableEvents throws at init', async () => {
