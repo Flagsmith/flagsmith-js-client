@@ -84,6 +84,11 @@ const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] =
         .join(',')
 }
 
+const getExperimentRenderKey = (flagsmith: IFlagsmith | null, key: string): string => {
+    const flag = flagsmith?.getAllFlags()?.[key]
+    return `${flag?.value}${flag?.enabled}`
+}
+
 export function useFlagsmithLoading() {
     const flagsmith = useContext(FlagsmithContext)
     const [loadingState, setLoadingState] = useState(flagsmith?.loadingState)
@@ -187,6 +192,57 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
     }, [renderRef])
 
     return res as UseFlagsReturn<F, T>
+}
+
+/**
+ * Resolve an experiment flag for the currently identified user and record a
+ * single `$flag_exposure` event as a side-effect. Re-renders when the flag's
+ * value or enabled state changes. When events are disabled (enableEvents is
+ * not set) the flag is still returned but no exposure is recorded.
+ *
+ * Exposures are gated three ways: the effect only runs when the flag value,
+ * identity, feature or source change; a ref guard prevents duplicate fires for
+ * the same (feature, identifier, value); and the core EventProcessor dedupes
+ * within each flush window. Frequent re-renders therefore never amplify into
+ * extra events.
+ *
+ * @experimental @internal
+ */
+export function useExperiment(featureName: string): IFlagsmithFeature | null {
+    const flagsmith = useContext(FlagsmithContext)
+    const key = featureName.toLowerCase().replace(/ /g, '_')
+    const lastExposureKey = useRef<string | null>(null)
+    const [, setRenderKey] = useState<string>(() => getExperimentRenderKey(flagsmith, key))
+
+    useEffect(() => {
+        const listener = () => {
+            const next = getExperimentRenderKey(flagsmith, key)
+            setRenderKey((prev) => (prev !== next ? next : prev))
+        }
+        const off = events.on('event', listener)
+        listener() // capture any change between first render and subscription
+        return () => {
+            off()
+        }
+    }, [flagsmith, key])
+
+    const flag = (flagsmith?.getAllFlags()?.[key] as IFlagsmithFeature | undefined) ?? null
+
+    useEffect(() => {
+        if (!flagsmith?.eventsEnabled || !flag) {
+            return
+        }
+        const identifier = flagsmith.getContext().identity?.identifier ?? null
+        const exposureKey = `${key}:${identifier}:${flag.value}`
+        if (lastExposureKey.current === exposureKey) {
+            return
+        }
+        lastExposureKey.current = exposureKey
+        flagsmith.getExperimentFlag(featureName)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [flagsmith, featureName, key, flag?.value, flag?.enabled])
+
+    return flag
 }
 
 export function useFlagsmith<F extends string | Record<string, any>, T extends string = string>() {
