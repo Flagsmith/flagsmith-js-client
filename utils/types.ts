@@ -22,3 +22,14 @@ export function toEvaluationContext(clientEvaluationContext: ClientEvaluationCon
         } : undefined,
     }
 }
+
+export function resolveTraitValues(
+    traits?: { [key: string]: TraitEvaluationContext | IFlagsmithTrait | null } | null
+): Record<string, any> | null {
+    if (!traits) return null;
+    const entries = Object.entries(traits).filter(([, v]) => v !== null && v !== undefined);
+    if (!entries.length) return null;
+    return Object.fromEntries(
+        entries.map(([k, v]) => [k, isTraitEvaluationContext(v) ? v.value : v])
+    );
+}

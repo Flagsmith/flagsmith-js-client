@@ -1,6 +1,6 @@
-import { IInitConfig, IState } from '../lib/flagsmith/types';
+import { IInitConfig, IState } from '../types';
 import MockAsyncStorage from './mocks/async-storage-mock';
-import { createFlagsmithInstance } from '../lib/flagsmith';
+import { createFlagsmithInstance } from '../index';
 import Mock = jest.Mock;
 import { promises as fs } from 'fs';
 
@@ -76,6 +76,12 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
     const flagsmith = createFlagsmithInstance();
     const AsyncStorage = new MockAsyncStorage();
     const mockFetch = jest.fn(async (url, options) => {
+        if (url.includes('/v1/events')) {
+            return {status: 202, text: () => Promise.resolve('')}
+        }
+        if (url.includes('analytics/flags')) {
+            return {status: 200, text: () => Promise.resolve('{}')}
+        }
         switch (url) {
             case 'https://edge.api.flagsmith.com/api/v1/flags/':
                 return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}

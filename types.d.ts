@@ -131,7 +131,26 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
      * Customer application metadata
      */
     applicationMetadata?: ApplicationMetadata;
+    /**
+     * @experimental Internal use only — API may change without notice.
+     * Opt-in gate for the events pipeline. When true, an EventProcessor is
+     * started and trackEvent / trackExposureEvent / getExperimentFlag become
+     * available.
+     * @internal
+     */
+    enableEvents?: boolean;
+    /**
+     * @experimental Optional tuning for the events pipeline. Only valid when
+     * enableEvents is true (passing it without enableEvents throws at init).
+     * @internal
+     */
+    eventProcessorConfig?: {
+        eventsApiUrl?: string;
+        maxBuffer?: number;
+        flushInterval?: number;
+    };
 }
+
 
 export interface IFlagsmithResponse {
     identifier?: string,
@@ -271,6 +290,42 @@ T extends string = string
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
     setTraits: (traits: ITraits) => Promise<void>;
+    /**
+     * Record an arbitrary product event (e.g. "purchase"). Requires
+     * enableEvents: true (throws otherwise). identifier/traits default to the
+     * current identified context when omitted.
+     * @experimental @internal
+     */
+    trackEvent: (event: string, opts?: {
+        identifier?: string | null;
+        value?: string | number | boolean | null;
+        traits?: ITraits;
+        metadata?: Record<string, unknown>;
+    }) => void;
+    /**
+     * Record that an identity was exposed to a flag/variant (emits the reserved
+     * "$flag_exposure" event). Requires enableEvents: true (throws otherwise).
+     * @experimental @internal
+     */
+    trackExposureEvent: (featureName: string, opts?: {
+        identifier?: string | null;
+        value?: string | number | boolean | null;
+        traits?: ITraits;
+        metadata?: Record<string, unknown>;
+    }) => void;
+    /**
+     * Resolve a flag for the currently identified user and fire one
+     * "$flag_exposure" event (skipped unless flags were loaded from the server
+     * and the feature exists). Requires enableEvents: true (throws otherwise).
+     * @experimental @internal
+     */
+    getExperimentFlag: (featureName: string) => IFlagsmithFeature | null;
+    /**
+     * Force-flush any buffered events. Useful server-side/SSR where the timer
+     * may not fire before the request ends. No-op when events are disabled.
+     * @experimental @internal
+     */
+    flushEvents: () => Promise<void>;
     /**
      * The stored identity of the user
     */
