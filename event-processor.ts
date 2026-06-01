@@ -55,7 +55,6 @@ export class EventProcessor {
     private buffer: IEvent[] = [];
     private dedupeKeys: Set<string> = new Set();
     private timer: ReturnType<typeof setInterval> | null = null;
-    private retryTimers: Set<ReturnType<typeof setTimeout>> = new Set();
 
     constructor(opts: EventProcessorOptions) {
         const url = ensureTrailingSlash(opts.eventsApiUrl || DEFAULT_EVENTS_API_URL);
@@ -117,7 +116,7 @@ export class EventProcessor {
         this.stop();
         if (this.flushInterval > 0) {
             this.timer = setInterval(this.flush, this.flushInterval);
-            (this.timer as any)?.unref?.();
+            this.timer?.unref?.();
         }
     }
 
@@ -127,20 +126,6 @@ export class EventProcessor {
             this.timer = null;
         }
         this.flush();
-        this.retryTimers.forEach((t) => clearTimeout(t));
-        this.retryTimers.clear();
-    }
-
-    // Resolves after `ms`, tracking the timer so stop() can cancel a pending retry.
-    private delay(ms: number): Promise<void> {
-        return new Promise((resolve) => {
-            const timer = setTimeout(() => {
-                this.retryTimers.delete(timer);
-                resolve();
-            }, ms);
-            this.retryTimers.add(timer);
-            (timer as any)?.unref?.();
-        });
     }
 
     private postBatch = async (events: IEvent[], attempt: number): Promise<void> => {
@@ -161,7 +146,10 @@ export class EventProcessor {
         } catch (err) {
             if (attempt < 1) {
                 this.log('Events: flush failed, retrying', err);
-                await this.delay(this.retryBackoffMs);
+                await new Promise<void>((resolve) => {
+                    const t = setTimeout(resolve, this.retryBackoffMs);
+                    t?.unref?.();
+                });
                 return this.postBatch(events, attempt + 1);
             }
             this.log('Events: flush failed, dropping batch', err);
