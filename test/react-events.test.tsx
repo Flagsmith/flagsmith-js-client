@@ -49,7 +49,7 @@ describe('useExperiment', () => {
         expect(fired[0]).toEqual(expect.objectContaining({
             feature_name: 'font_size',
             identifier: testIdentity,
-            value: '16',
+            value: 'control',
         }))
     })
 
@@ -86,7 +86,7 @@ describe('useExperiment', () => {
         expect(exposures(mockFetch)).toHaveLength(1)
     })
 
-    test('a variant value change fires a second exposure', async () => {
+    test('a variant change fires a second exposure even when the value is unchanged', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }))
         render(
             <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
@@ -98,22 +98,22 @@ describe('useExperiment', () => {
             expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.value).toBe(16)
         })
 
-        // Next fetch returns font_size = 20 for the identified user.
+        // Next fetch buckets the user into a different variant with the same value.
         getMockFetchWithValue(mockFetch, {
             flags: [
-                { enabled: true, feature_state_value: 20, feature: { id: 6149, name: 'font_size' } },
+                { enabled: true, feature_state_value: 16, variant: 'large', feature: { id: 6149, name: 'font_size' } },
             ],
             traits: [],
         })
         await flagsmith.getFlags()
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.value).toBe(20)
+            expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.variant).toBe('large')
         })
 
         await flagsmith.flushEvents()
         const values = exposures(mockFetch).map((e: any) => e.value)
-        expect(values).toEqual(['16', '20'])
+        expect(values).toEqual(['control', 'large'])
     })
 
     test('fires a fresh exposure when identity changes even if the value is unchanged', async () => {
@@ -128,10 +128,10 @@ describe('useExperiment', () => {
             expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.value).toBe(16)
         })
 
-        // A different identity that resolves the SAME font_size value (16).
+        // A different identity that resolves the SAME font_size variant and value.
         getMockFetchWithValue(mockFetch, {
             flags: [
-                { enabled: true, feature_state_value: 16, feature: { id: 6149, name: 'font_size' } },
+                { enabled: true, feature_state_value: 16, variant: 'control', feature: { id: 6149, name: 'font_size' } },
             ],
             traits: [],
         })

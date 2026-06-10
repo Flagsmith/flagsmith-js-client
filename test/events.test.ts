@@ -105,7 +105,7 @@ describe('getExperimentFlag', () => {
         await flagsmith.init(initConfig); // fetches identity flags -> source SERVER
 
         const flag = flagsmith.getExperimentFlag('font_size');
-        expect(flag).toEqual(expect.objectContaining({ enabled: true, value: 16 }));
+        expect(flag).toEqual(expect.objectContaining({ enabled: true, value: 16, variant: 'control' }));
 
         await flagsmith.flushEvents();
         const events = JSON.parse(eventCalls(mockFetch)[0][1].body).events;
@@ -114,7 +114,7 @@ describe('getExperimentFlag', () => {
         expect(exposures[0]).toEqual(expect.objectContaining({
             feature_name: 'font_size',
             identifier: testIdentity,
-            value: '16',
+            value: 'control',
         }));
     });
 

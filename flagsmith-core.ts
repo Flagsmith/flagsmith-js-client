@@ -122,7 +122,8 @@ const Flagsmith = class {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     id: feature.feature.id,
                     enabled: feature.enabled,
-                    value: feature.feature_state_value
+                    value: feature.feature_state_value,
+                    ...(feature.variant != null ? { variant: feature.variant } : {}),
                 };
             });
             traits.forEach(trait => {
@@ -994,9 +995,16 @@ const Flagsmith = class {
         const identifier = this.evaluationContext.identity?.identifier;
         if (!identifier) {
             this.log('Flagsmith: getExperimentFlag called without an identity; call identify() (optionally with transient: true) before using experiments to record an exposure. Returning environment flags; no exposure recorded.');
-        } else if (this.loadingState.source === FlagSource.SERVER && flag) {
-            this.trackExposureEvent(featureName, { value: flag.value });
+            return flag;
         }
+        if (!flag?.variant) {
+            this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which has no variant; experiments require a multivariate flag. No exposure recorded.`);
+            return flag;
+        }
+        if (this.loadingState.source !== FlagSource.SERVER) {
+            return flag;
+        }
+        this.trackExposureEvent(featureName, { value: flag.variant });
         return flag;
     };
 
