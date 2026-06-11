@@ -26,6 +26,18 @@ const identityWithVariant = {
             enabled: true,
             feature_state_value: 16,
         },
+        {
+            feature: { id: 4, name: 'empty_variant', type: 'MULTIVARIATE' },
+            enabled: true,
+            feature_state_value: 'value',
+            variant: '',
+        },
+        {
+            feature: { id: 5, name: 'empty_value_experiment', type: 'MULTIVARIATE' },
+            enabled: true,
+            feature_state_value: '',
+            variant: 'variant_b',
+        },
     ],
 };
 
@@ -76,6 +88,33 @@ describe('variant key', () => {
         expect(exposures).toEqual([
             expect.objectContaining({ feature_name: 'experiment', value: 'variant_a' }),
             expect.objectContaining({ feature_name: 'control_experiment', value: 'control' }),
+        ]);
+    });
+
+    test('treats an empty-string variant as absent and records no exposure for it', async () => {
+        const { flagsmith, mockFetch } = await initWithVariants();
+
+        expect(flagsmith.getAllFlags().empty_variant.variant).toBeUndefined();
+
+        flagsmith.getExperimentFlag('empty_variant');
+        await flagsmith.flushEvents();
+        expect(mockFetch.mock.calls.find(([url]) => url.includes('/v1/events'))).toBeUndefined();
+    });
+
+    test('surfaces the variant and records an exposure when the flag value is an empty string', async () => {
+        const { flagsmith, mockFetch } = await initWithVariants();
+
+        expect(flagsmith.getAllFlags().empty_value_experiment).toEqual(
+            expect.objectContaining({ enabled: true, value: '', variant: 'variant_b' })
+        );
+
+        flagsmith.getExperimentFlag('empty_value_experiment');
+        await flagsmith.flushEvents();
+
+        const [, opts] = mockFetch.mock.calls.find(([url]) => url.includes('/v1/events'))!;
+        const exposures = JSON.parse(opts.body).events.filter((e: any) => e.event === FLAG_EXPOSURE_EVENT);
+        expect(exposures).toEqual([
+            expect.objectContaining({ feature_name: 'empty_value_experiment', value: 'variant_b' }),
         ]);
     });
 });

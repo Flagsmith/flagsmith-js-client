@@ -75,10 +75,12 @@ const flagsAsArray = (_flags: any): string[] => {
     throw new Error('Flagsmith: please supply an array of strings or a single string of flag keys to useFlags')
 }
 
+const normalizeFlagKey = (key: string) => key.toLowerCase().replace(/ /g, '_')
+
 const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] = []) => {
     return flags
         .map((k) => {
-            return `${flagsmith.getValue(k)}${flagsmith.hasFeature(k)}`
+            return `${flagsmith.getValue(k)}${flagsmith.hasFeature(k)}${flagsmith.getAllFlags()?.[normalizeFlagKey(k)]?.variant}`
         })
         .concat(traits.map((t) => `${flagsmith.getTrait(t)}`))
         .join(',')
@@ -181,7 +183,7 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
         const res: any = {}
         flags
             .map((k) => {
-                const variant = flagsmith!.getAllFlags()?.[k]?.variant
+                const variant = flagsmith!.getAllFlags()?.[normalizeFlagKey(k)]?.variant
                 res[k] = {
                     enabled: flagsmith!.hasFeature(k),
                     value: flagsmith!.getValue(k),
@@ -215,7 +217,7 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
  */
 export function useExperiment(featureName: string): IFlagsmithFeature | null {
     const flagsmith = useContext(FlagsmithContext)
-    const key = featureName.toLowerCase().replace(/ /g, '_')
+    const key = normalizeFlagKey(featureName)
     const lastExposureKey = useRef<string | null>(null)
     const [, setRenderKey] = useState<string>(() => getExperimentRenderKey(flagsmith, key))
 

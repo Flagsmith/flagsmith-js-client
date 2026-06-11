@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { FlagsmithProvider, useExperiment } from '../react'
-import { getFlagsmith, testIdentity, getMockFetchWithValue } from './test-constants'
+import { getFlagsmith, testIdentity, experimentIdentity, getMockFetchWithValue } from './test-constants'
 
 const eventsUrl = 'https://events.test/'
 
@@ -30,7 +30,7 @@ const Probe: FC<{ feature: string }> = ({ feature }) => {
 
 describe('useExperiment', () => {
     test('fires one $flag_exposure when identified and source is SERVER', async () => {
-        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }))
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
         render(
             <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
                 <Probe feature="font_size" />
@@ -48,13 +48,13 @@ describe('useExperiment', () => {
         expect(fired).toHaveLength(1)
         expect(fired[0]).toEqual(expect.objectContaining({
             feature_name: 'font_size',
-            identifier: testIdentity,
+            identifier: experimentIdentity,
             value: 'control',
         }))
     })
 
     test('repeated parent re-renders produce only one exposure', async () => {
-        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }))
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
 
         const Storm: FC = () => {
             const [n, setN] = useState(0)
@@ -87,7 +87,7 @@ describe('useExperiment', () => {
     })
 
     test('a variant change fires a second exposure even when the value is unchanged', async () => {
-        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }))
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
         render(
             <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
                 <Probe feature="font_size" />
@@ -117,7 +117,7 @@ describe('useExperiment', () => {
     })
 
     test('fires a fresh exposure when identity changes even if the value is unchanged', async () => {
-        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }))
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
         render(
             <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
                 <Probe feature="font_size" />
@@ -141,7 +141,7 @@ describe('useExperiment', () => {
             await flagsmith.flushEvents()
             expect(exposures(mockFetch)).toHaveLength(2)
         })
-        expect(exposures(mockFetch).map((e: any) => e.identifier)).toEqual([testIdentity, 'other_identity'])
+        expect(exposures(mockFetch).map((e: any) => e.identifier)).toEqual([experimentIdentity, 'other_identity'])
     })
 
     test('renders the flag but fires no exposure when events are disabled', async () => {

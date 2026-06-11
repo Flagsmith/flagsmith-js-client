@@ -123,7 +123,7 @@ const Flagsmith = class {
                     id: feature.feature.id,
                     enabled: feature.enabled,
                     value: feature.feature_state_value,
-                    ...(feature.variant != null ? { variant: feature.variant } : {}),
+                    ...(feature.variant ? { variant: feature.variant } : {}),
                 };
             });
             traits.forEach(trait => {

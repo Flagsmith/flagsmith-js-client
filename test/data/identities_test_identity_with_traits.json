@@ -14,11 +14,10 @@
             "feature": {
                 "id": 6149,
                 "name": "font_size",
-                "type": "MULTIVARIATE"
+                "type": "STANDARD"
             },
             "enabled": true,
-            "feature_state_value": 16,
-            "variant": "control"
+            "feature_state_value": 16
         },
         {
             "feature": {

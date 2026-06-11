@@ -25,6 +25,7 @@ export const defaultState = {
 };
 
 export const testIdentity = 'test_identity'
+export const experimentIdentity = 'test_experiment_identity'
 export const identityState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     identity: testIdentity,
@@ -44,7 +45,7 @@ export const identityState = {
             enabled: true,
             value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg'
         },
-        font_size: { id: 6149, enabled: true, value: 16, variant: 'control' },
+        font_size: { id: 6149, enabled: true, value: 16 },
         json_value: { id: 80317, enabled: true, value: '{"title":"Hello World"}' },
         number_value: { id: 80318, enabled: true, value: 1 },
         off_value: { id: 80319, enabled: false, value: null },
@@ -87,6 +88,8 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
                 return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}
             case 'https://edge.api.flagsmith.com/api/v1/identities/?identifier=' + testIdentity:
                 return {status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentity}.json`, 'utf8')}
+            case 'https://edge.api.flagsmith.com/api/v1/identities/?identifier=' + experimentIdentity:
+                return {status: 200, text: () => fs.readFile(`./test/data/identities_${experimentIdentity}.json`, 'utf8')}
         }
 
         throw new Error('Please mock the call to ' + url)

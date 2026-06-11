@@ -1,4 +1,4 @@
-import { getFlagsmith, environmentID, testIdentity } from './test-constants';
+import { getFlagsmith, environmentID, testIdentity, experimentIdentity } from './test-constants';
 import { FLAG_EXPOSURE_EVENT } from '../event-processor';
 
 const eventsUrl = 'https://events.test/';
@@ -101,7 +101,7 @@ describe('trackEvent', () => {
 
 describe('getExperimentFlag', () => {
     test('returns the flag and fires one $flag_exposure when identified and source is SERVER', async () => {
-        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }));
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }));
         await flagsmith.init(initConfig); // fetches identity flags -> source SERVER
 
         const flag = flagsmith.getExperimentFlag('font_size');
@@ -113,7 +113,7 @@ describe('getExperimentFlag', () => {
         expect(exposures).toHaveLength(1);
         expect(exposures[0]).toEqual(expect.objectContaining({
             feature_name: 'font_size',
-            identifier: testIdentity,
+            identifier: experimentIdentity,
             value: 'control',
         }));
     });
@@ -154,7 +154,7 @@ describe('getExperimentFlag', () => {
     });
 
     test('repeated calls collapse to a single exposure within the window', async () => {
-        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }));
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }));
         await flagsmith.init(initConfig);
 
         flagsmith.getExperimentFlag('font_size');
