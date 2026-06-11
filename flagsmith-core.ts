@@ -997,7 +997,11 @@ const Flagsmith = class {
             this.log('Flagsmith: getExperimentFlag called without an identity; call identify() (optionally with transient: true) before using experiments to record an exposure. Returning environment flags; no exposure recorded.');
             return flag;
         }
-        if (!flag?.variant) {
+        if (!flag) {
+            this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which does not exist. No exposure recorded.`);
+            return null;
+        }
+        if (!flag.variant) {
             this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which has no variant; experiments require a multivariate flag. No exposure recorded.`);
             return flag;
         }
