@@ -25,6 +25,7 @@ export const defaultState = {
 };
 
 export const testIdentity = 'test_identity'
+export const experimentIdentity = 'test_experiment_identity'
 export const identityState = {
     api: 'https://edge.api.flagsmith.com/api/v1/',
     identity: testIdentity,
@@ -87,6 +88,8 @@ export function getFlagsmith(config: Partial<IInitConfig> = {}) {
                 return {status: 200, text: () => fs.readFile('./test/data/flags.json', 'utf8')}
             case 'https://edge.api.flagsmith.com/api/v1/identities/?identifier=' + testIdentity:
                 return {status: 200, text: () => fs.readFile(`./test/data/identities_${testIdentity}.json`, 'utf8')}
+            case 'https://edge.api.flagsmith.com/api/v1/identities/?identifier=' + experimentIdentity:
+                return {status: 200, text: () => fs.readFile(`./test/data/identities_${experimentIdentity}.json`, 'utf8')}
         }
 
         throw new Error('Please mock the call to ' + url)

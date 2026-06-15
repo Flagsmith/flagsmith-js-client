@@ -14,6 +14,7 @@ export interface IFlagsmithFeature<Value = IFlagsmithValue> {
     id?: number;
     enabled: boolean;
     value: Value;
+    variant?: string;
 }
 
 export declare type IFlagsmithTrait = IFlagsmithValue | TraitEvaluationContext;
@@ -162,6 +163,7 @@ export interface IFlagsmithResponse {
     flags?: {
         enabled: boolean;
         feature_state_value: IFlagsmithValue;
+        variant?: string;
         feature: {
             id: number;
             name: string;
@@ -316,9 +318,10 @@ T extends string = string
     }) => void;
     /**
      * Resolve a flag for the currently identified user and fire one
-     * "$flag_exposure" event (skipped unless flags were loaded from the server
-     * and the feature exists). When events are disabled (enableEvents is not
-     * set) this degrades to a plain flag read.
+     * "$flag_exposure" event with the selected variant as its value (skipped
+     * unless flags were loaded from the server and the flag has a variant).
+     * When events are disabled (enableEvents is not set) this degrades to a
+     * plain flag read.
      * @experimental @internal
      */
     getExperimentFlag: (featureName: string) => IFlagsmithFeature | null;

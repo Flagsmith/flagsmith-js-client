@@ -75,10 +75,12 @@ const flagsAsArray = (_flags: any): string[] => {
     throw new Error('Flagsmith: please supply an array of strings or a single string of flag keys to useFlags')
 }
 
+const normalizeFlagKey = (key: string) => key.toLowerCase().replace(/ /g, '_')
+
 const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] = []) => {
     return flags
         .map((k) => {
-            return `${flagsmith.getValue(k)}${flagsmith.hasFeature(k)}`
+            return `${flagsmith.getValue(k)}${flagsmith.hasFeature(k)}${flagsmith.getAllFlags()?.[normalizeFlagKey(k)]?.variant}`
         })
         .concat(traits.map((t) => `${flagsmith.getTrait(t)}`))
         .join(',')
@@ -89,7 +91,7 @@ const getExperimentRenderKey = (flagsmith: IFlagsmith | null, key: string): stri
     const identifier = flagsmith?.getContext().identity?.identifier ?? null
     // Identity is part of the key so that switching identity re-renders (and
     // re-fires the exposure) even when the resolved value is unchanged.
-    return `${identifier}|${flag?.value}|${flag?.enabled}`
+    return `${identifier}|${flag?.value}|${flag?.enabled}|${flag?.variant}`
 }
 
 export function useFlagsmithLoading() {
@@ -181,9 +183,11 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
         const res: any = {}
         flags
             .map((k) => {
+                const variant = flagsmith!.getAllFlags()?.[normalizeFlagKey(k)]?.variant
                 res[k] = {
                     enabled: flagsmith!.hasFeature(k),
                     value: flagsmith!.getValue(k),
+                    ...(variant != null ? { variant } : {}),
                 }
             })
             .concat(
@@ -204,16 +208,16 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
  * not set) the flag is still returned but no exposure is recorded.
  *
  * Exposures are gated three ways: the effect only runs when the flag value,
- * identity, feature or source change; a ref guard prevents duplicate fires for
- * the same (feature, identifier, value); and the core EventProcessor dedupes
- * within each flush window. Frequent re-renders therefore never amplify into
- * extra events.
+ * variant, identity, feature or source change; a ref guard prevents duplicate
+ * fires for the same (feature, identifier, value, variant); and the core
+ * EventProcessor dedupes within each flush window. Frequent re-renders
+ * therefore never amplify into extra events.
  *
  * @experimental @internal
  */
 export function useExperiment(featureName: string): IFlagsmithFeature | null {
     const flagsmith = useContext(FlagsmithContext)
-    const key = featureName.toLowerCase().replace(/ /g, '_')
+    const key = normalizeFlagKey(featureName)
     const lastExposureKey = useRef<string | null>(null)
     const [, setRenderKey] = useState<string>(() => getExperimentRenderKey(flagsmith, key))
 
@@ -236,14 +240,14 @@ export function useExperiment(featureName: string): IFlagsmithFeature | null {
         if (!flagsmith?.eventsEnabled || !flag) {
             return
         }
-        const exposureKey = `${key}:${identifier}:${flag.value}`
+        const exposureKey = `${key}:${identifier}:${flag.value}:${flag.variant}`
         if (lastExposureKey.current === exposureKey) {
             return
         }
         lastExposureKey.current = exposureKey
         flagsmith.getExperimentFlag(featureName)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [flagsmith, featureName, key, identifier, flag?.value, flag?.enabled])
+    }, [flagsmith, featureName, key, identifier, flag?.value, flag?.enabled, flag?.variant])
 
     return flag
 }
