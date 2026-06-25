@@ -144,6 +144,17 @@ describe('getExperimentFlag', () => {
         expect(eventCalls(mockFetch)).toHaveLength(0);
     });
 
+    test('skips exposure for a disabled flag even when it has a variant, still returns it', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }));
+        await flagsmith.init(initConfig); // identified, source SERVER
+
+        const flag = flagsmith.getExperimentFlag('disabled_experiment');
+        expect(flag).toEqual(expect.objectContaining({ enabled: false, variant: 'control' }));
+
+        await flagsmith.flushEvents();
+        expect(eventCalls(mockFetch)).toHaveLength(0);
+    });
+
     test('skips exposure and returns null for an absent feature', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }));
         await flagsmith.init(initConfig);

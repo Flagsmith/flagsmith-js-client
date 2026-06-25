@@ -19,6 +19,16 @@
             "enabled": true,
             "feature_state_value": 16,
             "variant": "control"
+        },
+        {
+            "feature": {
+                "id": 80321,
+                "name": "disabled_experiment",
+                "type": "MULTIVARIATE"
+            },
+            "enabled": false,
+            "feature_state_value": null,
+            "variant": "control"
         }
     ],
     "traits": []
