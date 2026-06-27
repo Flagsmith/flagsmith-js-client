@@ -7,7 +7,7 @@ describe('Flagsmith.functions', () => {
     });
     test('should use a fallback when the feature is undefined', async () => {
         const onChange = jest.fn()
-        const {flagsmith,initConfig, AsyncStorage,mockFetch} = getFlagsmith({onChange})
+        const { flagsmith,initConfig } = getFlagsmith({onChange})
         await flagsmith.init(initConfig);
 
         expect(flagsmith.getValue("deleted_feature",{fallback:"foo"})).toBe("foo");
