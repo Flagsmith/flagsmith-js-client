@@ -1,5 +1,20 @@
 # Changelog
 
+## [12.1.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.0.1...v12.1.0) (2026-06-29)
+
+
+### Features
+
+* experimentation events surface (trackEvent, trackExposureEvent, getExperimentFlag) ([#400](https://github.com/Flagsmith/flagsmith-js-client/issues/400)) ([f23db8f](https://github.com/Flagsmith/flagsmith-js-client/commit/f23db8fa93b23eb6ca42d15f2ea4717ebf3161c7))
+
+
+### Other
+
+* **deps-dev:** bump @babel/plugin-transform-modules-systemjs from 7.23.9 to 7.29.4 ([#398](https://github.com/Flagsmith/flagsmith-js-client/issues/398)) ([4d51a7b](https://github.com/Flagsmith/flagsmith-js-client/commit/4d51a7bb3a2dc1b93f2afa4c9eb4161862b767b0))
+* **deps-dev:** bump rollup from 2.79.2 to 2.80.0 ([#374](https://github.com/Flagsmith/flagsmith-js-client/issues/374)) ([66a47a5](https://github.com/Flagsmith/flagsmith-js-client/commit/66a47a5b85f4183c13c144671d691d8c87dd33c3))
+* **deps-dev:** bump tmp from 0.2.5 to 0.2.7 ([#399](https://github.com/Flagsmith/flagsmith-js-client/issues/399)) ([1a0e1f5](https://github.com/Flagsmith/flagsmith-js-client/commit/1a0e1f5795cc6a61f6a7a9e8f5adc341fc2ae366))
+* **deps-dev:** replace rollup-plugin-terser with @rollup/plugin-terser ([#405](https://github.com/Flagsmith/flagsmith-js-client/issues/405)) ([9e24f08](https://github.com/Flagsmith/flagsmith-js-client/commit/9e24f08c75be46b304367bdc5a50112e731ed4fc))
+
 ## [12.0.1](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.0.0...v12.0.1) (2026-04-23)
 
 
