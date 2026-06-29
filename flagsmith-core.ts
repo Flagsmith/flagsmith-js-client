@@ -6,8 +6,10 @@ import {
     IDatadogRum,
     IFlags,
     IFlagsmith,
+    IFlagsmithFeature,
     IFlagsmithResponse,
     IFlagsmithTrait,
+    IFlagsmithValue,
     IInitConfig,
     ISentryClient,
     IState,
@@ -23,9 +25,10 @@ import getChanges from './utils/get-changes';
 import angularFetch from './utils/angular-fetch';
 import setDynatraceValue from './utils/set-dynatrace-value';
 import { EvaluationContext } from './evaluation-context';
-import { isTraitEvaluationContext, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
+import { isTraitEvaluationContext, resolveTraitValues, toEvaluationContext, toTraitEvaluationContextObject } from './utils/types';
 import { ensureTrailingSlash } from './utils/ensureTrailingSlash';
 import { SDK_VERSION } from './utils/version';
+import { EventProcessor, FLAG_EXPOSURE_EVENT } from './event-processor';
 
 export enum FlagSource {
     "NONE" = "NONE",
@@ -119,7 +122,8 @@ const Flagsmith = class {
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     id: feature.feature.id,
                     enabled: feature.enabled,
-                    value: feature.feature_state_value
+                    value: feature.feature_state_value,
+                    ...(feature.variant ? { variant: feature.variant } : {}),
                 };
             });
             traits.forEach(trait => {
@@ -290,7 +294,16 @@ const Flagsmith = class {
     sentryClient: ISentryClient | null = null
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
+    private eventProcessor: EventProcessor | null = null
+    /**
+     * @experimental @internal Whether the events pipeline is enabled
+     * (enableEvents: true was passed to init).
+     */
+    eventsEnabled = false
     async init(config: IInitConfig) {
+        if (config.eventProcessorConfig && !config.enableEvents) {
+            throw new Error('Flagsmith: eventProcessorConfig requires enableEvents: true.');
+        }
         const evaluationContext = toEvaluationContext(config.evaluationContext || this.evaluationContext);
         try {
             const {
@@ -308,6 +321,8 @@ const Flagsmith = class {
                 enableDynatrace,
                 enableLogs,
                 environmentID,
+                enableEvents,
+                eventProcessorConfig,
                 eventSourceUrl= "https://realtime.flagsmith.com/",
                 fetch: fetchImplementation,
                 headers,
@@ -440,6 +455,19 @@ const Flagsmith = class {
                     });
                 }
             }
+
+            this.eventProcessor?.stop();
+            this.eventProcessor = null;
+            if (enableEvents) {
+                this.eventProcessor = new EventProcessor({
+                    ...(eventProcessorConfig || {}),
+                    environmentKey: this.evaluationContext.environment!.apiKey,
+                    fetch: _fetch,
+                    log: (...args: any[]) => this.log(...args),
+                });
+                this.eventProcessor.start();
+            }
+            this.eventsEnabled = !!enableEvents;
 
             //If the user specified default flags emit a changed event immediately
             if (cacheFlags) {
@@ -923,7 +951,76 @@ const Flagsmith = class {
             }
             this.evaluationEvent[this.evaluationContext.environment.apiKey][key] += 1;
         }
+
         this.updateEventStorage();
+    };
+
+    trackEvent = (event: string, opts?: {
+        identifier?: string | null;
+        value?: IFlagsmithValue;
+        traits?: ITraits;
+        metadata?: Record<string, unknown>;
+    }) => {
+        // No-op when events are disabled, mirroring enableAnalytics: false.
+        if (!this.eventProcessor) return;
+        if (event.startsWith('$')) {
+            throw new Error(`Flagsmith: event names starting with "$" are reserved; use trackExposureEvent to record "${FLAG_EXPOSURE_EVENT}".`);
+        }
+        this.eventProcessor.trackEvent({
+            event,
+            identifier: opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null,
+            value: opts?.value ?? null,
+            traits: resolveTraitValues(opts?.traits ?? this.evaluationContext.identity?.traits),
+            metadata: opts?.metadata ?? null,
+        });
+    };
+
+    trackExposureEvent = (featureName: string, opts?: {
+        identifier?: string | null;
+        value?: IFlagsmithValue;
+        traits?: ITraits;
+        metadata?: Record<string, unknown>;
+    }) => {
+        // No-op when events are disabled, mirroring enableAnalytics: false.
+        if (!this.eventProcessor) return;
+        this.eventProcessor.trackExposureEvent({
+            featureName,
+            identifier: opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null,
+            value: opts?.value ?? null,
+            traits: resolveTraitValues(opts?.traits ?? this.evaluationContext.identity?.traits),
+            metadata: opts?.metadata ?? null,
+        });
+    };
+
+    flushEvents = (): Promise<void> => this.eventProcessor ? this.eventProcessor.flush() : Promise.resolve();
+
+    getExperimentFlag = (featureName: string): IFlagsmithFeature | null => {
+        const key = featureName.toLowerCase().replace(/ /g, '_');
+        const flag = (this.flags && this.flags[key]) || null;
+        // When events are disabled this degrades to a plain flag read.
+        if (!this.eventProcessor) return flag;
+        const identifier = this.evaluationContext.identity?.identifier;
+        if (!identifier) {
+            this.log('Flagsmith: getExperimentFlag called without an identity; call identify() (optionally with transient: true) before using experiments to record an exposure. Returning environment flags; no exposure recorded.');
+            return flag;
+        }
+        if (!flag) {
+            this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which does not exist. No exposure recorded.`);
+            return null;
+        }
+        if (!flag.enabled) {
+            this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which is disabled. No exposure recorded.`);
+            return flag;
+        }
+        if (!flag.variant) {
+            this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which has no variant; experiments require a multivariate flag. No exposure recorded.`);
+            return flag;
+        }
+        if (this.loadingState.source !== FlagSource.SERVER) {
+            return flag;
+        }
+        this.trackExposureEvent(featureName, { value: flag.variant });
+        return flag;
     };
 
     private setLoadingState(loadingState: LoadingState) {

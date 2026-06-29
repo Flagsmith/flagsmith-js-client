@@ -1,0 +1,35 @@
+{
+    "identifier": "test_experiment_identity",
+    "flags": [
+        {
+            "feature": {
+                "id": 1804,
+                "name": "hero",
+                "type": "STANDARD"
+            },
+            "enabled": true,
+            "feature_state_value": "https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg"
+        },
+        {
+            "feature": {
+                "id": 6149,
+                "name": "font_size",
+                "type": "MULTIVARIATE"
+            },
+            "enabled": true,
+            "feature_state_value": 16,
+            "variant": "control"
+        },
+        {
+            "feature": {
+                "id": 80321,
+                "name": "disabled_experiment",
+                "type": "MULTIVARIATE"
+            },
+            "enabled": false,
+            "feature_state_value": null,
+            "variant": "control"
+        }
+    ],
+    "traits": []
+}

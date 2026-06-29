@@ -27,6 +27,13 @@ export declare function useFlags<
     F extends string | Record<string, any>,
     T extends string = string
 >(_flags: readonly (F | keyof F)[], _traits?: readonly T[]): UseFlagsReturn<F, T>;
+/**
+ * Resolve an experiment flag for the identified user and record one
+ * `$flag_exposure` event. Returns the flag (or null) and never throws when
+ * events are disabled.
+ * @experimental @internal
+ */
+export declare function useExperiment(featureName: string): IFlagsmithFeature | null;
 export declare const useFlagsmith: <F extends string | Record<string, any>,
     T extends string = string>() => IFlagsmith<F, T>;
 export declare const useFlagsmithLoading: () => LoadingState | undefined;

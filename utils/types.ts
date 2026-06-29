@@ -1,5 +1,5 @@
 import { EvaluationContext, TraitEvaluationContext } from "../evaluation-context";
-import { ClientEvaluationContext, ITraits, IFlagsmithTrait } from "../types";
+import { ClientEvaluationContext, ITraits, IFlagsmithTrait, IFlagsmithValue } from "../types";
 
 export function isTraitEvaluationContext(trait: TraitEvaluationContext | IFlagsmithTrait): trait is TraitEvaluationContext {
     return !!trait && typeof trait == 'object' && trait.value !== undefined;
@@ -21,4 +21,15 @@ export function toEvaluationContext(clientEvaluationContext: ClientEvaluationCon
             traits: toTraitEvaluationContextObject(clientEvaluationContext.identity.traits || {})
         } : undefined,
     }
+}
+
+export function resolveTraitValues(
+    traits?: { [key: string]: TraitEvaluationContext | IFlagsmithTrait | null } | null
+): Record<string, IFlagsmithValue> | null {
+    if (!traits) return null;
+    const entries = Object.entries(traits).filter(([, v]) => v !== null && v !== undefined);
+    if (!entries.length) return null;
+    return Object.fromEntries(
+        entries.map(([k, v]) => [k, isTraitEvaluationContext(v) ? v.value : v])
+    );
 }

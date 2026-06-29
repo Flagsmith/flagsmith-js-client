@@ -1,7 +1,7 @@
 import { EvaluationContext, IdentityEvaluationContext, TraitEvaluationContext } from "./evaluation-context";
 import { FlagSource } from "./flagsmith-core";
 
-type IFlagsmithValue<T = string | number | boolean | null> = T
+export type IFlagsmithValue<T = string | number | boolean | null> = T
 
 export type DynatraceObject = {
     "javaLongOrObject": Record<string, number>,
@@ -14,6 +14,7 @@ export interface IFlagsmithFeature<Value = IFlagsmithValue> {
     id?: number;
     enabled: boolean;
     value: Value;
+    variant?: string;
 }
 
 export declare type IFlagsmithTrait = IFlagsmithValue | TraitEvaluationContext;
@@ -131,7 +132,26 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
      * Customer application metadata
      */
     applicationMetadata?: ApplicationMetadata;
+    /**
+     * @experimental Internal use only — API may change without notice.
+     * Opt-in gate for the events pipeline. When true, an EventProcessor is
+     * started and trackEvent / trackExposureEvent / getExperimentFlag become
+     * available.
+     * @internal
+     */
+    enableEvents?: boolean;
+    /**
+     * @experimental Optional tuning for the events pipeline. Only valid when
+     * enableEvents is true (passing it without enableEvents throws at init).
+     * @internal
+     */
+    eventProcessorConfig?: {
+        eventsApiUrl?: string;
+        maxBuffer?: number;
+        flushInterval?: number;
+    };
 }
+
 
 export interface IFlagsmithResponse {
     identifier?: string,
@@ -143,6 +163,7 @@ export interface IFlagsmithResponse {
     flags?: {
         enabled: boolean;
         feature_state_value: IFlagsmithValue;
+        variant?: string;
         feature: {
             id: number;
             name: string;
@@ -271,6 +292,52 @@ T extends string = string
      * Set a key value set of traits for a given user, triggers a call to get flags
      */
     setTraits: (traits: ITraits) => Promise<void>;
+    /**
+     * Record an arbitrary product event (e.g. "purchase"). No-op when events
+     * are disabled (enableEvents is not set). identifier/traits default to the
+     * current identified context when omitted.
+     * @experimental @internal
+     */
+    trackEvent: (event: string, opts?: {
+        identifier?: string | null;
+        value?: IFlagsmithValue;
+        traits?: ITraits;
+        metadata?: Record<string, unknown>;
+    }) => void;
+    /**
+     * Record that an identity was exposed to a flag/variant (emits the reserved
+     * "$flag_exposure" event). No-op when events are disabled (enableEvents is
+     * not set).
+     * @experimental @internal
+     */
+    trackExposureEvent: (featureName: string, opts?: {
+        identifier?: string | null;
+        value?: IFlagsmithValue;
+        traits?: ITraits;
+        metadata?: Record<string, unknown>;
+    }) => void;
+    /**
+     * Resolve a flag for the currently identified user and fire one
+     * "$flag_exposure" event with the selected variant as its value (skipped
+     * unless flags were loaded from the server and the flag has a variant).
+     * When events are disabled (enableEvents is not set) this degrades to a
+     * plain flag read.
+     * @experimental @internal
+     */
+    getExperimentFlag: (featureName: string) => IFlagsmithFeature | null;
+    /**
+     * Force-flush any buffered events. Useful server-side/SSR where the timer
+     * may not fire before the request ends. No-op when events are disabled.
+     * @experimental @internal
+     */
+    flushEvents: () => Promise<void>;
+    /**
+     * Whether the events pipeline is enabled (enableEvents: true was passed
+     * to init). Used by the React useExperiment hook to skip exposure
+     * recording when events are off.
+     * @experimental @internal
+     */
+    readonly eventsEnabled: boolean;
     /**
      * The stored identity of the user
     */
