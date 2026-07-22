@@ -307,7 +307,8 @@ T extends string = string
     /**
      * Record that an identity was exposed to a flag/variant (emits the reserved
      * "$flag_exposure" event). No-op when events are disabled (enableEvents is
-     * not set).
+     * not set). Skipped (with a log) when no identifier resolves — identify()
+     * first (optionally with transient: true) or pass opts.identifier.
      * @experimental @internal
      */
     trackExposureEvent: (featureName: string, opts?: {
