@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.1.1](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.1.0...v12.1.1) (2026-07-23)
+
+
+### Bug Fixes
+
+* skip exposure events when no identifier resolves ([#407](https://github.com/Flagsmith/flagsmith-js-client/issues/407)) ([9c4533c](https://github.com/Flagsmith/flagsmith-js-client/commit/9c4533c441fc06f5f6f0803578e77578ce045b9a))
+
 ## [12.1.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.0.1...v12.1.0) (2026-06-29)
 
 
