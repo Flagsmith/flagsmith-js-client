@@ -983,9 +983,14 @@ const Flagsmith = class {
     }) => {
         // No-op when events are disabled, mirroring enableAnalytics: false.
         if (!this.eventProcessor) return;
+        const identifier = opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null;
+        if (!identifier) {
+            this.log(`Flagsmith: trackExposureEvent called for "${featureName}" without an identity; call identify() (optionally with transient: true) or pass opts.identifier. No exposure recorded.`);
+            return;
+        }
         this.eventProcessor.trackExposureEvent({
             featureName,
-            identifier: opts?.identifier ?? this.evaluationContext.identity?.identifier ?? null,
+            identifier,
             value: opts?.value ?? null,
             traits: resolveTraitValues(opts?.traits ?? this.evaluationContext.identity?.traits),
             metadata: opts?.metadata ?? null,

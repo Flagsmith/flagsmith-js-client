@@ -99,6 +99,47 @@ describe('trackEvent', () => {
     });
 });
 
+describe('trackExposureEvent', () => {
+    test('skips the exposure when no identity resolves', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig());
+        await flagsmith.init(initConfig); // anonymous
+
+        flagsmith.trackExposureEvent('font_size', { value: 'control' });
+        await flagsmith.flushEvents();
+
+        expect(eventCalls(mockFetch)).toHaveLength(0);
+    });
+
+    test('explicit identifier records the exposure without a context identity', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig());
+        await flagsmith.init(initConfig); // anonymous
+
+        flagsmith.trackExposureEvent('font_size', { identifier: 'anon-device-1', value: 'control' });
+        await flagsmith.flushEvents();
+
+        const events = JSON.parse(eventCalls(mockFetch)[0][1].body).events;
+        expect(events).toHaveLength(1);
+        expect(events[0]).toEqual(expect.objectContaining({
+            event: FLAG_EXPOSURE_EVENT,
+            feature_name: 'font_size',
+            identifier: 'anon-device-1',
+            value: 'control',
+        }));
+    });
+
+    test('trackEvent still sends anonymous events with identifier null', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig());
+        await flagsmith.init(initConfig); // anonymous
+
+        flagsmith.trackEvent('purchase');
+        await flagsmith.flushEvents();
+
+        const events = JSON.parse(eventCalls(mockFetch)[0][1].body).events;
+        expect(events).toHaveLength(1);
+        expect(events[0]).toEqual(expect.objectContaining({ event: 'purchase', identifier: null }));
+    });
+});
+
 describe('getExperimentFlag', () => {
     test('returns the flag and fires one $flag_exposure when identified and source is SERVER', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }));
