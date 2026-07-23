@@ -1,5 +1,13 @@
 # Changelog
 
+## [12.1.2](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.1.1...v12.1.2) (2026-07-23)
+
+
+### Other
+
+* **deps-dev:** bump ws from 8.19.0 to 8.21.1 ([#406](https://github.com/Flagsmith/flagsmith-js-client/issues/406)) ([2c7fc6f](https://github.com/Flagsmith/flagsmith-js-client/commit/2c7fc6f3f8ec7d9d0814f0cc1f318996dee70982))
+* **main:** release 12.1.1 ([#408](https://github.com/Flagsmith/flagsmith-js-client/issues/408)) ([2c9dde4](https://github.com/Flagsmith/flagsmith-js-client/commit/2c9dde4eb005979162b103e469657a80b3ab9ab6))
+
 ## [12.1.1](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.1.0...v12.1.1) (2026-07-23)
 
 
