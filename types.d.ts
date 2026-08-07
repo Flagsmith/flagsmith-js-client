@@ -15,6 +15,7 @@ export interface IFlagsmithFeature<Value = IFlagsmithValue> {
     enabled: boolean;
     value: Value;
     variant?: string;
+    reason?: string;
 }
 
 export declare type IFlagsmithTrait = IFlagsmithValue | TraitEvaluationContext;
@@ -164,6 +165,7 @@ export interface IFlagsmithResponse {
         enabled: boolean;
         feature_state_value: IFlagsmithValue;
         variant?: string;
+        reason?: string;
         feature: {
             id: number;
             name: string;

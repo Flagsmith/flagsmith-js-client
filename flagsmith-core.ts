@@ -124,6 +124,7 @@ const Flagsmith = class {
                     enabled: feature.enabled,
                     value: feature.feature_state_value,
                     ...(feature.variant ? { variant: feature.variant } : {}),
+                    ...(feature.reason ? { reason: feature.reason } : {}),
                 };
             });
             traits.forEach(trait => {
