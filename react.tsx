@@ -1,10 +1,15 @@
 import React, { createContext, FC, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Emitter from './utils/emitter'
-const events = new Emitter()
 
 import { IFlagsmith, IFlagsmithTrait, IFlagsmithFeature, IState } from './types'
 
 export const FlagsmithContext = createContext<IFlagsmith<string, string> | null>(null)
+
+// Each FlagsmithProvider owns its own Emitter instance (see EventsContext
+// below) so that separate provider trees never share an event bus. This
+// context is internal: consumers should not rely on it directly.
+const EventsContext = createContext<Emitter | null>(null)
+
 export type FlagsmithContextType = {
     flagsmith: IFlagsmith // The flagsmith instance
     options?: Parameters<IFlagsmith['init']>[0] // Initialisation options, if you do not provide this you will have to call init manually
@@ -14,6 +19,12 @@ export type FlagsmithContextType = {
 
 export const FlagsmithProvider: FC<FlagsmithContextType> = ({ flagsmith, options, serverState, children }) => {
     const firstRenderRef = useRef(true)
+    const eventsRef = useRef<Emitter | null>(null)
+    if (eventsRef.current === null) {
+        eventsRef.current = new Emitter()
+    }
+    const events = eventsRef.current
+
     if (flagsmith && !flagsmith?._trigger) {
         flagsmith._trigger = () => {
             // @ts-expect-error using internal function, consumers would never call this
@@ -52,7 +63,11 @@ export const FlagsmithProvider: FC<FlagsmithContextType> = ({ flagsmith, options
                 })
         }
     }
-    return <FlagsmithContext.Provider value={flagsmith}>{children}</FlagsmithContext.Provider>
+    return (
+        <EventsContext.Provider value={events}>
+            <FlagsmithContext.Provider value={flagsmith}>{children}</FlagsmithContext.Provider>
+        </EventsContext.Provider>
+    )
 }
 
 const useConstant = function <T>(value: T): T {
@@ -96,10 +111,11 @@ const getExperimentRenderKey = (flagsmith: IFlagsmith | null, key: string): stri
 
 export function useFlagsmithLoading() {
     const flagsmith = useContext(FlagsmithContext)
+    const events = useContext(EventsContext)
     const [loadingState, setLoadingState] = useState(flagsmith?.loadingState)
 
     useEffect(() => {
-        if (!flagsmith) return
+        if (!flagsmith || !events) return
         setLoadingState(flagsmith.loadingState)
         const unsubscribe = events.on('loading_event', () => {
             setLoadingState(flagsmith.loadingState)
@@ -107,7 +123,7 @@ export function useFlagsmithLoading() {
         return () => {
             unsubscribe()
         }
-    }, [flagsmith])
+    }, [flagsmith, events])
 
     return loadingState
 }
@@ -144,10 +160,11 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
     const flags = useConstant<string[]>(flagsAsArray(_flags))
     const traits = useConstant<string[]>(flagsAsArray(_traits))
     const flagsmith = useContext(FlagsmithContext)
+    const events = useContext(EventsContext)
     const [renderRef, setRenderRef] = useState(getRenderKey(flagsmith as IFlagsmith, flags, traits))
 
     useEffect(() => {
-        if (!flagsmith) return
+        if (!flagsmith || !events) return
         setRenderRef(getRenderKey(flagsmith, flags, traits))
         const unsubscribe = events.on('event', () => {
             setRenderRef((prev) => {
@@ -161,7 +178,7 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
         return () => {
             unsubscribe()
         }
-    }, [flagsmith, flags, traits])
+    }, [flagsmith, events, flags, traits])
 
     const res = useMemo(() => {
         const res: any = {}
@@ -201,11 +218,13 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
  */
 export function useExperiment(featureName: string): IFlagsmithFeature | null {
     const flagsmith = useContext(FlagsmithContext)
+    const events = useContext(EventsContext)
     const key = normalizeFlagKey(featureName)
     const lastExposureKey = useRef<string | null>(null)
     const [, setRenderKey] = useState<string>(() => getExperimentRenderKey(flagsmith, key))
 
     useEffect(() => {
+        if (!events) return
         const listener = () => {
             const next = getExperimentRenderKey(flagsmith, key)
             setRenderKey((prev) => (prev !== next ? next : prev))
@@ -215,7 +234,7 @@ export function useExperiment(featureName: string): IFlagsmithFeature | null {
         return () => {
             off()
         }
-    }, [flagsmith, key])
+    }, [flagsmith, events, key])
 
     const flag = (flagsmith?.getAllFlags()?.[key] as IFlagsmithFeature | undefined) ?? null
     const identifier = flagsmith?.getContext().identity?.identifier ?? null
