@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.2.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.1.2...v12.2.0) (2026-08-28)
+
+
+### Features
+
+* Surface engine evaluation reason on flags ([#411](https://github.com/Flagsmith/flagsmith-js-client/issues/411)) ([ad513f8](https://github.com/Flagsmith/flagsmith-js-client/commit/ad513f825d4c3182ebcc0ef236ef86987469fbf7))
+
+
+### Dependency Updates
+
+* Bump brace-expansion and js-yaml to patched versions ([#415](https://github.com/Flagsmith/flagsmith-js-client/issues/415)) ([205c02a](https://github.com/Flagsmith/flagsmith-js-client/commit/205c02a3e89dedcebb32db8be36087b0c83db503))
+
 ## [12.1.2](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.1.1...v12.1.2) (2026-07-23)
 
 
