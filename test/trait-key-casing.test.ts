@@ -1,4 +1,4 @@
-import { getFlagsmith, testIdentity } from './test-constants';
+import { delay, FLAGSMITH_KEY, getFlagsmith, identityState, testIdentity } from './test-constants';
 
 const identityWithCamelCaseTraits = {
     identifier: testIdentity,
@@ -59,6 +59,54 @@ describe('trait key casing', () => {
         ]);
         expect(flagsmith.getTrait('appVersion')).toBe('2.16.1');
         expect(flagsmith.getTrait('appversion')).toBe('2.15.1');
+        expect(flagsmith.getTrait('APPVERSION')).toBe('2.16.1');
+    });
+
+    test('does not re-send lowercased traits cached by a previous SDK version', async () => {
+        const { flagsmith, initConfig, mockFetch, AsyncStorage } = getFlagsmith({
+            cacheFlags: true,
+            identity: testIdentity,
+        });
+        await AsyncStorage.setItem(
+            FLAGSMITH_KEY,
+            JSON.stringify({
+                ...identityState,
+                evaluationContext: {
+                    ...identityState.evaluationContext,
+                    identity: {
+                        identifier: testIdentity,
+                        traits: { appversion: { value: '2.15.1' } },
+                    },
+                },
+            }),
+        );
+        mockFetch.mockImplementation(async (url: string) => {
+            if (url.includes('analytics/flags')) {
+                return { status: 200, text: () => Promise.resolve('{}') };
+            }
+            if (url.includes('/identities/')) {
+                return {
+                    status: 200,
+                    text: () =>
+                        Promise.resolve(
+                            JSON.stringify({
+                                identifier: testIdentity,
+                                traits: [{ trait_key: 'appVersion', trait_value: '2.15.1' }],
+                                flags: identityWithCamelCaseTraits.flags,
+                            }),
+                        ),
+                };
+            }
+            throw new Error('Please mock the call to ' + url);
+        });
+        await flagsmith.init(initConfig);
+        await delay(50);
+        await flagsmith.setTrait('otherTrait', 'x');
+        const sentKeys = mockFetch.mock.calls
+            .filter(([url, options]) => url.endsWith('/identities/') && options?.method === 'POST')
+            .flatMap(([, options]) => JSON.parse(options.body).traits.map((t: { trait_key: string }) => t.trait_key));
+        expect(sentKeys).toContain('appVersion');
+        expect(sentKeys).not.toContain('appversion');
     });
 
     test('re-sends trait keys to the API with their original casing', async () => {
