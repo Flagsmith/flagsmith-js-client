@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.3.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.2.0...v12.3.0) (2026-08-31)
+
+
+### Features
+
+* preserve trait key casing in API responses ([#416](https://github.com/Flagsmith/flagsmith-js-client/issues/416)) ([58414c0](https://github.com/Flagsmith/flagsmith-js-client/commit/58414c0def16809afc3990b723fa21507d228c01))
+
+
+### Dependency Updates
+
+* Bump @babel/core to 7.29.7 ([#417](https://github.com/Flagsmith/flagsmith-js-client/issues/417)) ([1dcd11f](https://github.com/Flagsmith/flagsmith-js-client/commit/1dcd11ffd967762de5f9b7640c3ef45324be0196))
+
 ## [12.2.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.1.2...v12.2.0) (2026-08-28)
 
 
