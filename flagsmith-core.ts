@@ -128,7 +128,7 @@ const Flagsmith = class {
                 };
             });
             traits.forEach(trait => {
-                userTraits[trait.trait_key.toLowerCase().replace(/ /g, '_')] = {
+                userTraits[trait.trait_key.replace(/ /g, '_')] = {
                     transient: trait.transient,
                     value: trait.trait_value,
                 }
@@ -716,7 +716,17 @@ const Flagsmith = class {
     }
 
     getTrait = (key: string) => {
-        return this.evaluationContext.identity?.traits && this.evaluationContext.identity.traits[key.toLowerCase().replace(/ /g, '_')]?.value;
+        const traits = this.evaluationContext.identity?.traits;
+        if (!traits) {
+            return undefined;
+        }
+        const lookupKey = key.replace(/ /g, '_');
+        if (lookupKey in traits) {
+            return traits[lookupKey]?.value;
+        }
+        const lowerKey = lookupKey.toLowerCase();
+        const matchedKey = Object.keys(traits).find((k) => k.toLowerCase() === lowerKey);
+        return matchedKey === undefined ? undefined : traits[matchedKey]?.value;
     }
 
     getAllTraits = () => {
