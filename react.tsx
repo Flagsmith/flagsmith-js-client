@@ -80,7 +80,8 @@ const normalizeFlagKey = (key: string) => key.toLowerCase().replace(/ /g, '_')
 const getRenderKey = (flagsmith: IFlagsmith, flags: string[], traits: string[] = []) => {
     return flags
         .map((k) => {
-            return `${flagsmith.getValue(k)}${flagsmith.hasFeature(k)}${flagsmith.getAllFlags()?.[normalizeFlagKey(k)]?.variant}`
+            const flag = flagsmith.getAllFlags()?.[normalizeFlagKey(k)]
+            return `${flagsmith.getValue(k)}${flagsmith.hasFeature(k)}${flag?.variant}${flag?.experiment?.id}${flag?.experiment?.inExperiment}`
         })
         .concat(traits.map((t) => `${flagsmith.getTrait(t)}`))
         .join(',')
@@ -91,7 +92,7 @@ const getExperimentRenderKey = (flagsmith: IFlagsmith | null, key: string): stri
     const identifier = flagsmith?.getContext().identity?.identifier ?? null
     // Identity is part of the key so that switching identity re-renders (and
     // re-fires the exposure) even when the resolved value is unchanged.
-    return `${identifier}|${flag?.value}|${flag?.enabled}|${flag?.variant}`
+    return `${identifier}|${flag?.value}|${flag?.enabled}|${flag?.variant}|${flag?.experiment?.inExperiment}`
 }
 
 export function useFlagsmithLoading() {
@@ -167,11 +168,13 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
         const res: any = {}
         flags
             .map((k) => {
-                const variant = flagsmith!.getAllFlags()?.[normalizeFlagKey(k)]?.variant
+                const flag = flagsmith!.getAllFlags()?.[normalizeFlagKey(k)]
+                const variant = flag?.variant
                 res[k] = {
                     enabled: flagsmith!.hasFeature(k),
                     value: flagsmith!.getValue(k),
                     ...(variant != null ? { variant } : {}),
+                    ...(flag?.experiment ? { experiment: flag.experiment } : {}),
                 }
             })
             .concat(
@@ -191,8 +194,9 @@ export function useFlags<F extends string | Record<string, any>, T extends strin
  * value or enabled state changes. When events are disabled (enableEvents is
  * not set) the flag is still returned but no exposure is recorded.
  *
- * Exposures are gated three ways: the effect only runs when the flag value,
- * variant, identity, feature or source change; a ref guard prevents duplicate
+ * An exposure is only recorded when `flag.experiment.inExperiment` is true.
+ * Beyond that it is gated three ways: the effect only runs when the flag value,
+ * variant, enrolment, identity, feature or source change; a ref guard prevents duplicate
  * fires for the same (feature, identifier, value, variant); and the core
  * EventProcessor dedupes within each flush window. Frequent re-renders
  * therefore never amplify into extra events.
@@ -221,7 +225,7 @@ export function useExperiment(featureName: string): IFlagsmithFeature | null {
     const identifier = flagsmith?.getContext().identity?.identifier ?? null
 
     useEffect(() => {
-        if (!flagsmith?.eventsEnabled || !flag) {
+        if (!flagsmith?.eventsEnabled || !flag || !flag.experiment?.inExperiment) {
             return
         }
         const exposureKey = `${key}:${identifier}:${flag.value}:${flag.variant}`
@@ -231,7 +235,7 @@ export function useExperiment(featureName: string): IFlagsmithFeature | null {
         lastExposureKey.current = exposureKey
         flagsmith.getExperimentFlag(featureName)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [flagsmith, featureName, key, identifier, flag?.value, flag?.enabled, flag?.variant])
+    }, [flagsmith, featureName, key, identifier, flag?.value, flag?.enabled, flag?.variant, flag?.experiment?.inExperiment])
 
     return flag
 }

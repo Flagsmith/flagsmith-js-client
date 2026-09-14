@@ -29,8 +29,9 @@ export declare function useFlags<
 >(_flags: readonly (F | keyof F)[], _traits?: readonly T[]): UseFlagsReturn<F, T>;
 /**
  * Resolve an experiment flag for the identified user and record one
- * `$flag_exposure` event. Returns the flag (or null) and never throws when
- * events are disabled.
+ * `$flag_exposure` event, but only when the identity is enrolled in a running
+ * experiment (`flag.experiment.inExperiment`). Returns the flag (or null)
+ * either way, and never throws when events are disabled.
  * @experimental @internal
  */
 export declare function useExperiment(featureName: string): IFlagsmithFeature | null;

@@ -119,12 +119,20 @@ const Flagsmith = class {
             features = features || [];
             traits = traits || [];
             features.forEach(feature => {
+                const experiment = feature.metadata?.experiment;
                 flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
                     id: feature.feature.id,
                     enabled: feature.enabled,
                     value: feature.feature_state_value,
                     ...(feature.variant ? { variant: feature.variant } : {}),
                     ...(feature.reason ? { reason: feature.reason } : {}),
+                    ...(experiment ? {
+                        experiment: {
+                            id: experiment.id,
+                            name: experiment.name,
+                            inExperiment: !!experiment.in_experiment,
+                        },
+                    } : {}),
                 };
             });
             traits.forEach(trait => {
@@ -1028,14 +1036,17 @@ const Flagsmith = class {
             this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which is disabled. No exposure recorded.`);
             return flag;
         }
-        if (!flag.variant) {
-            this.log(`Flagsmith: getExperimentFlag called for "${featureName}" which has no variant; experiments require a multivariate flag. No exposure recorded.`);
+        if (!flag.experiment?.inExperiment) {
+            this.log(`Flagsmith: getExperimentFlag called for "${featureName}" but this identity is not enrolled in a running experiment for it. No exposure recorded.`);
             return flag;
         }
         if (this.loadingState.source !== FlagSource.SERVER) {
             return flag;
         }
-        this.trackExposureEvent(featureName, { value: flag.variant });
+        this.trackExposureEvent(featureName, {
+            value: flag.variant,
+            metadata: { experiment_id: flag.experiment.id },
+        });
         return flag;
     };
 

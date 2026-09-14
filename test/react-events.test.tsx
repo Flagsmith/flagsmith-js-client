@@ -23,6 +23,12 @@ function exposures(mockFetch: jest.Mock) {
     )
 }
 
+const runningExperiment = {
+    id: 42,
+    name: 'New checkout CTA',
+    in_experiment: true,
+}
+
 const Probe: FC<{ feature: string }> = ({ feature }) => {
     const flag = useExperiment(feature)
     return <div data-testid="exp">{JSON.stringify(flag)}</div>
@@ -101,7 +107,13 @@ describe('useExperiment', () => {
         // Next fetch buckets the user into a different variant with the same value.
         getMockFetchWithValue(mockFetch, {
             flags: [
-                { enabled: true, feature_state_value: 16, variant: 'large', feature: { id: 6149, name: 'font_size' } },
+                {
+                    enabled: true,
+                    feature_state_value: 16,
+                    variant: 'large',
+                    feature: { id: 6149, name: 'font_size' },
+                    metadata: { experiment: runningExperiment },
+                },
             ],
             traits: [],
         })
@@ -131,7 +143,13 @@ describe('useExperiment', () => {
         // A different identity that resolves the SAME font_size variant and value.
         getMockFetchWithValue(mockFetch, {
             flags: [
-                { enabled: true, feature_state_value: 16, variant: 'control', feature: { id: 6149, name: 'font_size' } },
+                {
+                    enabled: true,
+                    feature_state_value: 16,
+                    variant: 'control',
+                    feature: { id: 6149, name: 'font_size' },
+                    metadata: { experiment: runningExperiment },
+                },
             ],
             traits: [],
         })
@@ -186,6 +204,40 @@ describe('useExperiment', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('exp').innerHTML).toBe('null')
+        })
+
+        await flagsmith.flushEvents()
+        expect(eventCalls(mockFetch)).toHaveLength(0)
+    })
+
+    test('the exposure event carries metadata.experiment_id', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <Probe feature="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.value).toBe(16)
+        })
+
+        await flagsmith.flushEvents()
+        const fired = exposures(mockFetch)
+        expect(fired).toHaveLength(1)
+        expect(fired[0].metadata).toEqual(expect.objectContaining({ experiment_id: 42 }))
+    })
+
+    test('fires no exposure for a "control" variant that is not enrolled', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <Probe feature="not_enrolled_experiment" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.variant).toBe('control')
         })
 
         await flagsmith.flushEvents()

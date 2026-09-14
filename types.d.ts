@@ -10,12 +10,21 @@ export type DynatraceObject = {
     "javaDouble": Record<string, number>,
 }
 
+/** The running experiment a flag was evaluated under; identity evaluations only. */
+export interface IFlagsmithExperiment {
+    id: number;
+    name: string;
+    /** Whether this identity is enrolled. `variant` alone cannot tell. */
+    inExperiment: boolean;
+}
+
 export interface IFlagsmithFeature<Value = IFlagsmithValue> {
     id?: number;
     enabled: boolean;
     value: Value;
     variant?: string;
     reason?: string;
+    experiment?: IFlagsmithExperiment;
 }
 
 export declare type IFlagsmithTrait = IFlagsmithValue | TraitEvaluationContext;
@@ -170,6 +179,14 @@ export interface IFlagsmithResponse {
             id: number;
             name: string;
         };
+        metadata?: {
+            experiment?: {
+                id: number;
+                name: string;
+                in_experiment: boolean;
+            };
+            [key: string]: unknown;
+        };
     }[];
 }
 type FKey<F> = F extends string ? F : keyof F;
@@ -322,7 +339,8 @@ T extends string = string
     /**
      * Resolve a flag for the currently identified user and fire one
      * "$flag_exposure" event with the selected variant as its value (skipped
-     * unless flags were loaded from the server and the flag has a variant).
+     * unless flags were loaded from the server and the identity is enrolled in
+     * the flag's experiment, i.e. `flag.experiment.inExperiment` is true).
      * When events are disabled (enableEvents is not set) this degrades to a
      * plain flag read.
      * @experimental @internal
