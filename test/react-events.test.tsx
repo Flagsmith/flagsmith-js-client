@@ -128,6 +128,41 @@ describe('useExperiment', () => {
         expect(values).toEqual(['control', 'large'])
     })
 
+    test('a new experiment on the same feature fires a second exposure when the assignment is unchanged', async () => {
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <Probe feature="font_size" />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.experiment?.id).toBe(42)
+        })
+
+        // Experiment 42 was replaced by 43; identity, value and variant are identical.
+        getMockFetchWithValue(mockFetch, {
+            flags: [
+                {
+                    enabled: true,
+                    feature_state_value: 16,
+                    variant: 'control',
+                    feature: { id: 6149, name: 'font_size' },
+                    metadata: { experiment: { ...runningExperiment, id: 43 } },
+                },
+            ],
+            traits: [],
+        })
+        await flagsmith.getFlags()
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId('exp').innerHTML)?.experiment?.id).toBe(43)
+        })
+
+        await flagsmith.flushEvents()
+        expect(exposures(mockFetch).map((e: any) => e.metadata.experiment_id)).toEqual([42, 43])
+    })
+
     test('fires a fresh exposure when identity changes even if the value is unchanged', async () => {
         const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: experimentIdentity }))
         render(

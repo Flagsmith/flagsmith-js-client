@@ -31,6 +31,15 @@ describe('EventProcessor dedupe', () => {
         expect(processor.buffer).toHaveLength(2);
     });
 
+    test('keeps exposures with distinct experiment_id', () => {
+        const { processor } = makeProcessor();
+        processor.trackExposureEvent({ featureName: 'dark_mode', identifier: 'u1', value: 'control', traits: null, metadata: { experiment_id: 42 } });
+        processor.trackExposureEvent({ featureName: 'dark_mode', identifier: 'u1', value: 'control', traits: null, metadata: { experiment_id: 43 } });
+        processor.trackExposureEvent({ featureName: 'dark_mode', identifier: 'u1', value: 'control', traits: null, metadata: { experiment_id: 43 } });
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(2);
+    });
+
     test('never dedupes custom events', () => {
         const { processor } = makeProcessor();
         const args = { event: 'purchase', identifier: 'u1', value: 99, traits: null, metadata: null };
