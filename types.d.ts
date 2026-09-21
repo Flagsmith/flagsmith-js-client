@@ -223,7 +223,7 @@ T extends string = string
     /**
      * Identify user, triggers a call to get flags if `flagsmith.init` has been called
      * */
-    identify: (userId: string, traits?: Record<T, IFlagsmithValue>) => Promise<void>;
+    identify: (userId: string, traits?: Record<T, IFlagsmithTrait>) => Promise<void>;
     /**
      * Retrieves the current state of flagsmith
      */

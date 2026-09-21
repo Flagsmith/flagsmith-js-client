@@ -96,4 +96,12 @@ describe('Flagsmith Types', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const incorrectNumberFlag: string = typedFlagsmith.getValue("numberFlag")
     });
+    test('should accept the same trait types in identify as in setTraits', async () => {
+        const { flagsmith } = getFlagsmith({});
+        const typedFlagsmith = flagsmith as IFlagsmith<string, "plan" | "session_id">
+        await typedFlagsmith.setTraits({ plan: "pro", session_id: { value: "abc", transient: true } })
+        await typedFlagsmith.identify("user", { plan: "pro", session_id: { value: "abc", transient: true } })
+        //@ts-expect-error - trait not defined
+        await typedFlagsmith.identify("user", { fail: "x" })
+    });
 });
