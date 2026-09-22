@@ -18,7 +18,14 @@
             },
             "enabled": true,
             "feature_state_value": 16,
-            "variant": "control"
+            "variant": "control",
+            "metadata": {
+                "experiment": {
+                    "id": 42,
+                    "name": "New checkout CTA",
+                    "in_experiment": true
+                }
+            }
         },
         {
             "feature": {
@@ -29,6 +36,23 @@
             "enabled": false,
             "feature_state_value": null,
             "variant": "control"
+        },
+        {
+            "feature": {
+                "id": 80322,
+                "name": "not_enrolled_experiment",
+                "type": "MULTIVARIATE"
+            },
+            "enabled": true,
+            "feature_state_value": "control_value",
+            "variant": "control",
+            "metadata": {
+                "experiment": {
+                    "id": 44,
+                    "name": "Not enrolled experiment",
+                    "in_experiment": false
+                }
+            }
         }
     ],
     "traits": []

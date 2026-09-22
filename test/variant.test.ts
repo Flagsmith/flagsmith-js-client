@@ -3,6 +3,10 @@ import { FLAG_EXPOSURE_EVENT } from '../event-processor';
 
 const eventsUrl = 'https://events.test/';
 
+const experimentMetadata = (id: number) => ({
+    experiment: { id, name: `experiment_${id}`, in_experiment: true },
+});
+
 // Identity payload where one flag carries a multivariate `variant` key, one is
 // in the control bucket, and one is a plain (non-variant) flag.
 const identityWithVariant = {
@@ -14,12 +18,14 @@ const identityWithVariant = {
             enabled: true,
             feature_state_value: 'variant_value',
             variant: 'variant_a',
+            metadata: experimentMetadata(1),
         },
         {
             feature: { id: 2, name: 'control_experiment', type: 'MULTIVARIATE' },
             enabled: true,
             feature_state_value: 'control_value',
             variant: 'control',
+            metadata: experimentMetadata(2),
         },
         {
             feature: { id: 3, name: 'font_size', type: 'STANDARD' },
@@ -37,6 +43,7 @@ const identityWithVariant = {
             enabled: true,
             feature_state_value: '',
             variant: 'variant_b',
+            metadata: experimentMetadata(5),
         },
     ],
 };
@@ -75,7 +82,7 @@ describe('variant key', () => {
         expect(flags.font_size.variant).toBeUndefined();
     });
 
-    test('getExperimentFlag uses the variant as the exposure value and skips flags without one', async () => {
+    test('getExperimentFlag uses the variant as the exposure value and skips flags with no experiment', async () => {
         const { flagsmith, mockFetch } = await initWithVariants();
 
         flagsmith.getExperimentFlag('experiment');
@@ -91,7 +98,7 @@ describe('variant key', () => {
         ]);
     });
 
-    test('treats an empty-string variant as absent and records no exposure for it', async () => {
+    test('treats an empty-string variant as absent and records no exposure without an experiment', async () => {
         const { flagsmith, mockFetch } = await initWithVariants();
 
         expect(flagsmith.getAllFlags().empty_variant.variant).toBeUndefined();

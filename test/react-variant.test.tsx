@@ -20,7 +20,9 @@ describe('useFlags variant', () => {
         )
 
         await waitFor(() => {
-            expect(renderedFlags().font_size).toEqual({ enabled: true, value: 16, variant: 'control' })
+            expect(renderedFlags().font_size).toEqual(
+                expect.objectContaining({ enabled: true, value: 16, variant: 'control' })
+            )
         })
 
         getMockFetchWithValue(mockFetch, {
@@ -45,7 +47,27 @@ describe('useFlags variant', () => {
         )
 
         await waitFor(() => {
-            expect(renderedFlags()['Font Size']).toEqual({ enabled: true, value: 16, variant: 'control' })
+            expect(renderedFlags()['Font Size']).toEqual(
+                expect.objectContaining({ enabled: true, value: 16, variant: 'control' })
+            )
         })
+    })
+
+    test('surfaces the experiment and omits it for flags without one', async () => {
+        const { flagsmith, initConfig } = getFlagsmith({ identity: experimentIdentity })
+        render(
+            <FlagsmithProvider flagsmith={flagsmith} options={initConfig}>
+                <FlagsPage flags={['font_size', 'hero']} />
+            </FlagsmithProvider>
+        )
+
+        await waitFor(() => {
+            expect(renderedFlags().font_size.experiment).toEqual({
+                id: 42,
+                name: 'New checkout CTA',
+                inExperiment: true,
+            })
+        })
+        expect(renderedFlags().hero.experiment).toBeUndefined()
     })
 })

@@ -86,7 +86,7 @@ export class EventProcessor {
     ) {
         const stringValue = value != null ? String(value) : null;
         if (dedupe) {
-            const key = JSON.stringify([event, feature_name, identifier, stringValue]);
+            const key = JSON.stringify([event, feature_name, identifier, stringValue, metadata?.experiment_id ?? null]);
             if (this.dedupeKeys.has(key)) return;
             this.dedupeKeys.add(key);
         }
