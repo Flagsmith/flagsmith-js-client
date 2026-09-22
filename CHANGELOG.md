@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.4.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.3.0...v12.4.0) (2026-09-22)
+
+
+### Features
+
+* experiment metadata on flags, exposure gated on inExperiment ([#420](https://github.com/Flagsmith/flagsmith-js-client/issues/420)) ([530a7cc](https://github.com/Flagsmith/flagsmith-js-client/commit/530a7ccd503e33fe7068d76ce15000a995d56908))
+
+
+### Bug Fixes
+
+* accept IFlagsmithTrait in identify() traits, matching setTraits() ([#421](https://github.com/Flagsmith/flagsmith-js-client/issues/421)) ([42b0bd2](https://github.com/Flagsmith/flagsmith-js-client/commit/42b0bd25955c7df7602966000e2ec13d256234fc))
+
 ## [12.3.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.2.0...v12.3.0) (2026-08-31)
 
 
