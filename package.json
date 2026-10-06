@@ -15,7 +15,7 @@
     "prepublish": "npx in-publish && npm run build || echo",
     "test": "jest --env=jsdom",
     "checknodeversion": "npx ls-engines",
-    "prepare": "husky",
+    "prepare": "husky && npm run prebuild",
     "precommit": "npm run typecheck && npm run prebuild"
   },
   "repository": {
