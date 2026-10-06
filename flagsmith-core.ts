@@ -68,6 +68,10 @@ const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
 const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
 const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
 
+// Flags are stored lower-cased with spaces replaced, so that callers can look a flag
+// up by any casing. The feature's original name is kept on the flag itself as `name`.
+const normalizeFlagKey = (key: string) => key.toLowerCase().replace(/ /g, '_');
+
 const Flagsmith = class {
     _trigger?:(()=>void)|null= null
     _triggerLoadingState?:(()=>void)|null= null
@@ -120,8 +124,9 @@ const Flagsmith = class {
             traits = traits || [];
             features.forEach(feature => {
                 const experiment = feature.metadata?.experiment;
-                flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
+                flags[normalizeFlagKey(feature.feature.name)] = {
                     id: feature.feature.id,
+                    name: feature.feature.name,
                     enabled: feature.enabled,
                     value: feature.feature_state_value,
                     ...(feature.variant ? { variant: feature.variant } : {}),
@@ -694,14 +699,14 @@ const Flagsmith = class {
     }
 
     getValue = (key: string, options?: GetValueOptions, skipAnalytics?: boolean) => {
-        const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
+        const flag = this.flags && this.flags[normalizeFlagKey(key)];
         let res = null;
         if (flag) {
             res = flag.value;
         }
 
         if (!options?.skipAnalytics && !skipAnalytics) {
-            this.evaluateFlag(key, "VALUE");
+            this.evaluateFlag(key, "VALUE", flag);
         }
 
         if (res === null && typeof options?.fallback !== 'undefined') {
@@ -818,7 +823,7 @@ const Flagsmith = class {
     hasFeature = (key: string, options?: HasFeatureOptions) => {
         // Support legacy skipAnalytics boolean parameter
         const usingNewOptions = typeof options === 'object'
-        const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
+        const flag = this.flags && this.flags[normalizeFlagKey(key)];
         let res = false;
         if (!flag && usingNewOptions && typeof options.fallback !== 'undefined') {
             res = options?.fallback
@@ -826,13 +831,13 @@ const Flagsmith = class {
             res = true;
         }
         if ((usingNewOptions && !options.skipAnalytics) || !options) {
-            this.evaluateFlag(key, "ENABLED");
+            this.evaluateFlag(key, "ENABLED", flag);
         }
         if(this.sentryClient) {
           try {
               this.sentryClient.getIntegrationByName(
                   "FeatureFlags",
-              )?.addFeatureFlag?.(key, res);
+              )?.addFeatureFlag?.(flag?.name || normalizeFlagKey(key), res);
           } catch (e) {
               console.error(e)
           }
@@ -947,15 +952,20 @@ const Flagsmith = class {
         }
     }
 
-    private evaluateFlag =(key: string, method: 'VALUE' | 'ENABLED') => {
+    private evaluateFlag =(key: string, method: 'VALUE' | 'ENABLED', flag?: IFlagsmithFeature | null) => {
+        // The API resolves analytics by exact feature name, so always report the
+        // feature's own name rather than whatever casing the caller happened to use.
+        // Without this, getValue('My Flag') and getValue('my_flag') report as two
+        // separate features and neither resolves unless it matches the name exactly.
+        const analyticsKey = flag?.name || normalizeFlagKey(key);
         if (this.datadogRum) {
             if (!this.datadogRum!.client!.addFeatureFlagEvaluation) {
                 console.error('Flagsmith: Your datadog RUM client does not support the function addFeatureFlagEvaluation, please update it.');
             } else {
                 if (method === 'VALUE') {
-                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + key, this.getValue(key, {}, true));
+                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_CONFIG_ANALYTICS_KEY + analyticsKey, this.getValue(key, {}, true));
                 } else {
-                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_FLAG_ANALYTICS_KEY + key, this.hasFeature(key, true));
+                    this.datadogRum!.client!.addFeatureFlagEvaluation(FLAGSMITH_FLAG_ANALYTICS_KEY + analyticsKey, this.hasFeature(key, true));
                 }
             }
         }
@@ -965,10 +975,10 @@ const Flagsmith = class {
             if (!this.evaluationEvent[this.evaluationContext.environment.apiKey]) {
                 this.evaluationEvent[this.evaluationContext.environment.apiKey] = {};
             }
-            if (this.evaluationEvent[this.evaluationContext.environment.apiKey][key] === undefined) {
-                this.evaluationEvent[this.evaluationContext.environment.apiKey][key] = 0;
+            if (this.evaluationEvent[this.evaluationContext.environment.apiKey][analyticsKey] === undefined) {
+                this.evaluationEvent[this.evaluationContext.environment.apiKey][analyticsKey] = 0;
             }
-            this.evaluationEvent[this.evaluationContext.environment.apiKey][key] += 1;
+            this.evaluationEvent[this.evaluationContext.environment.apiKey][analyticsKey] += 1;
         }
 
         this.updateEventStorage();
@@ -1007,8 +1017,11 @@ const Flagsmith = class {
             this.log(`Flagsmith: trackExposureEvent called for "${featureName}" without an identity; call identify() (optionally with transient: true) or pass opts.identifier. No exposure recorded.`);
             return;
         }
+        // As with evaluateFlag, report the feature's own name so that exposures for the
+        // same flag aggregate regardless of the casing the caller used.
+        const key = normalizeFlagKey(featureName);
         this.eventProcessor.trackExposureEvent({
-            featureName,
+            featureName: this.flags?.[key]?.name || key,
             identifier,
             value: opts?.value ?? null,
             traits: resolveTraitValues(opts?.traits ?? this.evaluationContext.identity?.traits),
@@ -1019,7 +1032,7 @@ const Flagsmith = class {
     flushEvents = (): Promise<void> => this.eventProcessor ? this.eventProcessor.flush() : Promise.resolve();
 
     getExperimentFlag = (featureName: string): IFlagsmithFeature | null => {
-        const key = featureName.toLowerCase().replace(/ /g, '_');
+        const key = normalizeFlagKey(featureName);
         const flag = (this.flags && this.flags[key]) || null;
         // When events are disabled this degrades to a plain flag read.
         if (!this.eventProcessor) return flag;
