@@ -1,6 +1,6 @@
 {
-  // Type-checks steps.mts, which runs on Node 24 against the built package in lib/flagsmith.
-  // Run after `npm run bundle`: tsc -p sdk-spec
+  // Type-checks steps.mts against the types npm run bundle builds in lib/flagsmith.
+  // The Docker build runs it; locally: npm run bundle && npx tsc -p sdk-spec
   "compilerOptions": {
     "strict": true,
     "noEmit": true,

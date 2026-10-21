@@ -1,7 +1,7 @@
 /**
  * Steps for the Flagsmith SDK behavioural spec: https://github.com/Flagsmith/sdk-spec
  *
- * Each function implements the step in the comment above it.
+ * Each exported function implements the step in the comment above it.
  */
 
 import { createFlagsmithInstance } from '@flagsmith/flagsmith/isomorphic';
