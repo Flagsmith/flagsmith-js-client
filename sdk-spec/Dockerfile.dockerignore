@@ -1,4 +1,4 @@
-# Used by spec-adapter/Dockerfile only. Keep the build from source: no installed
+# Used by sdk-spec/Dockerfile only. Keep the build from source: no installed
 # dependencies or previous build output from the host.
 node_modules
 lib/**/*.js

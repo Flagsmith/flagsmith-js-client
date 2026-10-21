@@ -11,6 +11,7 @@ permissions:
 jobs:
   sdk-spec:
     # Keep the ref in `uses:` and `spec-ref` in sync.
-    uses: Flagsmith/sdk-spec/.github/workflows/run-spec.yml@v0.1.1
+    uses: Flagsmith/sdk-spec/.github/workflows/run-spec.yml@feat/v0.2.0
     with:
-      spec-ref: v0.1.1
+      spec-ref: feat/v0.2.0
+      language: nodejs
