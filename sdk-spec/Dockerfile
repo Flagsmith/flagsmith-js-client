@@ -8,8 +8,10 @@ COPY patches ./patches
 # Install scripts apply ./patches; husky skips itself without a git checkout.
 RUN npm ci
 COPY . .
-# Pack lib/flagsmith, the package published as @flagsmith/flagsmith.
-RUN npm run prebuild && npm run bundle && npm pack ./lib/flagsmith --ignore-scripts --pack-destination /tmp
+# Type-check the steps file against the built package, then pack lib/flagsmith,
+# the package published as @flagsmith/flagsmith.
+RUN npm run prebuild && npm run bundle && npx tsc -p sdk-spec \
+    && npm pack ./lib/flagsmith --ignore-scripts --pack-destination /tmp
 
 FROM docker.io/library/node:24-slim
 
