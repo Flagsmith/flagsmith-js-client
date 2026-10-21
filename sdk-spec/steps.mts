@@ -19,7 +19,7 @@ function asSpecFlags(flagsmith: IFlagsmith) {
     }));
 }
 
-// Given an SDK client for the environment
+// Create the SDK client
 export function createClient(environmentKey: string, apiUrl: string): Client {
     return {
         flagsmith: createFlagsmithInstance(),
