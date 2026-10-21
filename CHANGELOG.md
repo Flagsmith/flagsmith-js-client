@@ -1,5 +1,13 @@
 # Changelog
 
+## [12.4.1](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.4.0...v12.4.1) (2026-10-21)
+
+
+### CI
+
+* Let Renovate bump the SDK spec ([#432](https://github.com/Flagsmith/flagsmith-js-client/issues/432)) ([c847836](https://github.com/Flagsmith/flagsmith-js-client/commit/c8478361d40c7cd69807a7a9d7709363680549fb))
+* **Spec:** Run the Flagsmith SDK behavioural spec ([#430](https://github.com/Flagsmith/flagsmith-js-client/issues/430)) ([94f5485](https://github.com/Flagsmith/flagsmith-js-client/commit/94f5485261d67652dcdf1cc06312a23e4549be4b))
+
 ## [12.4.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.3.0...v12.4.0) (2026-09-22)
 
 
