@@ -13,5 +13,5 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["lib"]
+  "exclude": ["lib", "sdk-spec"]
 }

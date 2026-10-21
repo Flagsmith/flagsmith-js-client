@@ -1,0 +1,17 @@
+name: SDK spec
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  sdk-spec:
+    # Keep the ref in `uses:` and `spec-ref` in sync.
+    uses: Flagsmith/sdk-spec/.github/workflows/run-spec.yml@v0.3.0
+    with:
+      spec-ref: v0.3.0
+      language: nodejs

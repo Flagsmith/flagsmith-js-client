@@ -1,0 +1,19 @@
+{
+  // Type-checks steps.mts against the types npm run bundle builds in lib/flagsmith.
+  // The Docker build runs it; locally: npm run bundle && npx tsc -p sdk-spec
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "lib": ["es2022", "dom"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "baseUrl": ".",
+    "paths": {
+      "@flagsmith/flagsmith/isomorphic": ["../lib/flagsmith/isomorphic.d.ts"],
+      "@flagsmith/flagsmith/types": ["../lib/flagsmith/types.d.ts"]
+    }
+  },
+  "files": ["steps.mts"]
+}
