@@ -1,0 +1,28 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended", ":semanticCommitScopeDisabled"],
+    "ignorePresets": [":semanticPrefixFixDepsChoreOthers"],
+    "semanticCommitType": "deps",
+    "customManagers": [
+        {
+            "customType": "regex",
+            "managerFilePatterns": ["/^\\.github/workflows/sdk-spec\\.yml$/"],
+            "matchStrings": ["spec-ref: (?<currentValue>v[\\d.]+)"],
+            "depNameTemplate": "Flagsmith/sdk-spec",
+            "datasourceTemplate": "github-tags"
+        }
+    ],
+    "packageRules": [
+        {
+            "description": "Dependabot handles dependency updates here; Renovate only bumps the SDK spec.",
+            "matchPackageNames": ["*"],
+            "enabled": false
+        },
+        {
+            "matchPackageNames": ["Flagsmith/sdk-spec"],
+            "groupName": "SDK spec",
+            "enabled": true,
+            "addLabels": ["sdk-spec"]
+        }
+    ]
+}
