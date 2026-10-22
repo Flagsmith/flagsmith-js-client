@@ -68,6 +68,8 @@ const FLAGSMITH_CONFIG_ANALYTICS_KEY = "flagsmith_value_";
 const FLAGSMITH_FLAG_ANALYTICS_KEY = "flagsmith_enabled_";
 const FLAGSMITH_TRAIT_ANALYTICS_KEY = "flagsmith_trait_";
 
+const normalizeFlagKey = (key: string) => key.toLowerCase().replace(/ /g, '_');
+
 const Flagsmith = class {
     _trigger?:(()=>void)|null= null
     _triggerLoadingState?:(()=>void)|null= null
@@ -120,8 +122,9 @@ const Flagsmith = class {
             traits = traits || [];
             features.forEach(feature => {
                 const experiment = feature.metadata?.experiment;
-                flags[feature.feature.name.toLowerCase().replace(/ /g, '_')] = {
+                flags[normalizeFlagKey(feature.feature.name)] = {
                     id: feature.feature.id,
+                    name: feature.feature.name,
                     enabled: feature.enabled,
                     value: feature.feature_state_value,
                     ...(feature.variant ? { variant: feature.variant } : {}),
@@ -694,7 +697,7 @@ const Flagsmith = class {
     }
 
     getValue = (key: string, options?: GetValueOptions, skipAnalytics?: boolean) => {
-        const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
+        const flag = this.flags && this.flags[normalizeFlagKey(key)];
         let res = null;
         if (flag) {
             res = flag.value;
@@ -818,7 +821,7 @@ const Flagsmith = class {
     hasFeature = (key: string, options?: HasFeatureOptions) => {
         // Support legacy skipAnalytics boolean parameter
         const usingNewOptions = typeof options === 'object'
-        const flag = this.flags && this.flags[key.toLowerCase().replace(/ /g, '_')];
+        const flag = this.flags && this.flags[normalizeFlagKey(key)];
         let res = false;
         if (!flag && usingNewOptions && typeof options.fallback !== 'undefined') {
             res = options?.fallback
@@ -1019,7 +1022,7 @@ const Flagsmith = class {
     flushEvents = (): Promise<void> => this.eventProcessor ? this.eventProcessor.flush() : Promise.resolve();
 
     getExperimentFlag = (featureName: string): IFlagsmithFeature | null => {
-        const key = featureName.toLowerCase().replace(/ /g, '_');
+        const key = normalizeFlagKey(featureName);
         const flag = (this.flags && this.flags[key]) || null;
         // When events are disabled this degrades to a plain flag read.
         if (!this.eventProcessor) return flag;
