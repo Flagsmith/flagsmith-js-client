@@ -5,7 +5,7 @@
  */
 
 import { createFlagsmithInstance } from '@flagsmith/flagsmith/isomorphic';
-import type { IFlagsmith, IInitConfig, ITraits } from '@flagsmith/flagsmith/types';
+import type { IFlagsmith, IFlagsmithValue, IInitConfig, ITraits } from '@flagsmith/flagsmith/types';
 
 // A client-side SDK holds one identity's flags: it loads them in init(), then reloads them
 // as the identity changes. The client remembers whether init() has run.
@@ -39,6 +39,13 @@ export function createClient(environmentKey: string, apiUrl: string): Client {
     };
 }
 
+// Create the SDK client with events enabled
+export function createClientWithEvents(environmentKey: string, apiUrl: string, eventsApiUrl: string): Client {
+    const client = createClient(environmentKey, apiUrl);
+    client.config = { ...client.config, enableEvents: true, eventProcessorConfig: { eventsApiUrl } };
+    return client;
+}
+
 // When the application gets the environment flags
 export function getEnvironmentFlags(client: Client) {
     const { flagsmith } = client;
@@ -48,6 +55,14 @@ export function getEnvironmentFlags(client: Client) {
     );
 }
 
+// Runs init() on the client's first use, for steps that only need it running.
+async function ensureInitialised(client: Client) {
+    if (!client.initialised) {
+        await client.flagsmith.init(client.config);
+        client.initialised = true;
+    }
+}
+
 // When the application gets the flags for identity "{identifier}" with traits:
 export function getIdentityFlags(client: Client, identifier: string, traits: ITraits) {
     const config = {
@@ -55,4 +70,35 @@ export function getIdentityFlags(client: Client, identifier: string, traits: ITr
         evaluationContext: { ...client.config.evaluationContext, identity: { identifier, traits } },
     };
     return load(client, config, () => client.flagsmith.identify(identifier, traits));
+}
+
+// When the application gets the experiment flag "{feature}" for identity "{identifier}" with traits:
+export async function getExperimentFlag(client: Client, feature: string, identifier: string, traits: ITraits) {
+    await getIdentityFlags(client, identifier, traits);
+    const flag = client.flagsmith.getExperimentFlag(feature);
+    return flag ? [{ feature, enabled: flag.enabled, value: flag.value }] : [];
+}
+
+// When the application tracks event "{event}" for identity "{identifier}" with value {value} and metadata:
+export async function trackEvent(
+    client: Client,
+    event: string,
+    identifier: string,
+    value: IFlagsmithValue,
+    metadata: Record<string, unknown>,
+) {
+    await ensureInitialised(client);
+    client.flagsmith.trackEvent(event, { identifier, value, metadata });
+}
+
+// When the application tracks an exposure of feature "{feature}" for identity "{identifier}" with value {value} and metadata:
+export async function trackExposureEvent(
+    client: Client,
+    feature: string,
+    identifier: string,
+    value: IFlagsmithValue,
+    metadata: Record<string, unknown>,
+) {
+    await ensureInitialised(client);
+    client.flagsmith.trackExposureEvent(feature, { identifier, value, metadata });
 }
