@@ -1,5 +1,6 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "gitIgnoredAuthors": ["216534828+flagsmith-engineering[bot]@users.noreply.github.com"],
     "extends": ["config:recommended", ":semanticCommitScopeDisabled"],
     "ignorePresets": [":semanticPrefixFixDepsChoreOthers"],
     "semanticCommitType": "deps",
