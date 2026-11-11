@@ -353,6 +353,13 @@ T extends string = string
      */
     flushEvents: () => Promise<void>;
     /**
+     * Stop the client: polling and realtime updates stop, and buffered events are sent,
+     * retries included. Resolves once they are sent, or after `timeoutMs`, whichever comes
+     * first; events still unsent then are dropped. Never rejects.
+     * @experimental @internal
+     */
+    close: (timeoutMs: number) => Promise<void>;
+    /**
      * Whether the events pipeline is enabled (enableEvents: true was passed
      * to init). Used by the React useExperiment hook to skip exposure
      * recording when events are off.

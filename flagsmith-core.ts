@@ -1018,6 +1018,15 @@ const Flagsmith = class {
 
     flushEvents = (): Promise<void> => this.eventProcessor ? this.eventProcessor.flush() : Promise.resolve();
 
+    close = async (timeoutMs: number): Promise<void> => {
+        this.stopListening();
+        this.eventSource?.close();
+        this.eventSource = null;
+        const eventProcessor = this.eventProcessor;
+        this.eventProcessor = null;
+        await eventProcessor?.close(timeoutMs);
+    };
+
     getExperimentFlag = (featureName: string): IFlagsmithFeature | null => {
         const key = featureName.toLowerCase().replace(/ /g, '_');
         const flag = (this.flags && this.flags[key]) || null;
