@@ -14,4 +14,5 @@ jobs:
     uses: Flagsmith/sdk-spec/.github/workflows/run-spec.yml@v0.9.0
     with:
       spec-ref: v0.9.0
+      tags: core events
       language: nodejs
