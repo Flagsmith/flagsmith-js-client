@@ -170,30 +170,251 @@ describe('EventProcessor lifecycle and retry', () => {
         await Promise.resolve();
         expect(mockFetch).toHaveBeenCalledTimes(1);
     });
+});
 
-    test('retries once then drops; buffer stays untouched by a failing batch', async () => {
-        const mockFetch = jest.fn(async () => ({ status: 500, text: async () => 'err' }));
-        const processor = new EventProcessor({
-            environmentKey: 'env_key_1',
-            fetch: mockFetch as any,
-            flushInterval: 60000,
-            retryBackoffMs: 0,
-        });
-        processor.trackEvent({ event: 'a', identifier: null, value: null, traits: null, metadata: null });
+function respondWith(...responses: (number | Error)[]) {
+    return jest.fn(async () => {
+        const response = responses.shift() ?? 202;
+        if (response instanceof Error) throw response;
+        return { status: response, text: async () => '' };
+    });
+}
+
+function sentEvents(mockFetch: jest.Mock) {
+    return mockFetch.mock.calls.map((call) => JSON.parse(call[1].body).events.map((e: any) => e.event));
+}
+
+function track(processor: EventProcessor, event: string) {
+    processor.trackEvent({ event, identifier: 'user_123', value: null, traits: null, metadata: null });
+}
+
+describe('EventProcessor delivery', () => {
+    test('a batch is retried until the events API accepts it', async () => {
+        // Given
+        const mockFetch = respondWith(503, new Error('ECONNRESET'), 202);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0 });
+        track(processor, 'checkout');
+
+        // When
         await processor.flush();
 
-        // 1 initial + 1 retry = 2 attempts, then dropped
-        expect(mockFetch).toHaveBeenCalledTimes(2);
-        // buffer was drained on flush and a failed batch never re-enters it
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['checkout'], ['checkout'], ['checkout']]);
         // @ts-ignore test access
         expect(processor.buffer).toHaveLength(0);
+    });
 
-        // processor keeps working: a new event buffers and flushes normally
-        const okFetch = jest.fn(async () => ({ status: 202, text: async () => '' }));
-        // @ts-ignore swap fetch for the recovery assertion
-        processor.fetch = okFetch;
-        processor.trackEvent({ event: 'b', identifier: null, value: null, traits: null, metadata: null });
+    test('retries back off with full jitter, doubling from the initial backoff', async () => {
+        // Given
+        const mockFetch = respondWith(503, 503, 202);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 10 });
+        const random = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+        const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+        track(processor, 'checkout');
+
+        // When
         await processor.flush();
-        expect(okFetch).toHaveBeenCalledTimes(1);
+
+        // Then
+        const waits = setTimeoutSpy.mock.calls.map(([, ms]) => ms).filter((ms) => ms !== 3000);
+        expect(waits).toEqual([5, 10]);
+        random.mockRestore();
+        setTimeoutSpy.mockRestore();
+    });
+
+    test('a request the events API does not answer is given up on and retried', async () => {
+        // Given
+        const signals: AbortSignal[] = [];
+        const mockFetch = jest.fn((_url: string, init: any) => {
+            signals.push(init.signal);
+            if (signals.length > 1) return Promise.resolve({ status: 202 });
+            return new Promise(() => {});
+        });
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0, requestTimeoutMs: 20 });
+        track(processor, 'checkout');
+
+        // When
+        await processor.flush();
+
+        // Then
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(signals[0].aborted).toBe(true);
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(0);
+    });
+
+    test('a batch that keeps failing is sent with the next flush, ahead of events tracked since', async () => {
+        // Given
+        const mockFetch = respondWith(503, 503, 503);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0 });
+        track(processor, 'add_to_cart');
+        await processor.flush();
+        track(processor, 'checkout');
+
+        // When
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([
+            ['add_to_cart'],
+            ['add_to_cart'],
+            ['add_to_cart'],
+            ['add_to_cart', 'checkout'],
+        ]);
+    });
+
+    test('a full buffer drops its oldest event', async () => {
+        // Given
+        const mockFetch = respondWith(503, 503, 503);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0, maxBuffer: 2 });
+        track(processor, 'event_1');
+        await processor.flush();
+        track(processor, 'event_2');
+        track(processor, 'event_3');
+
+        // When
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['event_1'], ['event_1'], ['event_1'], ['event_2', 'event_3']]);
+    });
+
+    test('a batch the events API rejects is dropped without retrying', async () => {
+        // Given
+        const mockFetch = respondWith(400);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0 });
+        track(processor, 'add_to_cart');
+        await processor.flush();
+        track(processor, 'checkout');
+
+        // When
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['add_to_cart'], ['checkout']]);
+    });
+
+    test('a batch whose last attempt gets a server error is dropped', async () => {
+        // Given
+        const mockFetch = respondWith(503, 503, 500);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0 });
+        track(processor, 'add_to_cart');
+        await processor.flush();
+        track(processor, 'checkout');
+
+        // When
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['add_to_cart'], ['add_to_cart'], ['add_to_cart'], ['checkout']]);
+    });
+
+    test('a batch whose last attempt fails otherwise is kept, after server errors', async () => {
+        // Given
+        const mockFetch = respondWith(500, 500, 503);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0 });
+        track(processor, 'add_to_cart');
+        await processor.flush();
+        track(processor, 'checkout');
+
+        // When
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([
+            ['add_to_cart'],
+            ['add_to_cart'],
+            ['add_to_cart'],
+            ['add_to_cart', 'checkout'],
+        ]);
+    });
+
+    test.each([401, 403])('an events API refusing the environment key with %i stops event tracking', async (status) => {
+        // Given
+        const mockFetch = respondWith(status);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0 });
+        track(processor, 'add_to_cart');
+        await processor.flush();
+        track(processor, 'checkout');
+
+        // When
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['add_to_cart']]);
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(0);
+    });
+
+    test('a flush waits for the batch in flight, sending one batch at a time', async () => {
+        // Given
+        let inFlight = 0;
+        let mostInFlight = 0;
+        const mockFetch = jest.fn(async () => {
+            mostInFlight = Math.max(mostInFlight, ++inFlight);
+            await new Promise((resolve) => setTimeout(resolve, 10));
+            inFlight--;
+            return { status: 202 };
+        });
+        const { processor } = makeProcessor({ fetch: mockFetch });
+        track(processor, 'add_to_cart');
+        const first = processor.flush();
+        track(processor, 'checkout');
+
+        // When
+        await Promise.all([first, processor.flush()]);
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['add_to_cart'], ['checkout']]);
+        expect(mostInFlight).toBe(1);
+    });
+});
+
+describe('EventProcessor close', () => {
+    test('closing sends the buffered events, retries included', async () => {
+        // Given
+        const mockFetch = respondWith(503);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0 });
+        track(processor, 'checkout');
+
+        // When
+        await processor.close(5000);
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['checkout'], ['checkout']]);
+    });
+
+    test('closing returns within its timeout when the events API does not answer', async () => {
+        // Given
+        const signals: AbortSignal[] = [];
+        const mockFetch = jest.fn((_url: string, init: any) => {
+            signals.push(init.signal);
+            return new Promise(() => {});
+        });
+        const { processor } = makeProcessor({ fetch: mockFetch, requestTimeoutMs: 60000 });
+        track(processor, 'checkout');
+        const started = Date.now();
+
+        // When
+        await processor.close(50);
+
+        // Then
+        expect(Date.now() - started).toBeLessThan(1000);
+        expect(signals[0].aborted).toBe(true);
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(0);
+    });
+
+    test('a closed processor tracks no more events', async () => {
+        // Given
+        const { processor, mockFetch } = makeProcessor();
+        await processor.close(1000);
+
+        // When
+        track(processor, 'checkout');
+        await processor.flush();
+
+        // Then
+        expect(mockFetch).not.toHaveBeenCalled();
     });
 });
