@@ -102,3 +102,23 @@ export async function trackExposureEvent(
     await ensureInitialised(client);
     client.flagsmith.trackExposureEvent(feature, { identifier, value, metadata });
 }
+
+// When the application tracks events "event_{first}" to "event_{last}" for identity "{identifier}"
+export async function trackEvents(client: Client, first: number, last: number, identifier: string) {
+    await ensureInitialised(client);
+    for (let number = first; number <= last; number++) {
+        client.flagsmith.trackEvent(`event_${number}`, { identifier });
+    }
+}
+
+// When the application flushes events
+export async function flushEvents(client: Client) {
+    await ensureInitialised(client);
+    await client.flagsmith.flushEvents();
+}
+
+// When the application closes the client with a timeout of {timeout} seconds
+export async function close(client: Client, timeout: number) {
+    await ensureInitialised(client);
+    await client.flagsmith.close(timeout * 1000);
+}

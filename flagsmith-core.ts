@@ -304,6 +304,7 @@ const Flagsmith = class {
     withTraits?: ITraits|null= null
     cacheOptions = {ttl:0, skipAPI: false, loadStale: false, storageKey: undefined as string|undefined}
     private eventProcessor: EventProcessor | null = null
+    private closed = false
     /**
      * @experimental @internal Whether the events pipeline is enabled
      * (enableEvents: true was passed to init).
@@ -359,8 +360,9 @@ const Flagsmith = class {
             this.evaluationContext = evaluationContext;
             this.api = ensureTrailingSlash(api);
             this.headers = headers;
-            this.getFlagInterval = null;
+            if (this.analyticsInterval) clearInterval(this.analyticsInterval);
             this.analyticsInterval = null;
+            this.closed = false;
             this.onChange = onChange;
             const WRONG_FLAGSMITH_CONFIG = 'Wrong Flagsmith Configuration: preventFetch is true and no defaulFlags provided'
             this._trigger = _trigger || this._trigger;
@@ -439,6 +441,8 @@ const Flagsmith = class {
                         } catch (e) {
                             this.evaluationEvent = {};
                         }
+                        if (this.closed) return;
+                        if (this.analyticsInterval) clearInterval(this.analyticsInterval);
                         this.analyticsInterval = setInterval(this.analyticsFlags, this.ticks!);
                     })
             }
@@ -1017,6 +1021,20 @@ const Flagsmith = class {
     };
 
     flushEvents = (): Promise<void> => this.eventProcessor ? this.eventProcessor.flush() : Promise.resolve();
+
+    close = async (timeoutMs: number): Promise<void> => {
+        this.closed = true;
+        this.stopListening();
+        if (this.analyticsInterval) {
+            clearInterval(this.analyticsInterval);
+            this.analyticsInterval = null;
+        }
+        this.eventSource?.close();
+        this.eventSource = null;
+        const eventProcessor = this.eventProcessor;
+        this.eventProcessor = null;
+        await eventProcessor?.close(timeoutMs);
+    };
 
     getExperimentFlag = (featureName: string): IFlagsmithFeature | null => {
         const key = featureName.toLowerCase().replace(/ /g, '_');

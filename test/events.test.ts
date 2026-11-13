@@ -232,3 +232,73 @@ describe('eventsEnabled', () => {
         expect(flagsmith.eventsEnabled).toBe(true);
     });
 });
+
+describe('close', () => {
+    test('sends the buffered events, then tracks no more', async () => {
+        // Given
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith(eventsConfig({ identity: testIdentity }));
+        await flagsmith.init(initConfig);
+        flagsmith.trackEvent('purchase');
+
+        // When
+        await flagsmith.close(1000);
+        flagsmith.trackEvent('refund');
+        await flagsmith.flushEvents();
+
+        // Then
+        const calls = eventCalls(mockFetch);
+        expect(calls).toHaveLength(1);
+        expect(JSON.parse(calls[0][1].body).events.map((e: any) => e.event)).toEqual(['purchase']);
+    });
+
+    test('stops sending evaluation analytics', async () => {
+        // Given
+        jest.useFakeTimers();
+        try {
+            const { flagsmith, initConfig, mockFetch } = getFlagsmith({ enableAnalytics: true });
+            await flagsmith.init(initConfig);
+            flagsmith.hasFeature('font_size');
+
+            // When
+            await flagsmith.close(1000);
+            jest.advanceTimersByTime(60000);
+
+            // Then
+            expect(mockFetch.mock.calls.filter(([url]) => String(url).includes('analytics/flags'))).toHaveLength(0);
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test('stops sending evaluation analytics after the client was initialised again', async () => {
+        // Given
+        jest.useFakeTimers();
+        try {
+            const { flagsmith, initConfig, mockFetch } = getFlagsmith({ enableAnalytics: true });
+            await flagsmith.init(initConfig);
+            await flagsmith.init(initConfig);
+            flagsmith.hasFeature('font_size');
+
+            // When
+            await flagsmith.close(1000);
+            jest.advanceTimersByTime(60000);
+
+            // Then
+            expect(mockFetch.mock.calls.filter(([url]) => String(url).includes('analytics/flags'))).toHaveLength(0);
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test('resolves when events are not enabled', async () => {
+        // Given
+        const { flagsmith, initConfig, mockFetch } = getFlagsmith();
+        await flagsmith.init(initConfig);
+
+        // When
+        await flagsmith.close(1000);
+
+        // Then
+        expect(eventCalls(mockFetch)).toHaveLength(0);
+    });
+});
