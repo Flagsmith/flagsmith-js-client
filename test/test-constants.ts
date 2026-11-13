@@ -14,13 +14,14 @@ export const defaultState = {
     flags: {
         hero: {
             id: 1804,
+            name: 'hero',
             enabled: true,
             value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg',
         },
-        font_size: { id: 6149, enabled: true, value: 16 },
-        json_value: { id: 80317, enabled: true, value: '{"title":"Hello World"}' },
-        number_value: { id: 80318, enabled: true, value: 1 },
-        off_value: { id: 80319, enabled: false, value: null },
+        font_size: { id: 6149, name: 'font_size', enabled: true, value: 16 },
+        json_value: { id: 80317, name: 'json_value', enabled: true, value: '{"title":"Hello World"}' },
+        number_value: { id: 80318, name: 'number_value', enabled: true, value: 1 },
+        off_value: { id: 80319, name: 'off_value', enabled: false, value: null },
     },
 };
 
@@ -42,13 +43,14 @@ export const identityState = {
     flags: {
         hero: {
             id: 1804,
+            name: 'hero',
             enabled: true,
             value: 'https://s3-us-west-2.amazonaws.com/com.uppercut.hero-images/assets/0466/comps/466_03314.jpg'
         },
-        font_size: { id: 6149, enabled: true, value: 16 },
-        json_value: { id: 80317, enabled: true, value: '{"title":"Hello World"}' },
-        number_value: { id: 80318, enabled: true, value: 1 },
-        off_value: { id: 80319, enabled: false, value: null },
+        font_size: { id: 6149, name: 'font_size', enabled: true, value: 16 },
+        json_value: { id: 80317, name: 'json_value', enabled: true, value: '{"title":"Hello World"}' },
+        number_value: { id: 80318, name: 'number_value', enabled: true, value: 1 },
+        off_value: { id: 80319, name: 'off_value', enabled: false, value: null },
     },
 };
 export const defaultStateAlt = {

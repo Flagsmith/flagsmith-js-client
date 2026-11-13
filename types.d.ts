@@ -20,6 +20,21 @@ export interface IFlagsmithExperiment {
 
 export interface IFlagsmithFeature<Value = IFlagsmithValue> {
     id?: number;
+    /**
+     * The feature name exactly as it is defined in Flagsmith, preserving its original
+     * casing. Flag keys in {@link IFlags} are lower-cased, so use this to rebuild a map
+     * keyed by the real feature names:
+     *
+     * ```ts
+     * const flagsByName = Object.fromEntries(
+     *     Object.entries(flagsmith.getAllFlags()).map(([key, flag]) => [flag.name ?? key, flag])
+     * );
+     * ```
+     *
+     * Absent on flags supplied via `defaultFlags` and on flags restored from a cache
+     * written by an older version of this SDK, hence the `?? key` fallback.
+     */
+    name?: string;
     enabled: boolean;
     value: Value;
     variant?: string;
