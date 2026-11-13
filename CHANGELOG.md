@@ -1,5 +1,28 @@
 # Changelog
 
+## [12.5.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.4.0...v12.5.0) (2026-11-13)
+
+
+### Features
+
+* Retry event delivery and flush on close ([#440](https://github.com/Flagsmith/flagsmith-js-client/issues/440)) ([2db272b](https://github.com/Flagsmith/flagsmith-js-client/commit/2db272b25c6b6ed554e4276f1560a6d5b609b989))
+
+
+### CI
+
+* Let Renovate bump the SDK spec ([#432](https://github.com/Flagsmith/flagsmith-js-client/issues/432)) ([c847836](https://github.com/Flagsmith/flagsmith-js-client/commit/c8478361d40c7cd69807a7a9d7709363680549fb))
+* **Spec:** Run the Flagsmith SDK behavioural spec ([#430](https://github.com/Flagsmith/flagsmith-js-client/issues/430)) ([94f5485](https://github.com/Flagsmith/flagsmith-js-client/commit/94f5485261d67652dcdf1cc06312a23e4549be4b))
+
+
+### Dependency Updates
+
+* update dependency flagsmith/sdk-spec to v0.6.0 ([#434](https://github.com/Flagsmith/flagsmith-js-client/issues/434)) ([8ca8263](https://github.com/Flagsmith/flagsmith-js-client/commit/8ca8263a79bdffc2918f26ab805ec88f3902860e))
+
+
+### Other
+
+* Let Renovate keep updating spec bumps the webhook handler commits to ([#438](https://github.com/Flagsmith/flagsmith-js-client/issues/438)) ([1191047](https://github.com/Flagsmith/flagsmith-js-client/commit/1191047d48c17c217173a38e54fd5fdb2d158add))
+
 ## [12.4.0](https://github.com/Flagsmith/flagsmith-js-client/compare/v12.3.0...v12.4.0) (2026-09-22)
 
 
