@@ -82,7 +82,7 @@ export class EventProcessor {
         this.environmentKey = opts.environmentKey;
         this.fetch = opts.fetch;
         this.log = opts.log || (() => {});
-        this.maxBuffer = opts.maxBuffer ?? DEFAULT_MAX_BUFFER;
+        this.maxBuffer = Math.max(1, opts.maxBuffer ?? DEFAULT_MAX_BUFFER);
         this.flushInterval = opts.flushInterval ?? DEFAULT_FLUSH_INTERVAL;
         this.retryBackoffMs = opts.retryBackoffMs ?? DEFAULT_RETRY_BACKOFF_MS;
         this.requestTimeoutMs = opts.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
@@ -106,22 +106,36 @@ export class EventProcessor {
         dedupe: boolean,
     ) {
         if (this.disabled || this.closed) return;
-        const stringValue = value != null ? String(value) : null;
-        if (dedupe) {
-            const key = JSON.stringify([event, feature_name, identifier, stringValue, metadata?.experiment_id ?? null]);
-            if (this.dedupeKeys.has(key)) return;
-            this.dedupeKeys.add(key);
-        }
-        this.buffer.push({
+        const entry: IEvent = {
             event,
             feature_name,
             identifier,
-            value: stringValue,
+            value: value != null ? String(value) : null,
             traits,
             metadata: { ...(metadata || {}), sdk_version: SDK_VERSION },
             timestamp: Date.now(),
-        });
+        };
+        try {
+            JSON.stringify(entry);
+        } catch (err) {
+            this.log(`Events: dropped event "${event}", which cannot be serialised to JSON`, err);
+            return;
+        }
+        if (dedupe) {
+            const key = this.dedupeKey(entry);
+            if (this.dedupeKeys.has(key)) return;
+            this.dedupeKeys.add(key);
+        }
+        this.buffer.push(entry);
         this.dropOverflow();
+        this.flushIfFull();
+    }
+
+    private dedupeKey(entry: IEvent) {
+        return JSON.stringify([entry.event, entry.feature_name, entry.identifier, entry.value, entry.metadata?.experiment_id ?? null]);
+    }
+
+    private flushIfFull() {
         if (this.buffer.length >= this.maxBuffer && !this.held && !this.sending) {
             this.flush();
         }
@@ -140,8 +154,10 @@ export class EventProcessor {
         const events = this.buffer;
         this.buffer = [];
         this.dedupeKeys.clear();
-        this.sending = this.send(events).finally(() => {
+        this.sending = this.send(events).then((kept) => {
             this.sending = null;
+            if (!kept) this.flushIfFull();
+            return kept;
         });
         await this.sending;
     };
@@ -196,7 +212,9 @@ export class EventProcessor {
     private dropOverflow() {
         const overflow = this.buffer.length - this.maxBuffer;
         if (overflow > 0) {
-            this.buffer.splice(0, overflow);
+            for (const evicted of this.buffer.splice(0, overflow)) {
+                if (evicted.event === FLAG_EXPOSURE_EVENT) this.dedupeKeys.delete(this.dedupeKey(evicted));
+            }
             this.log(`Events: buffer full, dropped the ${overflow} oldest events`);
         }
     }
@@ -210,7 +228,13 @@ export class EventProcessor {
 
     // Resolves to whether the batch was kept for the next flush.
     private send = async (events: IEvent[]): Promise<boolean> => {
-        const body = JSON.stringify({ events });
+        let body: string;
+        try {
+            body = JSON.stringify({ events });
+        } catch (err) {
+            this.log(`Events: dropped ${events.length} events, which cannot be serialised to JSON`, err);
+            return false;
+        }
         let outcome: SendOutcome;
         for (let attempt = 1; ; attempt++) {
             outcome = await this.attempt(body);
@@ -231,7 +255,7 @@ export class EventProcessor {
                 if (!this.closed && !this.disabled) {
                     this.buffer = events.concat(this.buffer);
                     this.dropOverflow();
-                    this.held = true;
+                    this.held = this.timer !== null; // without a timer, only the size trigger sends it again
                     this.log(`Events: flush failed, kept ${events.length} events for the next flush`);
                     return true;
                 }

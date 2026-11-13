@@ -228,7 +228,7 @@ describe('EventProcessor delivery', () => {
         const mockFetch = jest.fn((_url: string, init: any) => {
             signals.push(init.signal);
             if (signals.length > 1) return Promise.resolve({ status: 202 });
-            return new Promise(() => {});
+            return new Promise(() => undefined);
         });
         const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0, requestTimeoutMs: 20 });
         track(processor, 'checkout');
@@ -267,6 +267,7 @@ describe('EventProcessor delivery', () => {
         // Given
         const mockFetch = respondWith(503, 503, 503);
         const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0, maxBuffer: 2 });
+        processor.start();
         track(processor, 'event_1');
         await processor.flush();
         track(processor, 'event_2');
@@ -277,6 +278,117 @@ describe('EventProcessor delivery', () => {
 
         // Then
         expect(sentEvents(mockFetch)).toEqual([['event_1'], ['event_1'], ['event_1'], ['event_2', 'event_3']]);
+        processor.stop();
+    });
+
+    test('a buffer of size 0 sends each event as soon as it is tracked', async () => {
+        // Given
+        const mockFetch = respondWith();
+        const { processor } = makeProcessor({ fetch: mockFetch, maxBuffer: 0 });
+
+        // When
+        track(processor, 'checkout');
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['checkout']]);
+    });
+
+    test('without a flush interval, a full buffer sends a batch kept during an outage', async () => {
+        // Given
+        const mockFetch = respondWith(503, 503, 503);
+        const { processor } = makeProcessor({ fetch: mockFetch, retryBackoffMs: 0, maxBuffer: 2, flushInterval: 0 });
+        processor.start();
+        track(processor, 'event_1');
+        track(processor, 'event_2');
+        await processor.flush();
+
+        // When
+        track(processor, 'event_3');
+        await new Promise((resolve) => setTimeout(resolve, 10));
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([
+            ['event_1', 'event_2'],
+            ['event_1', 'event_2'],
+            ['event_1', 'event_2'],
+            ['event_2', 'event_3'],
+        ]);
+    });
+
+    test('a buffer filled while a batch is in flight is sent once that batch is delivered', async () => {
+        // Given
+        let answer: () => void = () => undefined;
+        const mockFetch = jest.fn()
+            .mockImplementationOnce(() => new Promise((resolve) => { answer = () => resolve({ status: 202 }); }))
+            .mockResolvedValue({ status: 202 });
+        const { processor } = makeProcessor({ fetch: mockFetch, maxBuffer: 2 });
+        track(processor, 'event_1');
+        track(processor, 'event_2');
+        track(processor, 'event_3');
+        track(processor, 'event_4');
+
+        // When
+        answer();
+        await new Promise((resolve) => setTimeout(resolve, 10));
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['event_1', 'event_2'], ['event_3', 'event_4']]);
+    });
+
+    test('an exposure evicted from a full buffer can be tracked again', async () => {
+        // Given
+        const { processor } = makeProcessor({ fetch: respondWith(503, 503, 503), retryBackoffMs: 0, maxBuffer: 2 });
+        processor.start();
+        const exposure = { featureName: 'banner', identifier: 'user_123', value: 'treatment', traits: null, metadata: null };
+        track(processor, 'add_to_cart');
+        await processor.flush();
+        processor.trackExposureEvent(exposure);
+        track(processor, 'checkout');
+        track(processor, 'refund');
+
+        // When
+        processor.trackExposureEvent(exposure);
+
+        // Then
+        // @ts-ignore test access
+        expect(processor.buffer.map((e) => e.event)).toEqual(['refund', FLAG_EXPOSURE_EVENT]);
+        processor.stop();
+    });
+
+    test('an event that cannot be serialised is dropped when tracked', async () => {
+        // Given
+        const mockFetch = respondWith();
+        const { processor } = makeProcessor({ fetch: mockFetch });
+        const circular: Record<string, unknown> = {};
+        circular.self = circular;
+
+        // When
+        processor.trackEvent({ event: 'bad', identifier: 'user_123', value: null, traits: null, metadata: circular });
+        track(processor, 'checkout');
+        await processor.flush();
+
+        // Then
+        expect(sentEvents(mockFetch)).toEqual([['checkout']]);
+    });
+
+    test('a batch that cannot be serialised is dropped without failing flush or close', async () => {
+        // Given
+        const mockFetch = respondWith();
+        const { processor } = makeProcessor({ fetch: mockFetch });
+        const metadata: Record<string, unknown> = {};
+        processor.trackEvent({ event: 'bad', identifier: 'user_123', value: null, traits: null, metadata: { nested: metadata } });
+        metadata.self = metadata;
+
+        // When
+        const flushed = processor.flush();
+        track(processor, 'checkout');
+        const closed = processor.close(1000);
+
+        // Then
+        await expect(flushed).resolves.toBeUndefined();
+        await expect(closed).resolves.toBeUndefined();
+        expect(sentEvents(mockFetch)).toEqual([['checkout']]);
     });
 
     test('a batch the events API rejects is dropped without retrying', async () => {
@@ -389,7 +501,7 @@ describe('EventProcessor close', () => {
         const signals: AbortSignal[] = [];
         const mockFetch = jest.fn((_url: string, init: any) => {
             signals.push(init.signal);
-            return new Promise(() => {});
+            return new Promise(() => undefined);
         });
         const { processor } = makeProcessor({ fetch: mockFetch, requestTimeoutMs: 60000 });
         track(processor, 'checkout');
