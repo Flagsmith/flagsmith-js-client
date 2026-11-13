@@ -360,7 +360,7 @@ const Flagsmith = class {
             this.evaluationContext = evaluationContext;
             this.api = ensureTrailingSlash(api);
             this.headers = headers;
-            this.getFlagInterval = null;
+            if (this.analyticsInterval) clearInterval(this.analyticsInterval);
             this.analyticsInterval = null;
             this.closed = false;
             this.onChange = onChange;

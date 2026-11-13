@@ -356,6 +356,26 @@ describe('EventProcessor delivery', () => {
         processor.stop();
     });
 
+    test('an exposure tracked again while its first copy is in flight stays deduplicated after that copy is evicted', async () => {
+        // Given
+        const { processor } = makeProcessor({ fetch: respondWith(503, 503, 503), retryBackoffMs: 0, maxBuffer: 2 });
+        processor.start();
+        const exposure = { featureName: 'banner', identifier: 'user_123', value: 'treatment', traits: null, metadata: null };
+        processor.trackExposureEvent(exposure);
+        const failing = processor.flush();
+        processor.trackExposureEvent(exposure);
+        await failing;
+        track(processor, 'checkout');
+
+        // When
+        processor.trackExposureEvent(exposure);
+
+        // Then
+        // @ts-ignore test access
+        expect(processor.buffer.map((e) => e.event)).toEqual([FLAG_EXPOSURE_EVENT, 'checkout']);
+        processor.stop();
+    });
+
     test('an event that cannot be serialised is dropped when tracked', async () => {
         // Given
         const mockFetch = respondWith();

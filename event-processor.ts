@@ -67,7 +67,7 @@ export class EventProcessor {
     private retryBackoffMs: number;
     private requestTimeoutMs: number;
     private buffer: IEvent[] = [];
-    private dedupeKeys: Set<string> = new Set();
+    private dedupeKeys: Map<string, number> = new Map(); // buffered copies of each exposure
     private timer: ReturnType<typeof setInterval> | null = null;
     // The batch being sent, resolving to whether it was kept for the next flush.
     private sending: Promise<boolean> | null = null;
@@ -122,9 +122,8 @@ export class EventProcessor {
             return;
         }
         if (dedupe) {
-            const key = this.dedupeKey(entry);
-            if (this.dedupeKeys.has(key)) return;
-            this.dedupeKeys.add(key);
+            if (this.dedupeKeys.has(this.dedupeKey(entry))) return;
+            this.rememberExposure(entry);
         }
         this.buffer.push(entry);
         this.dropOverflow();
@@ -133,6 +132,18 @@ export class EventProcessor {
 
     private dedupeKey(entry: IEvent) {
         return JSON.stringify([entry.event, entry.feature_name, entry.identifier, entry.value, entry.metadata?.experiment_id ?? null]);
+    }
+
+    private rememberExposure(entry: IEvent) {
+        const key = this.dedupeKey(entry);
+        this.dedupeKeys.set(key, (this.dedupeKeys.get(key) ?? 0) + 1);
+    }
+
+    private forgetExposure(entry: IEvent) {
+        const key = this.dedupeKey(entry);
+        const copies = (this.dedupeKeys.get(key) ?? 0) - 1;
+        if (copies > 0) this.dedupeKeys.set(key, copies);
+        else this.dedupeKeys.delete(key);
     }
 
     private flushIfFull() {
@@ -213,7 +224,7 @@ export class EventProcessor {
         const overflow = this.buffer.length - this.maxBuffer;
         if (overflow > 0) {
             for (const evicted of this.buffer.splice(0, overflow)) {
-                if (evicted.event === FLAG_EXPOSURE_EVENT) this.dedupeKeys.delete(this.dedupeKey(evicted));
+                if (evicted.event === FLAG_EXPOSURE_EVENT) this.forgetExposure(evicted);
             }
             this.log(`Events: buffer full, dropped the ${overflow} oldest events`);
         }
@@ -253,6 +264,7 @@ export class EventProcessor {
                 return false;
             case 'transient':
                 if (!this.closed && !this.disabled) {
+                    events.filter((e) => e.event === FLAG_EXPOSURE_EVENT).forEach((e) => this.rememberExposure(e));
                     this.buffer = events.concat(this.buffer);
                     this.dropOverflow();
                     this.held = this.timer !== null; // without a timer, only the size trigger sends it again

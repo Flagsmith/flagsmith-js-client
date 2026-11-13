@@ -270,6 +270,26 @@ describe('close', () => {
         }
     });
 
+    test('stops sending evaluation analytics after the client was initialised again', async () => {
+        // Given
+        jest.useFakeTimers();
+        try {
+            const { flagsmith, initConfig, mockFetch } = getFlagsmith({ enableAnalytics: true });
+            await flagsmith.init(initConfig);
+            await flagsmith.init(initConfig);
+            flagsmith.hasFeature('font_size');
+
+            // When
+            await flagsmith.close(1000);
+            jest.advanceTimersByTime(60000);
+
+            // Then
+            expect(mockFetch.mock.calls.filter(([url]) => String(url).includes('analytics/flags'))).toHaveLength(0);
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
     test('resolves when events are not enabled', async () => {
         // Given
         const { flagsmith, initConfig, mockFetch } = getFlagsmith();
