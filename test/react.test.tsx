@@ -10,7 +10,7 @@ import {
     identityState,
     testIdentity,
 } from './test-constants'
-import removeIds from './test-utils/remove-ids'
+import toRenderedFlags from './test-utils/to-rendered-flags'
 
 const FlagsmithPage: FC<Record<string, never>> = () => {
     const flags = useFlags(Object.keys(defaultState.flags))
@@ -74,7 +74,7 @@ describe('FlagsmithProvider', () => {
                 error: null,
                 source: 'SERVER',
             })
-            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(defaultState.flags))
+            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(toRenderedFlags(defaultState.flags))
         })
     })
     it('fetches and renders flags for an identified user', async () => {
@@ -94,7 +94,7 @@ describe('FlagsmithProvider', () => {
                 error: null,
                 source: 'SERVER',
             })
-            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(identityState.flags))
+            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(toRenderedFlags(identityState.flags))
         })
     })
     it('renders cached flags', async () => {
@@ -124,7 +124,7 @@ describe('FlagsmithProvider', () => {
                 error: null,
                 source: 'CACHE',
             })
-            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(defaultState.flags))
+            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(toRenderedFlags(defaultState.flags))
         })
     })
 
@@ -159,7 +159,7 @@ describe('FlagsmithProvider', () => {
                 error: null,
                 source: 'CACHE',
             })
-            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(defaultState.flags))
+            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(toRenderedFlags(defaultState.flags))
         })
     })
 
@@ -183,7 +183,7 @@ describe('FlagsmithProvider', () => {
                 error: null,
                 source: 'DEFAULT_FLAGS',
             })
-            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(defaultState.flags))
+            expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(toRenderedFlags(defaultState.flags))
         })
     })
     it('reports a loaded state when hydrated from serverState with no options', async () => {
@@ -195,7 +195,7 @@ describe('FlagsmithProvider', () => {
         )
 
         // Flags are available from serverState immediately.
-        expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(removeIds(defaultState.flags))
+        expect(JSON.parse(screen.getByTestId('flags').innerHTML)).toEqual(toRenderedFlags(defaultState.flags))
 
         // Loading state must not be stuck on isLoading/isFetching=true.
         await waitFor(() => {
