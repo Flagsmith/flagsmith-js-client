@@ -113,9 +113,9 @@ export function useFlagsmithLoading() {
     return loadingState
 }
 
-type UseFlagsReturn<F extends string | Record<string, any>, T extends string> = F extends string
+type UseFlagsReturn<F extends string | Record<string, any>, T extends string> = [F] extends [string]
     ? {
-          [K in F]: IFlagsmithFeature
+          [K in Extract<F, string>]: IFlagsmithFeature
       } & {
           [K in T]: IFlagsmithTrait
       }
