@@ -59,7 +59,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "nodemon": "^3.1.7",
     "patch-package": "^8.0.0",
-    "quicktype": "^23.0.170",
+    "quicktype": "^26.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rollup": "^2.80.0",
