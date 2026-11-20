@@ -5,18 +5,18 @@
  */
 
 import { createFlagsmithInstance } from '@flagsmith/flagsmith/isomorphic';
-import type { IFlagsmith, IFlagsmithValue, IInitConfig, ITraits } from '@flagsmith/flagsmith/types';
+import type { IFlagsmith, IFlagsmithFeature, IFlagsmithValue, IInitConfig, ITraits } from '@flagsmith/flagsmith/types';
 
 // A client-side SDK holds one identity's flags: it loads them in init(), then reloads them
 // as the identity changes. The client remembers whether init() has run.
 type Client = { flagsmith: IFlagsmith; config: IInitConfig; initialised: boolean };
 
+function asSpecFlag(feature: string, flag: IFlagsmithFeature) {
+    return { feature, enabled: flag.enabled, value: flag.value, reason: flag.reason ?? null };
+}
+
 function asSpecFlags(flagsmith: IFlagsmith) {
-    return Object.entries(flagsmith.getAllFlags()).map(([feature, flag]) => ({
-        feature,
-        enabled: flag.enabled,
-        value: flag.value,
-    }));
+    return Object.entries(flagsmith.getAllFlags()).map(([feature, flag]) => asSpecFlag(feature, flag));
 }
 
 // Runs init() with `config` on the client's first load, and `reload` on every later one.
@@ -76,7 +76,7 @@ export function getIdentityFlags(client: Client, identifier: string, traits: ITr
 export async function getExperimentFlag(client: Client, feature: string, identifier: string, traits: ITraits) {
     await getIdentityFlags(client, identifier, traits);
     const flag = client.flagsmith.getExperimentFlag(feature);
-    return flag ? [{ feature, enabled: flag.enabled, value: flag.value }] : [];
+    return flag ? [asSpecFlag(feature, flag)] : [];
 }
 
 // When the application tracks event "{event}" for identity "{identifier}" with value {value} and metadata:
