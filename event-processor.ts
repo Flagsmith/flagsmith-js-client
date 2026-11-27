@@ -10,6 +10,24 @@ const DEFAULT_FLUSH_INTERVAL = 10000;
 const DEFAULT_RETRY_BACKOFF_MS = 1000;
 const DEFAULT_REQUEST_TIMEOUT_MS = 3000;
 const MAX_ATTEMPTS = 3;
+// Browsers cap the combined bodies of all in-flight keepalive requests at 64 KiB, so a page
+// hide sends one request that stays under it.
+const KEEPALIVE_BODY_LIMIT = 60000;
+
+// UTF-8 byte length of a string, which is what the keepalive limit counts.
+function utf8Length(s: string): number {
+    let bytes = 0;
+    for (let i = 0; i < s.length; i++) {
+        const code = s.charCodeAt(i);
+        if (code < 0x80) bytes += 1;
+        else if (code < 0x800) bytes += 2;
+        else if (code >= 0xd800 && code < 0xdc00 && i + 1 < s.length) {
+            bytes += 4; // surrogate pair
+            i++;
+        } else bytes += 3;
+    }
+    return bytes;
+}
 const TRANSIENT_STATUSES = [408, 429, 502, 503, 504];
 
 export interface IEvent {
@@ -31,6 +49,16 @@ export interface EventProcessorOptions {
     log?: (...args: any[]) => void;
     retryBackoffMs?: number;
     requestTimeoutMs?: number;
+    /**
+     * In browsers, send buffered events when the page is hidden or unloaded, using
+     * `keepalive` requests that outlive the page. Default `true`.
+     */
+    flushOnPageHide?: boolean;
+    /**
+     * Native fetch for page-hide sends. `keepalive` needs the browser's own fetch; a polyfill
+     * built on XMLHttpRequest (such as unfetch) ignores it. Defaults to `fetch`.
+     */
+    keepaliveFetch?: LikeFetch;
 }
 
 interface EventArgs {
@@ -71,10 +99,14 @@ export class EventProcessor {
     private timer: ReturnType<typeof setInterval> | null = null;
     // The batch being sent, resolving to whether it was kept for the next flush.
     private sending: Promise<boolean> | null = null;
+    private inFlight: IEvent[] | null = null; // the batch `sending` is delivering
     private held = false; // a kept batch waits for the next flush rather than a full buffer
     private disabled = false; // the events API refused the environment key
     private closed = false;
     private abortRequest: (() => void) | null = null;
+    private flushOnPageHide: boolean;
+    private keepaliveFetch: LikeFetch;
+    private removePageListeners: (() => void) | null = null;
 
     constructor(opts: EventProcessorOptions) {
         const url = ensureTrailingSlash(opts.eventsApiUrl || DEFAULT_EVENTS_API_URL);
@@ -86,6 +118,8 @@ export class EventProcessor {
         this.flushInterval = opts.flushInterval ?? DEFAULT_FLUSH_INTERVAL;
         this.retryBackoffMs = opts.retryBackoffMs ?? DEFAULT_RETRY_BACKOFF_MS;
         this.requestTimeoutMs = opts.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
+        this.flushOnPageHide = opts.flushOnPageHide ?? true;
+        this.keepaliveFetch = opts.keepaliveFetch ?? opts.fetch;
     }
 
     trackEvent(args: TrackEventArgs) {
@@ -165,8 +199,10 @@ export class EventProcessor {
         const events = this.buffer;
         this.buffer = [];
         this.dedupeKeys.clear();
+        this.inFlight = events;
         this.sending = this.send(events).then((kept) => {
             this.sending = null;
+            if (this.inFlight === events) this.inFlight = null;
             if (!kept) this.flushIfFull();
             return kept;
         });
@@ -179,6 +215,7 @@ export class EventProcessor {
      */
     close = async (timeoutMs: number): Promise<void> => {
         this.stopTimer();
+        this.stopPageListeners();
         let deadline: ReturnType<typeof setTimeout> | undefined;
         await Promise.race([
             this.drain(),
@@ -203,10 +240,12 @@ export class EventProcessor {
             this.timer = setInterval(this.flush, this.flushInterval);
             this.timer?.unref?.();
         }
+        this.startPageListeners();
     }
 
     stop() {
         this.stopTimer();
+        this.stopPageListeners();
         // Best-effort, fire-and-forget: this flush is not awaited, so on rapid
         // re-init buffered events may be lost. Callers needing a guarantee
         // (SSR/teardown) should await flushEvents() or close() instead.
@@ -218,6 +257,103 @@ export class EventProcessor {
             clearInterval(this.timer);
             this.timer = null;
         }
+    }
+
+    // A page that is hidden may never run again: mobile browsers discard background tabs, and
+    // closing a tab cancels ordinary requests. pagehide covers unloads that skip visibilitychange.
+    private startPageListeners() {
+        if (!this.flushOnPageHide || this.removePageListeners) return;
+        if (typeof window === 'undefined' || typeof document === 'undefined' || !window.addEventListener) return;
+        const onVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') this.flushOnHide();
+        };
+        window.addEventListener('pagehide', this.flushOnHide);
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        this.removePageListeners = () => {
+            window.removeEventListener('pagehide', this.flushOnHide);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+        };
+    }
+
+    private stopPageListeners() {
+        this.removePageListeners?.();
+        this.removePageListeners = null;
+    }
+
+    /**
+     * Sends buffered events at once with a keepalive request, which the browser completes after
+     * the page is gone. It must start synchronously, so a batch already in flight is not awaited:
+     * its ordinary request, which unloading would cancel, is abandoned and the batch is sent here
+     * instead. Events beyond the keepalive limit stay buffered, as do the events of a failed
+     * request, in case the page comes back from the back/forward cache.
+     */
+    private flushOnHide = () => {
+        if (this.disabled || this.closed) return;
+        let events = this.buffer;
+        if (this.inFlight) {
+            events = this.inFlight.concat(events);
+            this.inFlight = null; // the ordinary send stops without keeping or retrying it
+            this.abortRequest?.();
+        }
+        if (!events.length) return;
+        this.buffer = [];
+        this.dedupeKeys.clear();
+        const { batch, rest } = this.takeKeepaliveBatch(events);
+        if (rest.length) this.requeue(rest, `${rest.length} events over the keepalive limit stay buffered`);
+        if (!batch.length) return;
+        let request: Promise<Partial<Response>>;
+        try {
+            request = Promise.resolve(
+                this.keepaliveFetch(this.endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify({ events: batch }),
+                    headers: this.headers(),
+                    keepalive: true,
+                }),
+            );
+        } catch (err) {
+            request = Promise.reject(err);
+        }
+        request.then(
+            (res) => {
+                const status = res.status || 0;
+                if (status >= 200 && status < 300) return;
+                if (status === 401 || status === 403) return this.disable(batch.length);
+                if (TRANSIENT_STATUSES.includes(status) || status >= 500) {
+                    this.requeue(batch, `page-hide flush failed, kept ${batch.length} events`);
+                }
+            },
+            () => this.requeue(batch, `page-hide flush failed, kept ${batch.length} events`),
+        );
+    };
+
+    // The oldest events whose request body fits the keepalive limit, in UTF-8 bytes.
+    private takeKeepaliveBatch(events: IEvent[]): { batch: IEvent[]; rest: IEvent[] } {
+        let size = utf8Length('{"events":[]}');
+        let count = 0;
+        for (const event of events) {
+            const eventSize = utf8Length(JSON.stringify(event)) + (count ? 1 : 0);
+            if (size + eventSize > KEEPALIVE_BODY_LIMIT) break;
+            size += eventSize;
+            count++;
+        }
+        return { batch: events.slice(0, count), rest: events.slice(count) };
+    }
+
+    private requeue(events: IEvent[], message: string) {
+        if (this.closed || this.disabled) return;
+        events.filter((e) => e.event === FLAG_EXPOSURE_EVENT).forEach((e) => this.rememberExposure(e));
+        this.buffer = events.concat(this.buffer);
+        this.dropOverflow();
+        this.log(`Events: ${message}`);
+    }
+
+    private headers(): Record<string, string> {
+        return {
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Environment-Key': this.environmentKey,
+            ...(SDK_VERSION ? { 'Flagsmith-SDK-User-Agent': `flagsmith-js-sdk/${SDK_VERSION}` } : {}),
+        };
     }
 
     private dropOverflow() {
@@ -249,10 +385,12 @@ export class EventProcessor {
         let outcome: SendOutcome;
         for (let attempt = 1; ; attempt++) {
             outcome = await this.attempt(body);
+            if (this.inFlight !== events) return false; // handed to the page-hide send
             const retryable = outcome === 'transient' || outcome === 'server_error';
             if (!retryable || attempt >= MAX_ATTEMPTS || this.closed) break;
             // Full jitter: any wait up to the backoff, which doubles with every retry.
             await this.sleep(Math.random() * this.retryBackoffMs * 2 ** (attempt - 1));
+            if (this.inFlight !== events) return false;
             if (this.closed) break;
         }
         switch (outcome) {
@@ -292,11 +430,7 @@ export class EventProcessor {
                 this.fetch(this.endpoint, {
                     method: 'POST',
                     body,
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                        'X-Environment-Key': this.environmentKey,
-                        ...(SDK_VERSION ? { 'Flagsmith-SDK-User-Agent': `flagsmith-js-sdk/${SDK_VERSION}` } : {}),
-                    },
+                    headers: this.headers(),
                     ...(controller ? { signal: controller.signal } : {}),
                 }),
                 abandon,
@@ -322,6 +456,7 @@ export class EventProcessor {
         this.buffer = [];
         this.dedupeKeys.clear();
         this.stopTimer();
+        this.stopPageListeners();
     }
 
     private sleep(ms: number) {

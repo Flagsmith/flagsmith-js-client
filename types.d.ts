@@ -159,6 +159,11 @@ export interface IInitConfig<F extends string | Record<string, any> = string, T 
         eventsApiUrl?: string;
         maxBuffer?: number;
         flushInterval?: number;
+        /**
+         * In browsers, send buffered events when the page is hidden or unloaded, with `keepalive`
+         * requests that outlive the page. Default `true`.
+         */
+        flushOnPageHide?: boolean;
     };
 }
 
