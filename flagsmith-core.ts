@@ -476,6 +476,12 @@ const Flagsmith = class {
                     ...(eventProcessorConfig || {}),
                     environmentKey: this.evaluationContext.environment!.apiKey,
                     fetch: _fetch,
+                    // The browser build's default fetch is an XMLHttpRequest polyfill, which cannot
+                    // send keepalive requests. Use the native fetch unless the app supplied its own.
+                    keepaliveFetch:
+                        !fetchImplementation && typeof window !== 'undefined' && typeof window.fetch === 'function'
+                            ? (window.fetch.bind(window) as LikeFetch)
+                            : _fetch,
                     log: (...args: any[]) => this.log(...args),
                 });
                 this.eventProcessor.start();

@@ -550,3 +550,128 @@ describe('EventProcessor close', () => {
         expect(mockFetch).not.toHaveBeenCalled();
     });
 });
+
+describe('EventProcessor flush on page hide', () => {
+    const purchase = (i = 0) => ({ event: 'purchase', identifier: `u${i}`, value: 1, traits: null, metadata: null });
+    const setVisibility = (state: 'hidden' | 'visible') => {
+        Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+    };
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+    const started: EventProcessor[] = [];
+    const start = (overrides: any = {}) => {
+        const made = makeProcessor(overrides);
+        made.processor.start();
+        started.push(made.processor);
+        return made;
+    };
+
+    afterEach(async () => {
+        await Promise.all(started.splice(0).map((p) => p.close(0)));
+        Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+    });
+
+    test('sends the buffer with keepalive as soon as the page is hidden', () => {
+        const { processor, mockFetch } = start();
+        processor.trackEvent(purchase());
+        setVisibility('hidden');
+        // Started synchronously: the page may be gone before any await resumes.
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        const [url, init] = (mockFetch.mock.calls[0] as any[]);
+        expect(url).toBe('https://events.api.flagsmith.com/v1/events');
+        expect(init.keepalive).toBe(true);
+        expect(init.headers['X-Environment-Key']).toBe('env_key_1');
+        expect(JSON.parse(init.body).events[0].event).toBe('purchase');
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(0);
+    });
+
+    test('sends on pagehide too, for unloads without a visibility change', () => {
+        const { processor, mockFetch } = start();
+        processor.trackEvent(purchase());
+        window.dispatchEvent(new Event('pagehide'));
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect((mockFetch.mock.calls[0] as any[])[1].keepalive).toBe(true);
+    });
+
+    test('does nothing when the page becomes visible or the buffer is empty', () => {
+        const { processor, mockFetch } = start();
+        setVisibility('hidden');
+        processor.trackEvent(purchase());
+        setVisibility('visible');
+        expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    test('splits large buffers into bodies under the keepalive limit', () => {
+        const { processor, mockFetch } = start({ maxBuffer: 10000 });
+        const big = 'x'.repeat(1000);
+        for (let i = 0; i < 150; i++) {
+            processor.trackEvent({ ...purchase(i), metadata: { note: big } });
+        }
+        setVisibility('hidden');
+        expect(mockFetch.mock.calls.length).toBeGreaterThan(1);
+        let sent = 0;
+        for (const [, init] of mockFetch.mock.calls as any[]) {
+            expect(init.body.length).toBeLessThanOrEqual(64 * 1024);
+            sent += JSON.parse(init.body).events.length;
+        }
+        expect(sent).toBe(150);
+    });
+
+    test('keeps events whose keepalive request failed, in case the page comes back', async () => {
+        const mockFetch = jest.fn(async () => {
+            throw new TypeError('Failed to fetch');
+        });
+        const { processor } = start({ fetch: mockFetch });
+        processor.trackEvent(purchase());
+        setVisibility('hidden');
+        await settle();
+        await settle();
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(1);
+    });
+
+    test('stops tracking when the keepalive request is refused with 401', async () => {
+        const mockFetch = jest.fn(async () => ({ status: 401 }));
+        const { processor } = start({ fetch: mockFetch });
+        processor.trackEvent(purchase());
+        setVisibility('hidden');
+        await settle();
+        await settle();
+        processor.trackEvent(purchase(1));
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(0);
+    });
+
+    test('sends page-hide batches through keepaliveFetch when one is given', () => {
+        const keepaliveFetch = jest.fn(async () => ({ status: 202 }));
+        const { processor, mockFetch } = start({ keepaliveFetch });
+        processor.trackEvent(purchase());
+        setVisibility('hidden');
+        expect(keepaliveFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    test('can be turned off', () => {
+        const { processor, mockFetch } = start({ flushOnPageHide: false });
+        processor.trackEvent(purchase());
+        setVisibility('hidden');
+        window.dispatchEvent(new Event('pagehide'));
+        expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    test('registers its listeners once and removes them on close', async () => {
+        const { processor, mockFetch } = start();
+        processor.start();
+        processor.trackEvent(purchase());
+        setVisibility('hidden');
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+
+        await processor.close(0);
+        mockFetch.mockClear();
+        setVisibility('visible');
+        setVisibility('hidden');
+        window.dispatchEvent(new Event('pagehide'));
+        expect(mockFetch).not.toHaveBeenCalled();
+    });
+});
