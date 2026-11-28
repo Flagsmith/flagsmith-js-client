@@ -142,6 +142,31 @@ describe('EventProcessor flush', () => {
     });
 });
 
+describe('EventProcessor fetch', () => {
+    test('calls fetch without a receiver, like the browser requires', async () => {
+        // Given a fetch that throws when called as a method, like window.fetch
+        const receivers: unknown[] = [];
+        const strictFetch = jest.fn(function (this: unknown) {
+            receivers.push(this);
+            if (this !== undefined && this !== globalThis) {
+                return Promise.reject(new TypeError("Failed to execute 'fetch' on 'Window': Illegal invocation"));
+            }
+            return Promise.resolve({ status: 202, text: async () => '' });
+        });
+        const { processor } = makeProcessor({ fetch: strictFetch, retryBackoffMs: 0 });
+
+        // When an event is tracked and flushed
+        processor.trackEvent({ event: 'purchase', identifier: 'u1', value: 1, traits: null, metadata: null });
+        await processor.flush();
+
+        // Then it is delivered, not kept as a failed batch
+        expect(strictFetch).toHaveBeenCalledTimes(1);
+        expect(receivers[0]).toBeUndefined();
+        // @ts-ignore test access
+        expect(processor.buffer).toHaveLength(0);
+    });
+});
+
 describe('EventProcessor lifecycle and retry', () => {
     test('start arms a timer that flushes; stop clears it', () => {
         jest.useFakeTimers();

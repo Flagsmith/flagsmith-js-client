@@ -80,7 +80,11 @@ export class EventProcessor {
         const url = ensureTrailingSlash(opts.eventsApiUrl || DEFAULT_EVENTS_API_URL);
         this.endpoint = `${url}v1/events`;
         this.environmentKey = opts.environmentKey;
-        this.fetch = opts.fetch;
+        // Call fetch without a receiver. Browsers reject the native fetch when it
+        // is called as a method of another object ("Illegal invocation"), and the
+        // default fetch on React Native for Web is the browser's.
+        const fetchImpl = opts.fetch;
+        this.fetch = (input, init) => fetchImpl(input, init);
         this.log = opts.log || (() => {});
         this.maxBuffer = Math.max(1, opts.maxBuffer ?? DEFAULT_MAX_BUFFER);
         this.flushInterval = opts.flushInterval ?? DEFAULT_FLUSH_INTERVAL;
